@@ -1,0 +1,20 @@
+# test related
+coverage.html
+testing
+testapp
+
+# OSX
+.DS_Store
+
+# npm
+node_modules
+npm-debug.log
+
+# IDE
+.idea/
+*~
+*.swp
+
+# Things
+README.html
+*.tgz

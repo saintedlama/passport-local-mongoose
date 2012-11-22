@@ -1,0 +1,23 @@
+{
+  "name": "passport-local-mongoose",
+  "description": "Mongoose plugin that simplifies building username and password login with Passport",
+  "version": "0.1.0",
+  "main": "lib/passport-local-mongoose.js",
+  "repository": "",
+  "author": "Christoph Walcher <christoph.walcher@gmail.com>",
+  "license": "BSD",
+  "keywords": [
+    "mongoose",
+    "passport",
+    "authentication",
+    "login"
+  ],
+  "dependencies": {
+    "mongoose": "3.4.x",
+    "passport": "0.1.x",
+    "passport-local": "0.1.x"
+  },
+  "devDependencies": {
+    "mocha": "1.7.x"
+  }
+}
