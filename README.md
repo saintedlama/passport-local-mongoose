@@ -6,6 +6,9 @@ that simplifies building username and password login with [Passport](http://pass
 
     $ npm install passport-local-mongoose
 
+Passport-Local Mongoose does not require `passport`, `passport-local` or `mongoose` dependencies directly but expects you
+to have these dependencies installed.
+
 ## Usage
 
 ### Plugin Passport-Local Mongoose
