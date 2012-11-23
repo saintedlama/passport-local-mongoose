@@ -56,4 +56,4 @@ Make sure that you have mongoose connected and you're done.
 
 ### Examples
 For a complete example implementing a registration, login and logout see the 
-[login example]([login example](https://github.com/jaredhanson/passport-local/tree/master/examples/login).
+[login example]([login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
