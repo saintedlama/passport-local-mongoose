@@ -45,12 +45,15 @@ Passport-Local Mongoose supports this setup by implementing a `LocalStrategy` an
 
 To setup Passport-Local Mongoose use this code
 
-    var Account = require('./models/account');
+    // requires the model with Passport-Local Mongoose plugged in
+    var User = require('./models/user');
     
-    passport.use(new LocalStrategy(Account.authenticate()));
+    // use static authenticate method of model in LocalStrategy
+    passport.use(new LocalStrategy(User.authenticate()));
     
-    passport.serializeUser(Account.serializeUser());
-    passport.deserializeUser(Account.deserializeUser());
+    // use static serialize and deserialize of model for passport session support
+    passport.serializeUser(User.serializeUser());
+    passport.deserializeUser(User.deserializeUser());
 
 Make sure that you have mongoose connected and you're done.
 
