@@ -16,7 +16,7 @@ First you need to plugin Passport-Local Mongoose into your User schema
 
     var mongoose = require('mongoose'),
         Schema = mongoose.Schema,
-        passportLocalMongoose = require('../lib/passport-local-mongoose.js');
+        passportLocalMongoose = require('passport-local-mongoose');
     
     var User = new Schema({});
     
