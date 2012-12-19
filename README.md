@@ -57,6 +57,26 @@ To setup Passport-Local Mongoose use this code
 
 Make sure that you have mongoose connected and you're done.
 
+### Options
+When plugging in Passport-Local Mongoose plugin additional options can be provided to configure
+the hashing algorithm.
+
+    User.plugin(passportLocalMongoose, options);
+
+Option keys and defaults
+* saltlen: specifies the salt length in bytes. Default: 32
+* iterations: specifies the number of iterations used in pbkdf2 hashing algorithm. Default: 25000
+* keylen: specifies the length in byte of the generated key. Default: 512
+
+*Attention!* Changing these values for example in a production environment will prevent that existing users can authenticate!
+
+### Hash Algorithm
+Passport-Local Mongoose use the pbkdf2 algorithm of the node crypto library. 
+[Pbkdf2](http://en.wikipedia.org/wiki/PBKDF2) was choosen because platform independent 
+(in contrary to bcrypt). For every user a generated salt value is saved to make
+rainbow table attacks even harder.
+
+
 ### Examples
 For a complete example implementing a registration, login and logout see the 
 [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
