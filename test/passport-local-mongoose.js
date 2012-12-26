@@ -3,9 +3,9 @@ var mongoose = require('mongoose'),
     passportLocalMongoose = require('../lib/passport-local-mongoose'),
     assert = require('assert');
 
-var modelUser = function(schemaValues) {
+var modelUser = function(schemaValues, options) {
     var UserSchema = new Schema(schemaValues || {});
-    UserSchema.plugin(passportLocalMongoose);
+    UserSchema.plugin(passportLocalMongoose, options || {});
 
     return mongoose.model('User', UserSchema);
 }
@@ -61,6 +61,36 @@ describe('passportLocalMongoose', function() {
             var User = modelUser();
 
             assert.equal('function', typeof(User.authenticate));
+        });
+        
+        it('should allow overriding "username" field name', function() {
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, { usernameField : 'email' });
+
+            var User = mongoose.model('UsernameOverriddenUser', UserSchema);
+            var user = new User();
+            
+            assert.ok(user.schema.path('email'));
+        });
+
+        it('should allow overriding "salt" field name', function() {
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, { saltField : 'passwordSalt' });
+
+            var User = mongoose.model('SaltOverriddenUser', UserSchema);
+            var user = new User();
+
+            assert.ok(user.schema.path('passwordSalt'));
+        });
+
+        it('should allow overriding "hash" field name', function() {
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, { saltField : 'passwordHash' });
+
+            var User = mongoose.model('HashOverriddenUser', UserSchema);
+            var user = new User();
+
+            assert.ok(user.schema.path('passwordHash'));
         });
     });
 
@@ -145,8 +175,8 @@ describe('passportLocalMongoose', function() {
         
         beforeEach(function(done){
             User.remove({}, done);
-        })
-        
+        });
+
         it('should yield false with message option for authenticate', function(done) {
             this.timeout(5000); // Five seconds - mongo db access needed
 
@@ -247,5 +277,6 @@ describe('passportLocalMongoose', function() {
                 });
             });
         });
+
     });
 });
