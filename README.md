@@ -37,6 +37,8 @@ Additionally Passport-Local Mongoose adds these methods to your Schema.
 * authenticate() Generates a function that is used in Passport's LocalStrategy
 * serializeUser() Generates a function that is used by Passport to serialize users into the session
 * deserializeUser() Generates a function that is used by Passport to deserialize users into the session
+* register(user, password, cb) Convenience method to register a new user instance with a given password. Checks if username is unique. See [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
+* findByUsername() Convenience method to find a user instance by it's unique username.
 
 ### Configure Passport/Passport-Local
 You should configure Passport/Passport-Local as described in [the Passport Guide](http://passportjs.org/guide/configure/).
@@ -67,6 +69,10 @@ Option keys and defaults
 * saltlen: specifies the salt length in bytes. Default: 32
 * iterations: specifies the number of iterations used in pbkdf2 hashing algorithm. Default: 25000
 * keylen: specifies the length in byte of the generated key. Default: 512
+* usernameField: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different 
+field to hold the username for example "email".
+* saltField: specifies the field name that holds the salt value. Defaults to 'salt'.
+* hashField: specifies the field name that holds the password hash value. Defaults to 'hash'.
 
 *Attention!* Changing these values for example in a production environment will prevent that existing users can authenticate!
 
