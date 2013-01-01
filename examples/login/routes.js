@@ -12,27 +12,12 @@ module.exports = function (app) {
     });
 
     app.post('/register', function(req, res) {
-        var username = req.body.username;
-        
-        Account.findOne({username : username }, function(err, existingUser) {
-            if (err || existingUser) {
+        Account.register(new Account({ username : req.body.username }), req.body.password, function(err, account) {
+            if (err) {
                 return res.render('register', { account : account });
             }
 
-            var account = new Account({ username : req.body.username });
-            account.setPassword(req.body.password, function(err) {
-                if (err) {
-                    return res.render('register', { account : account });
-                }
-
-                account.save(function(err) {
-                    if (err) {
-                        return res.render('register', { account : account });
-                    }
-
-                    res.redirect('/');
-                });
-            });  
+            res.redirect('/');
         });
     });
 
@@ -48,4 +33,4 @@ module.exports = function (app) {
         req.logout();
         res.redirect('/');
     });
-}
+};
