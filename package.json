@@ -16,5 +16,8 @@
   "devDependencies": {
     "mongoose": "3.4.x",
     "mocha": "1.7.x"
+  },
+  "scripts": {
+      "test": "node node_modules/mocha/bin/mocha"
   }
 }
