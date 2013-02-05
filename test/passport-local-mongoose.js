@@ -1,8 +1,7 @@
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
     passportLocalMongoose = require('../lib/passport-local-mongoose'),
-    assert = require('assert'),
-    async = require('async');
+    assert = require('assert');
 
 var DefaultUserSchema = new Schema();
 DefaultUserSchema.plugin(passportLocalMongoose);
