@@ -406,7 +406,7 @@ describe('passportLocalMongoose', function() {
             User.remove({}, function() {
                 User.register({ username : 'hugo' }, 'password', function(err) {
                     assert.ifError(err);
-    
+
                     User.register({ username : 'hugo' }, 'password', function(err) {
                         assert.ok(err);
                         done(); 
