@@ -13,7 +13,7 @@
     "login"
   ],
   "dependencies": {
-      "passport": "~0.1.6"
+      "passport-local": "~0.1.6"
   },
   "devDependencies": {
     "mongoose": "3.4.x",
