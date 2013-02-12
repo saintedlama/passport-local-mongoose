@@ -12,7 +12,9 @@
     "authentication",
     "login"
   ],
-  "dependencies": {},
+  "dependencies": {
+      "passport": "~0.1.6"
+  },
   "devDependencies": {
     "mongoose": "3.4.x",
     "mocha": "1.7.x"
