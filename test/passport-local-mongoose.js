@@ -376,7 +376,7 @@ describe('passportLocalMongoose', function() {
             UserSchema.plugin(passportLocalMongoose, {});
             var User = mongoose.model('RegisterDefined', UserSchema);
 
-            assert.ok(User.findByUsername);
+            assert.ok(User.register);
         });
 
         it('should register user', function(done) {
@@ -410,6 +410,31 @@ describe('passportLocalMongoose', function() {
                     User.register({ username : 'hugo' }, 'password', function(err) {
                         assert.ok(err);
                         done(); 
+                    });
+                });
+            });
+        });
+        
+        it('it should add username existing user without username', function(done) {
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, {});
+            var User = mongoose.model('RegisterExistingUser', UserSchema);
+
+            User.remove({}, function() {
+                var existingUser = new User({});
+                existingUser.save(function(err, user) {
+                    assert.ifError(err);
+                    assert.ok(user);
+                    user.username ='hugo';
+                    User.register(user, 'password', function(err, user) {
+                        assert.ifError(err);
+                        assert.ok(user);
+
+                        User.findByUsername('hugo', function(err, user) {
+                            assert.ifError(err);
+                            assert.ok(user);
+                            done();
+                        });
                     });
                 });
             });
