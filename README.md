@@ -80,8 +80,13 @@ Option keys and defaults
 field to hold the username for example "email".
 * saltField: specifies the field name that holds the salt value. Defaults to 'salt'.
 * hashField: specifies the field name that holds the password hash value. Defaults to 'hash'.
+* incorrectPasswordError: specifies the error message returned when the password is incorrect. Defaults to 'Incorrect password'.
+* incorrectUsernameError: specifies the error message returned when the username is incorrect. Defaults to 'Incorrect username'.
+* missingUsernameError: specifies the error message returned when the username has not been set during registration. Defaults to 'Field %s is not set'.
+* missingPasswordError: specifies the error message returned when the password has not been set during registration. Defaults to 'Password argument not set!'.
+* userExistsError: specifies the error message returned when the user already exists during registration. Defaults to 'User already exists with name %s'.
 
-*Attention!* Changing these values for example in a production environment will prevent that existing users can authenticate!
+*Attention!* Changing any of the hashing options for example in a production environment will prevent that existing users can authenticate!
 
 ### Hash Algorithm
 Passport-Local Mongoose use the pbkdf2 algorithm of the node crypto library. 
