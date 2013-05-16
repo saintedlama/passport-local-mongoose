@@ -86,7 +86,7 @@ field to hold the username for example "email".
 * missingPasswordError: specifies the error message returned when the password has not been set during registration. Defaults to 'Password argument not set!'.
 * userExistsError: specifies the error message returned when the user already exists during registration. Defaults to 'User already exists with name %s'.
 
-*Attention!* Changing any of the hashing options for example in a production environment will prevent that existing users can authenticate!
+*Attention!* Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
 
 ### Hash Algorithm
 Passport-Local Mongoose use the pbkdf2 algorithm of the node crypto library. 
