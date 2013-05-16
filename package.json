@@ -16,8 +16,8 @@
       "passport-local": "~0.1.6"
   },
   "devDependencies": {
-    "mongoose": "3.4.x",
-    "mocha": "1.8.x"
+    "mongoose": "3.6.x",
+    "mocha": "1.9.x"
   },
   "scripts": {
       "test": "node node_modules/mocha/bin/mocha"
