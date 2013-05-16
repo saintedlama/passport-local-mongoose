@@ -415,6 +415,46 @@ describe('passportLocalMongoose', function () {
             });
         });
 
+        it('should authenticate registered user', function (done) {
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, { iterations : 1 }); // 1 iteration - safes time in tests
+            var User = mongoose.model('RegisterAndAuthenticateUser', UserSchema);
+
+            User.remove({}, function () {
+                User.register({ username : 'hugo' }, 'password', function (err) {
+                    assert.ifError(err);
+
+                    User.authenticate()('hugo', 'password', function(err, user, message) {
+                        assert.ifError(err);
+                        assert.ok(user);
+                        assert.ok(!message);
+                        
+                        done();
+                    });
+                });
+            });
+        });
+
+        it('should not authenticate registered user with wrong password', function (done) {
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, { iterations : 1 }); // 1 iteration - safes time in tests
+            var User = mongoose.model('RegisterAndNotAuthenticateUser', UserSchema);
+
+            User.remove({}, function () {
+                User.register({ username : 'hugo' }, 'password', function (err) {
+                    assert.ifError(err);
+
+                    User.authenticate()('hugo', 'wrong_password', function(err, user, message) {
+                        assert.ifError(err);
+                        assert.ok(!user);
+                        assert.ok(message);
+
+                        done();
+                    });
+                });
+            });
+        });
+        
         it('it should add username existing user without username', function (done) {
             var UserSchema = new Schema({});
             UserSchema.plugin(passportLocalMongoose, {});
