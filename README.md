@@ -100,7 +100,7 @@ For a complete example implementing a registration, login and logout see the
 
 ## API Documentation
 ### Instance methods
-* setPassword(password, cb) asynchronous method to set a user's password hash and salt
+* setPassword(password, cb) asynchronous method to set a user's password hash and salt.  Note that this does not persist the changes to MongoDB and you must do that manually.
 * authenticate(password, cb) asynchronous method to authenticate a user instance
 
 ### Static methods
