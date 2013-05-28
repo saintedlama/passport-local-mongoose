@@ -103,6 +103,9 @@ For a complete example implementing a registration, login and logout see the
 * setPassword(password, cb) asynchronous method to set a user's password hash and salt
 * authenticate(password, cb) asynchronous method to authenticate a user instance
 
+Using `setPassword()` will only update the document's password fields, but will not save the document.
+To commit the changed document, remember to use Mongoose's `document.save()` after using `setPassword()`.
+
 ### Static methods
 * authenticate() Generates a function that is used in Passport's LocalStrategy
 * serializeUser() Generates a function that is used by Passport to serialize users into the session
