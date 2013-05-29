@@ -17,16 +17,18 @@ var setPasswordAndAuthenticate = function (user, passwordToSet, passwordToAuthen
     });
 };
 
-before(function () {
-    mongoose.connect('mongodb://localhost/passportlocalmongoosetests');
-});
-
-beforeEach(function (done) {
-    this.timeout(5000); // Five seconds - give mongoose some time
-    DefaultUser.remove({}, done);
-});
-
 describe('passportLocalMongoose', function () {
+    beforeEach(function (done) {
+        this.timeout(5000); // Five seconds - give mongoose some time
+        mongoose.connect('mongodb://localhost/passportlocalmongoosetests', function(err) {
+            assert.ifError(err);
+            DefaultUser.remove({}, done);
+        });
+    });
+
+    afterEach(function(done) {
+        mongoose.disconnect(done);
+    });
 
     describe('#plugin()', function () {
         it('should add "username" field to model', function () {
