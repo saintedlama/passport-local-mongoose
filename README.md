@@ -85,6 +85,7 @@ field to hold the username for example "email".
 * missingUsernameError: specifies the error message returned when the username has not been set during registration. Defaults to 'Field %s is not set'.
 * missingPasswordError: specifies the error message returned when the password has not been set during registration. Defaults to 'Password argument not set!'.
 * userExistsError: specifies the error message returned when the user already exists during registration. Defaults to 'User already exists with name %s'.
+* selectFields: specifies the fields of the model to be selected from mongodb (and stored in the session). Defaults to 'undefined' so that all fields of the model are selected.
 
 *Attention!* Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
 

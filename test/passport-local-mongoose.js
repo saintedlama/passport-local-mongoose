@@ -350,6 +350,46 @@ describe('passportLocalMongoose', function () {
             });
         });
 
+        it('should select all fields', function (done) {
+            var UserSchema = new Schema({ department : { type : String, required : true} });
+            UserSchema.plugin(passportLocalMongoose, {});
+            var User = mongoose.model('FindByUsernameWithAllFields', UserSchema);
+
+            var user = new User({ username : 'hugo', department : 'DevOps' });
+            user.save(function (err) {
+                assert.ifError(err);
+
+                User.findByUsername('hugo', function (err, user) {
+                    assert.ifError(err);
+                    assert.ok(user);
+                    assert.equal(user.username, 'hugo');
+                    assert.equal(user.department, 'DevOps');
+
+                    done();
+                });
+            });
+        });
+
+        it('should select fields specified by selectFields option', function (done) {
+            var UserSchema = new Schema({ department : { type : String, required : true} });
+            UserSchema.plugin(passportLocalMongoose, { selectFields : 'username' });
+            var User = mongoose.model('FindByUsernameWithSelectFieldsOption', UserSchema);
+
+            var user = new User({ username : 'hugo', department : 'DevOps' });
+            user.save(function (err) {
+                assert.ifError(err);
+
+                User.findByUsername('hugo', function (err, user) {
+                    assert.ifError(err);
+                    assert.ok(user);
+                    assert.equal(user.username, 'hugo');
+                    assert.equal(user.department, undefined);
+
+                    done();
+                });
+            });
+        });
+
         it('should retrieve saved user with findByUsername helper function with username field override', function (done) {
             var UserSchema = new Schema({});
             UserSchema.plugin(passportLocalMongoose, { usernameField : 'email' });
