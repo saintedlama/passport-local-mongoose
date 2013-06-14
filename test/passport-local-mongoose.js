@@ -524,7 +524,7 @@ describe('passportLocalMongoose', function () {
 		
 		it('it should verify ad not activation field after password check', function (done) {
             var UserSchema = new Schema({});
-			var validateFunction = function validateOptionalField(user, cb) {
+			var validateFunction = function validateOptionalField(user) {
 				if (user.activated == true ) 
 					return true
 				else
