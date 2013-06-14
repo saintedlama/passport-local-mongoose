@@ -521,5 +521,39 @@ describe('passportLocalMongoose', function () {
                 });
             });
         });
+		
+		it('it should verify ad not activation field after password check', function (done) {
+            var UserSchema = new Schema({});
+			var validateFunction = function validateOptionalField(user, cb) {
+				if (user.activated == true ) 
+					return true
+				else
+					return false
+			}
+            UserSchema.plugin(passportLocalMongoose, {options.validateFunction: validateFunction, options.validateError: 'User not activated'});
+            var User = mongoose.model('RegisterExistingUser', UserSchema);
+
+            User.remove({}, function () {
+                var existingUser = new User({});
+                existingUser.save(function (err, user) {
+                    assert.ifError(err);
+                    assert.ok(user);
+                    user.username = 'hugo';
+					user.activated = false;
+                    User.register(user, 'password', function (err, user) {
+                        assert.ifError(err);
+                        assert.ok(user);
+
+                        User.authenticate()('hugo', 'password', function(err, user, message) {
+							assert.ifError(err);
+							assert.ok(!user);
+							assert.ok(message);
+
+							done();
+						});
+                    });
+                });
+            });
+        });
     });
 });
