@@ -198,6 +198,30 @@ describe('passportLocalMongoose', function () {
             });
         });
 
+        it('should authenticate existing user with case insensitive username with matching password', function (done) {
+            this.timeout(5000); // Five seconds - mongo db access needed
+
+            var UserSchema = new Schema();
+            UserSchema.plugin(passportLocalMongoose, { usernameLowerCase : true });
+            var User = mongoose.model('AuthenticateWithCaseInsensitiveUsername', UserSchema);
+
+            User.remove({}, function () {
+                var username = 'userName';
+                User.register({ username : username }, 'password', function (err, user) {
+                    assert.ifError(err);
+
+                    User.authenticate()('username', 'password', function (err, result) {
+                        assert.ifError(err);
+
+                        assert.ok(result instanceof User);
+                        assert.equal(result.username, 'username');
+
+                        done();
+                    });
+                });
+            });
+        });
+
         it('should authenticate existing user with matching password with field overrides', function (done) {
             this.timeout(50000); // Five seconds - mongo db access needed
 
