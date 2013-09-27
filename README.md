@@ -92,7 +92,7 @@ field to hold the username for example "email".
 
 ### Hash Algorithm
 Passport-Local Mongoose use the pbkdf2 algorithm of the node crypto library. 
-[Pbkdf2](http://en.wikipedia.org/wiki/PBKDF2) was choosen because platform independent 
+[Pbkdf2](http://en.wikipedia.org/wiki/PBKDF2) was chosen because platform independent
 (in contrary to bcrypt). For every user a generated salt value is saved to make
 rainbow table attacks even harder.
 
