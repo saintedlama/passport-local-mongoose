@@ -4,9 +4,6 @@ that simplifies building username and password login with [Passport](http://pass
 
 [![Build Status](https://travis-ci.org/saintedlama/passport-local-mongoose.png?branch=master)](https://travis-ci.org/saintedlama/passport-local-mongoose)
 
-## License
-Passport-Local Mongoose is licenses under the [MIT license](http://opensource.org/licenses/MIT).
-
 ## Installation
 
     $ npm install passport-local-mongoose
@@ -118,3 +115,6 @@ To commit the changed document, remember to use Mongoose's `document.save()` aft
 * register(user, password, cb) Convenience method to register a new user instance with a given password. Checks if username is unique. See [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
 * findByUsername() Convenience method to find a user instance by it's unique username.
 * createStrategy() Creates a configured passport-local `LocalStrategy` instance that can be used in passport.
+
+## License
+Passport-Local Mongoose is licenses under the [MIT license](http://opensource.org/licenses/MIT).
