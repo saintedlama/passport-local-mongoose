@@ -4,6 +4,9 @@ that simplifies building username and password login with [Passport](http://pass
 
 [![Build Status](https://travis-ci.org/saintedlama/passport-local-mongoose.png?branch=master)](https://travis-ci.org/saintedlama/passport-local-mongoose)
 
+## License
+Passport-Local Mongoose is licenses under the [MIT license](http://opensource.org/licenses/MIT).
+
 ## Installation
 
     $ npm install passport-local-mongoose
