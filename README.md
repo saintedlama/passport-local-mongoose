@@ -57,7 +57,7 @@ The `createStrategy` is responsible to setup passport-local `LocalStrategy` with
     var User = require('./models/user');
     
     // CHANGE: USE "createStrategy" INSTEAD OF "authenticate"
-    passport.use(User.createStrategy()));
+    passport.use(User.createStrategy());
     
     passport.serializeUser(User.serializeUser());
     passport.deserializeUser(User.deserializeUser());
