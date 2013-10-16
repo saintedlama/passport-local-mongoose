@@ -8,24 +8,22 @@ var path = require('path'),
 var app = express();
 
 // Configuration
-app.configure(function(){
-    app.set('views', __dirname + '/views');
-    app.set('view engine', 'jade');
-    app.set('view options', { layout: false });
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
+app.set('view options', { layout: false });
 
-    app.use(express.logger());
-    app.use(express.bodyParser());
-    app.use(express.methodOverride());
+app.use(express.logger());
+app.use(express.bodyParser());
+app.use(express.methodOverride());
 
-    app.use(express.cookieParser('your secret here'));
-    app.use(express.session());
+app.use(express.cookieParser('your secret here'));
+app.use(express.session());
 
-    app.use(passport.initialize());
-    app.use(passport.session());
+app.use(passport.initialize());
+app.use(passport.session());
 
-    app.use(app.router);
-    app.use(express.static(path.join(__dirname, 'public')));
-});
+app.use(app.router);
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.configure('development', function(){
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
