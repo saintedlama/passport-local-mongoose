@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
-    passportLocalMongoose = require('../../../lib/passport-local-mongoose.js');
+    passportLocalMongoose = require('passport-local-mongoose');
 
 var Account = new Schema({
     nickname: String,

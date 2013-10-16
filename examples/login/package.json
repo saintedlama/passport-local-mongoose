@@ -8,6 +8,7 @@
     "jade" : "> 0.0.1",
     "mongoose": "3.4.x",
     "passport": "0.1.x",
-    "passport-local": "0.1.x"
+    "passport-local": "0.1.x",
+    "passport-local-mongoose": "*"
   }
 }
