@@ -434,6 +434,17 @@ describe('passportLocalMongoose', function () {
                 });
             });
         });
+
+        it('should not throw if lowercase option is specified and no username is supplied', function (done) {
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, { usernameLowerCase : true });
+            var User = mongoose.model('FindByUsernameWithUndefinedUsername', UserSchema);
+
+            User.findByUsername(undefined, function(err) {
+                assert.ifError(err);
+                done();
+            });
+        });
     });
 
     describe('static #register()', function () {
