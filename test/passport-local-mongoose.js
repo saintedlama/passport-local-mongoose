@@ -19,7 +19,7 @@ var setPasswordAndAuthenticate = function (user, passwordToSet, passwordToAuthen
 
 describe('passportLocalMongoose', function () {
     beforeEach(function (done) {
-        this.timeout(5000); // Five seconds - give mongoose some time
+        this.timeout(5000); // TODO: This timeout is somehow ignored
         mongoose.connect('mongodb://localhost/passportlocalmongoosetests', function(err) {
             assert.ifError(err);
             DefaultUser.remove({}, done);
@@ -446,6 +446,8 @@ describe('passportLocalMongoose', function () {
         });
 
         it('should register user', function (done) {
+            this.timeout(5000); // Five seconds - mongo db access needed
+
             var UserSchema = new Schema({});
             UserSchema.plugin(passportLocalMongoose, {});
             var User = mongoose.model('RegisterUser', UserSchema);
@@ -465,6 +467,8 @@ describe('passportLocalMongoose', function () {
         });
 
         it('should check for duplicate user name', function (done) {
+            this.timeout(5000); // Five seconds - mongo db access needed
+
             var UserSchema = new Schema({});
             UserSchema.plugin(passportLocalMongoose, {});
             var User = mongoose.model('RegisterDuplicateUser', UserSchema);
@@ -482,6 +486,8 @@ describe('passportLocalMongoose', function () {
         });
 
         it('should authenticate registered user', function (done) {
+            this.timeout(5000); // Five seconds - mongo db access needed
+
             var UserSchema = new Schema({});
             UserSchema.plugin(passportLocalMongoose, { iterations : 1 }); // 1 iteration - safes time in tests
             var User = mongoose.model('RegisterAndAuthenticateUser', UserSchema);
@@ -502,6 +508,8 @@ describe('passportLocalMongoose', function () {
         });
 
         it('should not authenticate registered user with wrong password', function (done) {
+            this.timeout(5000); // Five seconds - mongo db access needed
+
             var UserSchema = new Schema({});
             UserSchema.plugin(passportLocalMongoose, { iterations : 1 }); // 1 iteration - safes time in tests
             var User = mongoose.model('RegisterAndNotAuthenticateUser', UserSchema);
@@ -522,6 +530,8 @@ describe('passportLocalMongoose', function () {
         });
         
         it('it should add username existing user without username', function (done) {
+            this.timeout(5000); // Five seconds - mongo db access needed
+
             var UserSchema = new Schema({});
             UserSchema.plugin(passportLocalMongoose, {});
             var User = mongoose.model('RegisterExistingUser', UserSchema);
