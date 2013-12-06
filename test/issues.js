@@ -40,5 +40,5 @@ describe('issues', function () {
                 });
             });
         });
-    })
+    });
 });
