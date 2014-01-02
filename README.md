@@ -83,6 +83,7 @@ field to hold the username for example "email".
 * hashField: specifies the field name that holds the password hash value. Defaults to 'hash'.
 * selectFields: specifies the fields of the model to be selected from mongodb (and stored in the session). Defaults to 'undefined' so that all fields of the model are selected.
 * usernameLowerCase: convert username field value to lower case when saving an querying. Defaults to 'false'.
+* populateFields: specifies fields to populate in findByUsername function. Defaults to 'undefined'.
 
 __Error Message Options__
 

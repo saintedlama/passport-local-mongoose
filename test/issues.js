@@ -101,4 +101,47 @@ describe('issues', function () {
             });
         });
     });
+
+    it('should populate fields in findByUsername if option is given - Issue #20', function(done) {
+        var LoginSchema = new Schema({ date : Date, success : Boolean });
+        var UserSchema = new Schema({ logins : [{ type: Schema.Types.ObjectId, ref: 'Login' }]});
+
+        UserSchema.plugin(passportLocalMongoose, { populateFields : 'logins'});
+        var User = mongoose.model('ShouldPopulateFields_Issue_20', UserSchema);
+        var Login = mongoose.model('Login', LoginSchema);
+
+        User.remove({}, function(err) {
+            assert.ifError(err);
+
+            Login.remove({}, function(err) {
+                assert.ifError(err);
+                var loginDate = new Date();
+                var loginSuccess = true;
+
+                Login.create({ date : loginDate, success : loginSuccess}, function(err, login) {
+                    assert.ifError(err);
+                    assert.ok(login);
+
+                    var logins = [];
+                    logins.push(login._id);
+
+                    User.register(new User({username: 'hugo', logins : logins}), 'password', function(err, user) {
+                        assert.ifError(err);
+                        assert.ok(user);
+
+                        User.findByUsername('hugo', function(err, loadedUser) {
+                            assert.ifError(err);
+                            assert.ok(loadedUser);
+                            assert.equal(loadedUser.logins.length, 1);
+
+                            assert.equal(loadedUser.logins[0].date.getTime(), loginDate.getTime());
+                            assert.equal(loadedUser.logins[0].success, loginSuccess);
+
+                            done();
+                        });
+                    });
+                });
+            });
+        });
+    });
 });
