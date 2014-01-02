@@ -374,6 +374,29 @@ describe('passportLocalMongoose', function () {
             });
         });
 
+        it('should return a query object when no callback is specified', function (done) {
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, {});
+            var User = mongoose.model('FindByUsernameQueryObject', UserSchema);
+
+            var user = new User({ username : 'hugo' });
+            user.save(function (err) {
+                assert.ifError(err);
+
+                var query = User.findByUsername('hugo')
+
+                assert.ok(query);
+
+                query.exec(function (err, user) {
+                    assert.ifError(err);
+                    assert.ok(user);
+                    assert.equal(user.username, 'hugo');
+
+                    done();
+                });
+            });
+        });
+
         it('should select all fields', function (done) {
             var UserSchema = new Schema({ department : { type : String, required : true} });
             UserSchema.plugin(passportLocalMongoose, {});
