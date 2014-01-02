@@ -1,7 +1,8 @@
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-    passportLocalMongoose = require('../lib/passport-local-mongoose'),
-    assert = require('assert');
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var passportLocalMongoose = require('../lib/passport-local-mongoose');
+var assert = require('assert');
+var mongotest = require('./mongotest');
 
 var DefaultUserSchema = new Schema();
 DefaultUserSchema.plugin(passportLocalMongoose);
@@ -18,18 +19,6 @@ var setPasswordAndAuthenticate = function (user, passwordToSet, passwordToAuthen
 };
 
 describe('passportLocalMongoose', function () {
-    beforeEach(function (done) {
-        this.timeout(5000); // TODO: This timeout is somehow ignored
-        mongoose.connect('mongodb://localhost/passportlocalmongoosetests', function(err) {
-            assert.ifError(err);
-            DefaultUser.remove({}, done);
-        });
-    });
-
-    afterEach(function(done) {
-        mongoose.disconnect(done);
-    });
-
     describe('#plugin()', function () {
         it('should add "username" field to model', function () {
             var user = new DefaultUser({ username : 'username' });
@@ -162,6 +151,9 @@ describe('passportLocalMongoose', function () {
     });
 
     describe('static #authenticate()', function () {
+        beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
+        afterEach(mongotest.disconnect());
+
         it('should yield false with message option for authenticate', function (done) {
             this.timeout(5000); // Five seconds - mongo db access needed
 
@@ -205,19 +197,17 @@ describe('passportLocalMongoose', function () {
             UserSchema.plugin(passportLocalMongoose, { usernameLowerCase : true });
             var User = mongoose.model('AuthenticateWithCaseInsensitiveUsername', UserSchema);
 
-            User.remove({}, function () {
-                var username = 'userName';
-                User.register({ username : username }, 'password', function (err, user) {
+            var username = 'userName';
+            User.register({ username : username }, 'password', function (err, user) {
+                assert.ifError(err);
+
+                User.authenticate()('username', 'password', function (err, result) {
                     assert.ifError(err);
 
-                    User.authenticate()('username', 'password', function (err, result) {
-                        assert.ifError(err);
+                    assert.ok(result instanceof User);
+                    assert.equal(result.username, 'username');
 
-                        assert.ok(result instanceof User);
-                        assert.equal(result.username, 'username');
-
-                        done();
-                    });
+                    done();
                 });
             });
         });
@@ -229,21 +219,19 @@ describe('passportLocalMongoose', function () {
             UserSchema.plugin(passportLocalMongoose, { usernameField : 'email', hashField : 'hashValue', saltField : 'saltValue' });
             var User = mongoose.model('AuthenticateWithFieldOverrides', UserSchema);
 
-            User.remove({}, function () {
-                var email = 'emailUsedAsUsername';
-                User.register({ email : email }, 'password', function (err, user) {
+            var email = 'emailUsedAsUsername';
+            User.register({ email : email }, 'password', function (err, user) {
+                assert.ifError(err);
+
+                User.authenticate()(email, 'password', function (err, result) {
                     assert.ifError(err);
 
-                    User.authenticate()(email, 'password', function (err, result) {
-                        assert.ifError(err);
+                    assert.ok(result instanceof User);
+                    assert.equal(user.email, result.email);
+                    assert.equal(user.saltValue, result.saltValue);
+                    assert.equal(user.hashValue, result.hashValue);
 
-                        assert.ok(result instanceof User);
-                        assert.equal(user.email, result.email);
-                        assert.equal(user.saltValue, result.saltValue);
-                        assert.equal(user.hashValue, result.hashValue);
-
-                        done();
-                    });
+                    done();
                 });
             });
         });
@@ -302,6 +290,9 @@ describe('passportLocalMongoose', function () {
     });
 
     describe('static #deserializeUser()', function () {
+        beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
+        afterEach(mongotest.disconnect());
+
         it('should define a static deserializeUser function for passport', function () {
             assert.ok(DefaultUser.deserializeUser);
         });
@@ -309,16 +300,14 @@ describe('passportLocalMongoose', function () {
         it('should deserialize users by retrieving users from mongodb', function (done) {
             this.timeout(5000); // Five seconds - mongo db access needed
 
-            DefaultUser.remove({}, function () {
-                DefaultUser.register({username : 'user'}, 'password', function (err, user) {
+            DefaultUser.register({username : 'user'}, 'password', function (err, user) {
+                assert.ifError(err);
+
+                DefaultUser.deserializeUser()('user', function (err, loadedUser) {
                     assert.ifError(err);
+                    assert.equal(user.username, loadedUser.username);
 
-                    DefaultUser.deserializeUser()('user', function (err, loadedUser) {
-                        assert.ifError(err);
-                        assert.equal(user.username, loadedUser.username);
-
-                        done();
-                    });
+                    done();
                 });
             });
         });
@@ -330,23 +319,24 @@ describe('passportLocalMongoose', function () {
             UserSchema.plugin(passportLocalMongoose, { usernameField : 'email' });
             var User = mongoose.model('DeserializeUserWithOverride', UserSchema);
 
-            User.remove({}, function () {
-                var email = 'emailUsedForUsername';
-                User.register({ email : email }, 'password', function (err) {
+            var email = 'emailUsedForUsername';
+            User.register({ email : email }, 'password', function (err) {
+                assert.ifError(err);
+
+                User.deserializeUser()(email, function (err, loadedUser) {
                     assert.ifError(err);
+                    assert.equal(email, loadedUser.email);
 
-                    User.deserializeUser()(email, function (err, loadedUser) {
-                        assert.ifError(err);
-                        assert.equal(email, loadedUser.email);
-
-                        done();
-                    });
+                    done();
                 });
             });
         });
     });
 
     describe('static #findByUsername()', function () {
+        beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
+        afterEach(mongotest.disconnect());
+
         it('should define static findByUsername helper function', function () {
             var UserSchema = new Schema({});
             UserSchema.plugin(passportLocalMongoose, {});
@@ -471,6 +461,9 @@ describe('passportLocalMongoose', function () {
     });
 
     describe('static #register()', function () {
+        beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
+        afterEach(mongotest.disconnect());
+
         it('should define static register helper function', function () {
             var UserSchema = new Schema({});
             UserSchema.plugin(passportLocalMongoose, {});
@@ -486,16 +479,14 @@ describe('passportLocalMongoose', function () {
             UserSchema.plugin(passportLocalMongoose, {});
             var User = mongoose.model('RegisterUser', UserSchema);
 
-            User.remove({}, function () {
-                User.register({ username : 'hugo' }, 'password', function (err, user) {
+            User.register({ username : 'hugo' }, 'password', function (err, user) {
+                assert.ifError(err);
+                assert.ok(user);
+
+                User.findByUsername('hugo', function (err, user) {
                     assert.ifError(err);
                     assert.ok(user);
-
-                    User.findByUsername('hugo', function (err, user) {
-                        assert.ifError(err);
-                        assert.ok(user);
-                        done();
-                    });
+                    done();
                 });
             });
         });
@@ -507,14 +498,12 @@ describe('passportLocalMongoose', function () {
             UserSchema.plugin(passportLocalMongoose, {});
             var User = mongoose.model('RegisterDuplicateUser', UserSchema);
 
-            User.remove({}, function () {
-                User.register({ username : 'hugo' }, 'password', function (err) {
-                    assert.ifError(err);
+            User.register({ username : 'hugo' }, 'password', function (err) {
+                assert.ifError(err);
 
-                    User.register({ username : 'hugo' }, 'password', function (err) {
-                        assert.ok(err);
-                        done();
-                    });
+                User.register({ username : 'hugo' }, 'password', function (err) {
+                    assert.ok(err);
+                    done();
                 });
             });
         });
@@ -526,17 +515,15 @@ describe('passportLocalMongoose', function () {
             UserSchema.plugin(passportLocalMongoose, { iterations : 1 }); // 1 iteration - safes time in tests
             var User = mongoose.model('RegisterAndAuthenticateUser', UserSchema);
 
-            User.remove({}, function () {
-                User.register({ username : 'hugo' }, 'password', function (err) {
-                    assert.ifError(err);
+            User.register({ username : 'hugo' }, 'password', function (err) {
+                assert.ifError(err);
 
-                    User.authenticate()('hugo', 'password', function(err, user, message) {
-                        assert.ifError(err);
-                        assert.ok(user);
-                        assert.ok(!message);
-                        
-                        done();
-                    });
+                User.authenticate()('hugo', 'password', function(err, user, message) {
+                    assert.ifError(err);
+                    assert.ok(user);
+                    assert.ok(!message);
+
+                    done();
                 });
             });
         });
@@ -548,17 +535,15 @@ describe('passportLocalMongoose', function () {
             UserSchema.plugin(passportLocalMongoose, { iterations : 1 }); // 1 iteration - safes time in tests
             var User = mongoose.model('RegisterAndNotAuthenticateUser', UserSchema);
 
-            User.remove({}, function () {
-                User.register({ username : 'hugo' }, 'password', function (err) {
+            User.register({ username : 'hugo' }, 'password', function (err) {
+                assert.ifError(err);
+
+                User.authenticate()('hugo', 'wrong_password', function(err, user, message) {
                     assert.ifError(err);
+                    assert.ok(!user);
+                    assert.ok(message);
 
-                    User.authenticate()('hugo', 'wrong_password', function(err, user, message) {
-                        assert.ifError(err);
-                        assert.ok(!user);
-                        assert.ok(message);
-
-                        done();
-                    });
+                    done();
                 });
             });
         });
@@ -570,21 +555,19 @@ describe('passportLocalMongoose', function () {
             UserSchema.plugin(passportLocalMongoose, {});
             var User = mongoose.model('RegisterExistingUser', UserSchema);
 
-            User.remove({}, function () {
-                var existingUser = new User({});
-                existingUser.save(function (err, user) {
+            var existingUser = new User({});
+            existingUser.save(function (err, user) {
+                assert.ifError(err);
+                assert.ok(user);
+                user.username = 'hugo';
+                User.register(user, 'password', function (err, user) {
                     assert.ifError(err);
                     assert.ok(user);
-                    user.username = 'hugo';
-                    User.register(user, 'password', function (err, user) {
+
+                    User.findByUsername('hugo', function (err, user) {
                         assert.ifError(err);
                         assert.ok(user);
-
-                        User.findByUsername('hugo', function (err, user) {
-                            assert.ifError(err);
-                            assert.ok(user);
-                            done();
-                        });
+                        done();
                     });
                 });
             });
