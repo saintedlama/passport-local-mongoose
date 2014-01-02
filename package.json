@@ -5,7 +5,7 @@
   "main": "lib/passport-local-mongoose.js",
   "repository": "git://github.com/saintedlama/passport-local-mongoose.git",
   "author": "Christoph Walcher <christoph.walcher@gmail.com>",
-  "license": "BSD",
+  "license": "MIT",
   "keywords": [
     "mongoose",
     "passport",
