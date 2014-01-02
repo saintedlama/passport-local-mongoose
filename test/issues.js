@@ -63,7 +63,7 @@ describe('issues', function () {
                     assert.equal(false, auth);
                     assert.ok(reason);
 
-                    assert.equal('User cannot be logged in. No salt value stored in mongodb', reason.message);
+                    assert.equal('Authentication not possible. No salt value stored in mongodb collection!', reason.message);
 
                     done();
                 });
@@ -94,7 +94,7 @@ describe('issues', function () {
                     assert.equal(false, auth);
                     assert.ok(reason);
 
-                    assert.equal('User cannot be logged in. No salt value stored in mongodb', reason.message);
+                    assert.equal('Authentication not possible. No salt value stored in mongodb collection!', reason.message);
 
                     done();
                 });
