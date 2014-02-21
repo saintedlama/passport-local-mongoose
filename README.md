@@ -116,6 +116,11 @@ Using `setPassword()` will only update the document's password fields, but will 
 To commit the changed document, remember to use Mongoose's `document.save()` after using `setPassword()`.
 
 ### Static methods
+Static methods are exposed on the model constructor. For example to use createStrategy function use
+
+    var User = require('./models/user');
+    User.createStrategy();
+
 * authenticate() Generates a function that is used in Passport's LocalStrategy
 * serializeUser() Generates a function that is used by Passport to serialize users into the session
 * deserializeUser() Generates a function that is used by Passport to deserialize users into the session
