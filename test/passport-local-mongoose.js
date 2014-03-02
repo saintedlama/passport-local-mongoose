@@ -573,4 +573,15 @@ describe('passportLocalMongoose', function () {
             });
         });
     });
+
+    describe('static #createStrategy()', function () {
+        it('should create strategy', function () {
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, { usernameField : 'email' });
+            var User = mongoose.model('CreateStrategy', UserSchema);
+
+            var strategy = User.createStrategy();
+            assert.ok(strategy);
+        });
+    });
 });
