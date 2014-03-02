@@ -20,6 +20,6 @@
     "mocha": "1.10.x"
   },
   "scripts": {
-      "test": "node node_modules/mocha/bin/mocha"
+    "test": "mocha -R spec test/"
   }
 }
