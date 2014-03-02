@@ -20,6 +20,7 @@
     "mocha": "1.10.x"
   },
   "scripts": {
-    "test": "mocha -R spec test/"
+    "test": "mocha -R spec test/",
+    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec"
   }
 }
