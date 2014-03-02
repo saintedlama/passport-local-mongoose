@@ -13,11 +13,12 @@
     "login"
   ],
   "dependencies": {
-      "passport-local": "~0.1.6"
+    "passport-local": "~0.1.6"
   },
   "devDependencies": {
     "mongoose": "3.6.x",
-    "mocha": "1.10.x"
+    "mocha": "1.10.x",
+    "chai": "1.9.x"
   },
   "scripts": {
     "test": "mocha -R spec test/",
