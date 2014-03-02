@@ -1,7 +1,9 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var BadRequestError = require('passport-local').BadRequestError;
 var passportLocalMongoose = require('../lib/passport-local-mongoose');
 var assert = require('assert');
+var expect = require('chai').expect;
 var mongotest = require('./mongotest');
 
 var DefaultUserSchema = new Schema();
@@ -570,6 +572,32 @@ describe('passportLocalMongoose', function () {
                         done();
                     });
                 });
+            });
+        });
+
+        it('should result in BadRequest error in case no username was given', function (done) {
+            this.timeout(5000); // Five seconds - mongo db access needed
+
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, {});
+            var User = mongoose.model('RegisterUserWithoutUsername', UserSchema);
+
+            User.register({  }, 'password', function (err) {
+                expect(err).to.be.instanceof(BadRequestError);
+                done();
+            });
+        });
+
+        it('should result in BadRequest error in case no password was given', function (done) {
+            this.timeout(5000); // Five seconds - mongo db access needed
+
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, {});
+            var User = mongoose.model('RegisterUserWithoutPassword', UserSchema);
+
+            User.register({ username : 'hugo' }, undefined, function (err) {
+                expect(err).to.be.instanceof(BadRequestError);
+                done();
             });
         });
     });
