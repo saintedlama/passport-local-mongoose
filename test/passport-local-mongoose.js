@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var BadRequestError = require('passport-local').BadRequestError;
+var BadRequestError = require('../lib/badrequesterror');
 var passportLocalMongoose = require('../lib/passport-local-mongoose');
 var assert = require('assert');
 var expect = require('chai').expect;
