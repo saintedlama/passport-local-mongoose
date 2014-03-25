@@ -12,6 +12,10 @@ that simplifies building username and password login with [Passport](http://pass
 Passport-Local Mongoose does not require `passport`, `passport-local` or `mongoose` dependencies directly but expects you
 to have these dependencies installed.
 
+In case you need to install the whole set of dependencies
+
+    $ npm install passport passport-local mongoose passport-local-mongoose --save
+
 ## Usage
 
 ### Plugin Passport-Local Mongoose
@@ -49,7 +53,7 @@ To setup Passport-Local Mongoose use this code
     passport.serializeUser(User.serializeUser());
     passport.deserializeUser(User.deserializeUser());
 
-Make sure that you have mongoose connected and you're done.
+Make sure that you have a mongoose connected to mongodb and you're done.
 
 #### Simplified Passport/Passport-Local Configuration
 Starting with version 0.2.1 passport-local-mongoose adds a helper method `createStrategy` as static method to your schema.
