@@ -258,6 +258,59 @@ describe('passportLocalMongoose', function () {
                 });
             });
         });
+
+        it('should allow changing of saltlen, keylen, and iterations via passed in options', function (done) {
+            this.timeout(5000); // Five seconds - mongo db access needed
+
+            var user = new DefaultUser({username : 'user'});
+            user.setPassword('password', {
+                saltlen: 64,
+                iterations: 5000,
+                keylen: 256
+            }, function (err) {
+                assert.ifError(err);
+
+                user.save(function (err) {
+                    assert.ifError(err);
+
+                    user.authenticate('password', {
+                        saltlen: 64,
+                        iterations: 5000,
+                        keylen: 256
+                    }, function (err, result, options) {
+                        assert.ifError(err);
+                        assert.ok(result);
+
+                        done();
+                    });
+                });
+            });
+        });
+
+        it('should use default saltlen, iterations, keylen, encoding, if no options passed in', function (done) {
+            this.timeout(5000); // Five seconds - mongo db access needed
+
+            var user = new DefaultUser({username : 'user'});
+            user.setPassword('password', {
+                saltlen: 64,
+                iterations: 5000,
+                keylen: 256
+            }, function (err) {
+                assert.ifError(err);
+
+                user.save(function (err) {
+                    assert.ifError(err);
+
+                    user.authenticate('password', function (err, result, options) {
+                        assert.ifError(err);
+                        assert.equal(result, false);
+                        assert.ok(options.message);
+
+                        done();
+                    });
+                });
+            });
+        });
     });
 
 
@@ -375,7 +428,7 @@ describe('passportLocalMongoose', function () {
             user.save(function (err) {
                 assert.ifError(err);
 
-                var query = User.findByUsername('hugo')
+                var query = User.findByUsername('hugo');
 
                 assert.ok(query);
 
@@ -549,7 +602,7 @@ describe('passportLocalMongoose', function () {
                 });
             });
         });
-        
+
         it('it should add username existing user without username', function (done) {
             this.timeout(5000); // Five seconds - mongo db access needed
 
