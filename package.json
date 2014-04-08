@@ -18,7 +18,12 @@
   "devDependencies": {
     "mongoose": "3.8.x",
     "mocha": "1.17.x",
-    "chai": "1.9.x"
+    "chai": "1.9.x",
+    "gulp": "~3.6.0",
+    "gulp-load-tasks": "~0.1.1",
+    "gulp-docco": "0.0.3",
+    "gulp-clean": "~0.2.4",
+    "gulp-mocha": "~0.4.1"
   },
   "scripts": {
     "test": "mocha -R spec test/",
