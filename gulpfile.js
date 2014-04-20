@@ -12,12 +12,18 @@ gulp.task('doc', function() {
         .pipe(gulp.dest('docs'));
 });
 
+gulp.task('package', function() {
+    return gulp.src('')
+        .pipe(p.exec('npm pack'));
+});
+
 gulp.task('test', function() {
     return gulp.src(path.tests)
         .pipe(p.mocha({ reporter : 'spec' }));
 });
 
 gulp.task('build', ['doc', 'test'], function() {
+    gulp.start('package');
 });
 
 gulp.task('clean', function() {
@@ -28,3 +34,4 @@ gulp.task('clean', function() {
 gulp.task('default', ['clean'], function() {
     gulp.start('build');
 });
+

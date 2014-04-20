@@ -23,7 +23,8 @@
     "gulp-load-tasks": "~0.1.1",
     "gulp-docco": "0.0.3",
     "gulp-clean": "~0.2.4",
-    "gulp-mocha": "~0.4.1"
+    "gulp-mocha": "~0.4.1",
+    "gulp-exec": "~1.0.4"
   },
   "scripts": {
     "test": "mocha -R spec test/",
