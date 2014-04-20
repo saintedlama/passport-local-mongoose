@@ -19,12 +19,12 @@
     "mongoose": "3.8.x",
     "mocha": "1.17.x",
     "chai": "1.9.x",
-    "gulp": "~3.6.0",
-    "gulp-docco": "~0.0.3",
-    "gulp-clean": "~0.2.4",
-    "gulp-mocha": "~0.4.1",
-    "gulp-exec": "~1.0.4",
-    "gulp-load-plugins": "~0.5.0"
+    "gulp": "3.x.x",
+    "gulp-docco": "0.0.x",
+    "gulp-clean": "0.2.x",
+    "gulp-mocha": "0.4.x",
+    "gulp-exec": "1.0.x",
+    "gulp-load-plugins": "0.5.x"
   },
   "scripts": {
     "test": "mocha -R spec test/",
