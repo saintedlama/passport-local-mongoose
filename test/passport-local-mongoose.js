@@ -215,7 +215,7 @@ describe('passportLocalMongoose', function () {
         });
 
         it('should authenticate existing user with matching password with field overrides', function (done) {
-            this.timeout(50000); // Five seconds - mongo db access needed
+            this.timeout(5000); // Five seconds - mongo db access needed
 
             var UserSchema = new Schema();
             UserSchema.plugin(passportLocalMongoose, { usernameField : 'email', hashField : 'hashValue', saltField : 'saltValue' });
