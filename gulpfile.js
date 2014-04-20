@@ -1,5 +1,5 @@
 var gulp = require('gulp');
-var p = require('gulp-load-tasks')();
+var p = require('gulp-load-plugins')();
 
 var path = {
     source : 'lib/*.js',
