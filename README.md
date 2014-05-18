@@ -5,6 +5,11 @@ that simplifies building username and password login with [Passport](http://pass
 [![Build Status](https://travis-ci.org/saintedlama/passport-local-mongoose.png?branch=master)](https://travis-ci.org/saintedlama/passport-local-mongoose)
 [![Coverage Status](https://coveralls.io/repos/saintedlama/passport-local-mongoose/badge.png?branch=master)](https://coveralls.io/r/saintedlama/passport-local-mongoose?branch=master)
 
+## Tutorials
+Michael Hermann gives a comprehensible walk through for setting up mongoose,
+passport, passport-local and passport-local-mongoose for user authentication in his blog post [User Authentication With Passport.js](http://mherman.org/blog/2013/11/11/user-authentication-with-passport-dot-js/)
+
+
 ## Installation
 
     $ npm install passport-local-mongoose
