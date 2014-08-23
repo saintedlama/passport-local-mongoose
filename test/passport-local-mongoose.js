@@ -99,7 +99,7 @@ describe('passportLocalMongoose', function () {
             var UserSchema = new Schema({});
             UserSchema.plugin(passportLocalMongoose, { limitAttempts : true, attemptsField: 'failures' });
 
-            var User = mongoose.model('LimitOverriddenUser', UserSchema);
+            var User = mongoose.model('AttemptsOverriddenUser', UserSchema);
             var user = new User();
 
             assert.ok(user.schema.path('failures'));
