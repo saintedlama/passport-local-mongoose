@@ -94,6 +94,16 @@ describe('passportLocalMongoose', function () {
 
             assert.ok(user.schema.path('attempts'));
         });
+
+        it('should allow overriding "attempts" field name', function () {
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, { limitAttempts : true, attemptsField: 'failures' });
+
+            var User = mongoose.model('LimitOverriddenUser', UserSchema);
+            var user = new User();
+
+            assert.ok(user.schema.path('failures'));
+        });
     });
 
     describe('#setPassword()', function () {
