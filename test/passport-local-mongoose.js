@@ -84,6 +84,16 @@ describe('passportLocalMongoose', function () {
 
             assert.ok(user.schema.path('passwordHash'));
         });
+
+        it('should allow overriding "limitAttempts" option', function () {
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, { limitAttempts : true });
+
+            var User = mongoose.model('LimitOverriddenUser', UserSchema);
+            var user = new User();
+
+            assert.ok(user.schema.path('attempts'));
+        });
     });
 
     describe('#setPassword()', function () {
