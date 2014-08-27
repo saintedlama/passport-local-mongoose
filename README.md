@@ -87,14 +87,18 @@ __Main Options__
 * saltlen: specifies the salt length in bytes. Default: 32
 * iterations: specifies the number of iterations used in pbkdf2 hashing algorithm. Default: 25000
 * keylen: specifies the length in byte of the generated key. Default: 512
+* interval: specifies the interval in milliseconds between login attempts. Default: 100
 * usernameField: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different 
 field to hold the username for example "email".
 * saltField: specifies the field name that holds the salt value. Defaults to 'salt'.
 * hashField: specifies the field name that holds the password hash value. Defaults to 'hash'.
+* attemptsField: specifies the field name that holds the number of login failures since the last sucessful login. Defaults to 'attempts'.
+* lastLoginField: specifies the field name that holds the timestamp of the last login attempt. Defaults to 'last'.
 * selectFields: specifies the fields of the model to be selected from mongodb (and stored in the session). Defaults to 'undefined' so that all fields of the model are selected.
 * usernameLowerCase: convert username field value to lower case when saving an querying. Defaults to 'false'.
 * populateFields: specifies fields to populate in findByUsername function. Defaults to 'undefined'.
 * encoding: specifies the encoding the generated salt and hash will be stored in. Defaults to 'hex'.
+* limitAttempts: specifies whether login attempts should be limited and login failures should be penalized. Default: false.
 
 __Error Message Options__
 
