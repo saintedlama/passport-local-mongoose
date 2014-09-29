@@ -16,12 +16,12 @@
     "node": ">= 0.9"
   },
   "dependencies": {
-    "passport-local": "1.0.x"
+    "passport-local": "^1.0.0"
   },
   "devDependencies": {
-    "mongoose": "3.8.x",
-    "mocha": "1.17.x",
-    "chai": "1.9.x",
+    "mongoose": "^3.8.0",
+    "mocha": "^1.17.0",
+    "chai": "^1.9.0",
     "gulp": "*",
     "gulp-docco": "*",
     "gulp-clean": "*",
