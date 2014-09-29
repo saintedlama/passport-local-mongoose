@@ -19,15 +19,15 @@
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
-    "mongoose": "^3.8.0",
-    "mocha": "^1.17.0",
-    "chai": "^1.9.0",
-    "gulp": "*",
-    "gulp-docco": "*",
-    "gulp-clean": "*",
-    "gulp-mocha": "*",
-    "gulp-exec": "*",
-    "gulp-load-plugins": "*"
+    "chai": "^1.9.1",
+    "gulp": "^3.8.8",
+    "gulp-clean": "^0.3.1",
+    "gulp-docco": "0.0.4",
+    "gulp-exec": "^2.1.0",
+    "gulp-load-plugins": "^0.6.0",
+    "gulp-mocha": "^1.1.0",
+    "mocha": "^1.21.4",
+    "mongoose": "^3.8.16"
   },
   "scripts": {
     "test": "mocha -R spec test/",
