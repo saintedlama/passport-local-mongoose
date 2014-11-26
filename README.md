@@ -90,6 +90,7 @@ __Main Options__
 * interval: specifies the interval in milliseconds between login attempts. Default: 100
 * usernameField: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different 
 field to hold the username for example "email".
+* usernameUnique : specifies if the username field should be enforced to be unique by a mongodb index or not. Defaults to true.
 * saltField: specifies the field name that holds the salt value. Defaults to 'salt'.
 * hashField: specifies the field name that holds the password hash value. Defaults to 'hash'.
 * attemptsField: specifies the field name that holds the number of login failures since the last successful login. Defaults to 'attempts'.
