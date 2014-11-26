@@ -19,7 +19,7 @@
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
-    "chai": "^1.9.1",
+    "chai": "^1.10.0",
     "gulp": "^3.8.8",
     "gulp-clean": "^0.3.1",
     "gulp-docco": "0.0.4",
@@ -31,6 +31,6 @@
   },
   "scripts": {
     "test": "mocha -R spec test/",
-    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec"
+    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report html -- -R spec"
   }
 }
