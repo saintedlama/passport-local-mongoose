@@ -104,6 +104,29 @@ describe('passportLocalMongoose', function () {
 
             assert.ok(user.schema.path('failures'));
         });
+
+        it('should preserve "username" field if already defined in the schema', function () {
+            var usernameField = { type : String, required : true, unique : false };
+
+            var UserSchema = new Schema({ username : usernameField });
+            UserSchema.plugin(passportLocalMongoose);
+
+            expect(UserSchema.path('username').options).to.deep.equal(usernameField);
+        });
+
+        it('should add "username" field to as unique model per default', function () {
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose);
+
+            assert.strictEqual(true, UserSchema.path('username').options.unique);
+        });
+
+        it('should add "username" field to as non unique if specified by option', function () {
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, { usernameUnique : false });
+
+            assert.strictEqual(false, UserSchema.path('username').options.unique);
+        });
     });
 
     describe('#setPassword()', function () {
@@ -274,6 +297,47 @@ describe('passportLocalMongoose', function () {
                         assert.ok(options.message);
 
                         done();
+                    });
+                });
+            });
+        });
+
+        it('should lock authenticate after too many login attempts', function (done) {
+            this.timeout(5000); // Five seconds - mongo db access needed
+
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, { limitAttempts : true, interval : 2000 }); // One second to be on the save side to trigger this test case!
+
+            var User = mongoose.model('LockUserAfterLimitAttempts', UserSchema);
+
+            var user = new User({username : 'user'});
+            user.setPassword('password', function (err) {
+                assert.ifError(err);
+
+                user.save(function (err) {
+                    assert.ifError(err);
+
+                    User.authenticate()('user', 'WRONGpassword', function (err, result, message) {
+                        expect(err).to.not.exist;
+                        expect(result).to.be.false;
+
+                        User.authenticate()('user', 'WRONGpassword', function (err, result, message) {
+                            expect(err).to.not.exist;
+                            expect(result).to.be.false;
+
+                            User.authenticate()('user', 'WRONGpassword', function (err, result, message) {
+                                expect(err).to.not.exist;
+                                expect(result).to.be.false;
+
+                                // Last login attempt should lock the user!
+                                User.authenticate()('user', 'password', function (err, result, message) {
+                                    expect(err).to.not.exist;
+                                    expect(result).to.be.false;
+                                    
+                                    done();
+                                });
+                            });
+                        });
                     });
                 });
             });
