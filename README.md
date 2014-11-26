@@ -92,7 +92,7 @@ __Main Options__
 field to hold the username for example "email".
 * saltField: specifies the field name that holds the salt value. Defaults to 'salt'.
 * hashField: specifies the field name that holds the password hash value. Defaults to 'hash'.
-* attemptsField: specifies the field name that holds the number of login failures since the last sucessful login. Defaults to 'attempts'.
+* attemptsField: specifies the field name that holds the number of login failures since the last successful login. Defaults to 'attempts'.
 * lastLoginField: specifies the field name that holds the timestamp of the last login attempt. Defaults to 'last'.
 * selectFields: specifies the fields of the model to be selected from mongodb (and stored in the session). Defaults to 'undefined' so that all fields of the model are selected.
 * usernameLowerCase: convert username field value to lower case when saving an querying. Defaults to 'false'.
