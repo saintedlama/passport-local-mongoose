@@ -128,4 +128,25 @@ describe('issues', function () {
                     });
                 });
     });
+
+    /* Since password is not directly stored with mongo/mongoose, password cannot be easily validated */
+    it('should support password validation - Issue #57', function(done) {
+        this.timeout(5000); // Five seconds - mongo db access needed
+
+        var UserSchema = new Schema({});
+
+        var nastyPasswordValidator = function(password, cb) {
+            cb("My nasty error");
+        };
+
+        UserSchema.plugin(passportLocalMongoose, {
+            passwordValidator: nastyPasswordValidator
+        });
+        var User = mongoose.model('ShouldSupportPasswordValidation_Issue_57', UserSchema);
+
+        User.register({username: "nicolascage"}, 'password', function (err, user) {
+            assert.equal(err, "My nasty error");
+            done();
+        });
+    });
 });
