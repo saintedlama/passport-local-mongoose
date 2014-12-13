@@ -100,6 +100,7 @@ field to hold the username for example "email".
 * populateFields: specifies fields to populate in findByUsername function. Defaults to 'undefined'.
 * encoding: specifies the encoding the generated salt and hash will be stored in. Defaults to 'hex'.
 * limitAttempts: specifies whether login attempts should be limited and login failures should be penalized. Default: false.
+* passwordValidator: specifies your custom validation function for the password in the form 'function(password,cb)'. Default: validates non-empty passwords.
 
 __Error Message Options__
 
