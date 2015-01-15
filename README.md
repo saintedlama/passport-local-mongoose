@@ -124,8 +124,20 @@ For a complete example implementing a registration, login and logout see the
 
 ## API Documentation
 ### Instance methods
-* setPassword(password, cb) asynchronous method to set a user's password hash and salt
-* authenticate(password, cb) asynchronous method to authenticate a user instance
+
+#### setPassword(password, cb) 
+asynchronous method to set a user's password hash and salt
+
+#### authenticate(password, cb)
+asynchronous method to authenticate a user instance
+
+**callback arguments**
+- err
+  - null unless the hasing algorithm throws an error
+- thisModel
+  - the model getting authenticated *if* authentication was successful otherwise false
+- passwordErr
+  - the reason the password failed, else undefined ex. `{message: "Incorrect password"}
 
 Using `setPassword()` will only update the document's password fields, but will not save the document.
 To commit the changed document, remember to use Mongoose's `document.save()` after using `setPassword()`.
