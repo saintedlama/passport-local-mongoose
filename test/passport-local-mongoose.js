@@ -302,11 +302,11 @@ describe('passportLocalMongoose', function () {
             });
         });
 
-        it.only('should lock authenticate after too many login attempts', function (done) {
+        it('should lock authenticate after too many login attempts', function (done) {
             this.timeout(5000); // Five seconds - mongo db access needed
 
             var UserSchema = new Schema({});
-            UserSchema.plugin(passportLocalMongoose, { limitAttempts : true, interval : 10000 }); // High initial value for test
+            UserSchema.plugin(passportLocalMongoose, { limitAttempts : true, interval : 20000 }); // High initial value for test
 
             var User = mongoose.model('LockUserAfterLimitAttempts', UserSchema);
 
