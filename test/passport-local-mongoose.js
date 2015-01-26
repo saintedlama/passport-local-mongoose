@@ -306,7 +306,7 @@ describe('passportLocalMongoose', function () {
             this.timeout(5000); // Five seconds - mongo db access needed
 
             var UserSchema = new Schema({});
-            UserSchema.plugin(passportLocalMongoose, { limitAttempts : true, interval : 2000 }); // One second to be on the save side to trigger this test case!
+            UserSchema.plugin(passportLocalMongoose, { limitAttempts : true, interval : 20000 }); // High initial value for test
 
             var User = mongoose.model('LockUserAfterLimitAttempts', UserSchema);
 
@@ -331,6 +331,7 @@ describe('passportLocalMongoose', function () {
 
                                 // Last login attempt should lock the user!
                                 User.authenticate()('user', 'password', function (err, result, message) {
+                                  debugger;
                                     expect(err).to.not.exist;
                                     expect(result).to.be.false;
                                     
