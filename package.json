@@ -16,7 +16,8 @@
     "node": ">= 0.9"
   },
   "dependencies": {
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "scmp": "^1.0.0"
   },
   "devDependencies": {
     "chai": "^1.10.0",
