@@ -100,6 +100,7 @@ field to hold the username for example "email".
 * populateFields: specifies fields to populate in findByUsername function. Defaults to 'undefined'.
 * encoding: specifies the encoding the generated salt and hash will be stored in. Defaults to 'hex'.
 * limitAttempts: specifies whether login attempts should be limited and login failures should be penalized. Default: false.
+* maxAttempts: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
 
 __Error Message Options__
 
@@ -109,6 +110,7 @@ __Error Message Options__
 * missingPasswordError: specifies the error message returned when the password has not been set during registration. Defaults to 'Password argument not set!'.
 * userExistsError: specifies the error message returned when the user already exists during registration. Defaults to 'User already exists with name %s'.
 * noSaltValueStored: specifies the error message returned in case no salt value is stored in the mongodb collection. Defaults to 'Authentication not possible. No salt value stored in mongodb collection!'
+* tooManyAttemptsError: specifies the error message returned when the user's account is locked due to too many failed login attempts. Defaults to 'Account locked due to too many failed login attempts'.
 
 *Attention!* Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
 
@@ -130,6 +132,9 @@ asynchronous method to set a user's password hash and salt
 
 #### authenticate(password, cb)
 asynchronous method to authenticate a user instance
+
+### resetAttempts(cb)
+asynchronous method to reset a user's number of failed password attempts (only defined if `options.limitAttempts` is true)
 
 **callback arguments**
 - err
