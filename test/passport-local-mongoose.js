@@ -343,6 +343,61 @@ describe('passportLocalMongoose', function () {
                 });
             });
         });
+
+        it('should completely lock account after too many failed attempts', function (done) {
+            this.timeout(5000); // Five seconds - mongo db access needed
+
+            var UserSchema = new Schema({});
+            UserSchema.plugin(passportLocalMongoose, {
+              limitAttempts : true,
+              maxInterval : 1, // Don't require more than a millisecond of waiting
+              maxAttempts : 3
+            });
+
+            var User = mongoose.model('LockUserPermanentlyAfterLimitAttempts', UserSchema);
+
+            var user = new User({username : 'user'});
+            user.setPassword('password', function (err) {
+              assert.ifError(err);
+
+              user.save(function (err) {
+                assert.ifError(err);
+
+                User.authenticate()('user', 'WRONGpassword', function (err, result, message) {
+                  expect(err).to.not.exist;
+                  expect(result).to.be.false;
+
+                  User.authenticate()('user', 'WRONGpassword', function (err, result, message) {
+                    expect(err).to.not.exist;
+                    expect(result).to.be.false;
+
+                    User.authenticate()('user', 'WRONGpassword', function (err, result, message) {
+                      expect(err).to.not.exist;
+                      expect(result).to.be.false;
+
+                      // Last login attempt should lock the user!
+                      User.authenticate()('user', 'password', function (err, result, message) {
+                        expect(err).to.not.exist;
+                        expect(result).to.be.false;
+
+                        user.resetAttempts(function(err) {
+                          assert.ifError(err);
+
+                          // User should be unlocked
+                          User.authenticate()('user', 'password', function(err, result, message) {
+                            expect(err).to.not.exist;
+                            expect(result).to.exist;
+
+                            done();
+                          });
+                        });
+                      });
+                    });
+                  });
+                });
+              });
+            });
+        });
     });
 
 
