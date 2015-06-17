@@ -28,7 +28,7 @@
     "gulp-load-plugins": "^0.6.0",
     "gulp-mocha": "^1.1.0",
     "mocha": "^1.21.4",
-    "mongoose": "^3.8.16"
+    "mongoose": "3.8.x"
   },
   "scripts": {
     "test": "mocha -R spec test/",
