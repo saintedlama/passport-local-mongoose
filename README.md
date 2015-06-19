@@ -87,6 +87,7 @@ __Main Options__
 * saltlen: specifies the salt length in bytes. Default: 32
 * iterations: specifies the number of iterations used in pbkdf2 hashing algorithm. Default: 25000
 * keylen: specifies the length in byte of the generated key. Default: 512
+* algorithm: specifies the hashing algorithm. Default: sha256. (get a list of supported algorithms with crypto.getHashes())
 * interval: specifies the interval in milliseconds between login attempts. Default: 100
 * usernameField: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different 
 field to hold the username for example "email".
