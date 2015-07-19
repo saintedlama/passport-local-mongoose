@@ -363,22 +363,26 @@ describe('passportLocalMongoose', function () {
               user.save(function (err) {
                 assert.ifError(err);
 
-                User.authenticate()('user', 'WRONGpassword', function (err, result, message) {
+                User.authenticate()('user', 'WRONGpassword', function (err, result, data) {
                   expect(err).to.not.exist;
                   expect(result).to.be.false;
+                  expect(data.message).to.not.contain('locked');
 
-                  User.authenticate()('user', 'WRONGpassword', function (err, result, message) {
+                  User.authenticate()('user', 'WRONGpassword', function (err, result, data) {
                     expect(err).to.not.exist;
                     expect(result).to.be.false;
+                    expect(data.message).to.not.contain('locked');
 
-                    User.authenticate()('user', 'WRONGpassword', function (err, result, message) {
+                    User.authenticate()('user', 'WRONGpassword', function (err, result, data) {
                       expect(err).to.not.exist;
                       expect(result).to.be.false;
+                      expect(data.message).to.contain('locked');
 
                       // Last login attempt should lock the user!
-                      User.authenticate()('user', 'password', function (err, result, message) {
+                      User.authenticate()('user', 'password', function (err, result, data) {
                         expect(err).to.not.exist;
                         expect(result).to.be.false;
+                        expect(data.message).to.contain('locked');
 
                         user.resetAttempts(function(err) {
                           assert.ifError(err);
