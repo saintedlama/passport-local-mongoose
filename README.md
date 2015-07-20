@@ -103,6 +103,7 @@ field to hold the username for example "email".
 * limitAttempts: specifies whether login attempts should be limited and login failures should be penalized. Default: false.
 * maxAttempts: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
 * passwordValidator: specifies your custom validation function for the password in the form 'function(password,cb)'. Default: validates non-empty passwords.
+* usernameQueryFields: specifies alternative fields of the model for identifying a user (e.g. email).
 
 __Error Message Options__
 

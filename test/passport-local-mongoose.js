@@ -673,7 +673,7 @@ describe('passportLocalMongoose', function () {
                 });
             });
         });
-
+        
         it('should not authenticate registered user with wrong password', function (done) {
             this.timeout(5000); // Five seconds - mongo db access needed
 
