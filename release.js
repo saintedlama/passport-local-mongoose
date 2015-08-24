@@ -14,8 +14,8 @@ if (versionIncrement != 'major' && versionIncrement != 'minor' && versionIncreme
 
 exec('npm version ' + versionIncrement);
 
-var package = require('./package.json');
-exec('git tag v' + package.version);
+//var package = require('./package.json');
+//exec('git tag v' + package.version);
 
 exec('npm test') // && git push && git push --tags && npm publish
 
