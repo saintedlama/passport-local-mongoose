@@ -28,6 +28,6 @@
   "scripts": {
     "test": "mocha -R spec test/",
     "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report html -- -R spec",
-    "release" "node release.js" 
+    "release": "node release.js" 
   }
 }
