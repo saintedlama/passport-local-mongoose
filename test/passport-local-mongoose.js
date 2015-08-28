@@ -173,13 +173,12 @@ describe('passportLocalMongoose', function () {
 
             var user = new DefaultUser();
 
+            setPasswordAndAuthenticate(user, 'password', 'nopassword', function (err, result) {
+                assert.ifError(err);
+                assert.ok(result === false);
 
-				setPasswordAndAuthenticate(user, 'password', 'nopassword', function (err, result) {
-					assert.ifError(err);
-					assert.ok(result === false);
-
-					done();
-				});
+                done();
+            });
         });
 
         it('should supply a message when authentication fails', function (done) {

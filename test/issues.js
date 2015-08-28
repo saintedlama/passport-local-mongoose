@@ -81,7 +81,7 @@ describe('issues', function () {
 
                 authenticate('hugo', 'password', function(err, result) {
                     assert.ifError(err);
-					assert.ok(result instanceof User);
+                    assert.ok(result instanceof User);
 
                     done();
                 });
@@ -169,41 +169,41 @@ describe('issues', function () {
         });
     });
 
-	describe('authentication should work with salt/hash field marked as select: false - Issue #96', function() {
-		this.timeout(5000); // Five seconds - mongo db access needed
-		var UserSchema = new Schema({});
-		UserSchema.plugin(passportLocalMongoose, { });
-		var userName = 'user_' + Math.random();
-		var User = mongoose.model('ShouldAuthenticateWithSaltAndHashNotExposed_Issue_96', UserSchema);
-		beforeEach(function(done) {
-			User.register({username: userName}, 'password', function (err, user) {
-				assert.ifError(err);
-				assert.ok(user);
-				done();
-			});
-		});
+    describe('authentication should work with salt/hash field marked as select: false - Issue #96', function() {
+        this.timeout(5000); // Five seconds - mongo db access needed
+        var UserSchema = new Schema({});
+        UserSchema.plugin(passportLocalMongoose, { });
+        var userName = 'user_' + Math.random();
+        var User = mongoose.model('ShouldAuthenticateWithSaltAndHashNotExposed_Issue_96', UserSchema);
+        beforeEach(function(done) {
+            User.register({username: userName}, 'password', function (err, user) {
+                assert.ifError(err);
+                assert.ok(user);
+                done();
+            });
+        });
 
-		it('instance.authenticate( password, callback )', function(done) {
-			User.findOne({username: userName}, function(err, user) {
-				assert.ifError(err);
-				assert.ok(user);
-				assert.equal(user.username, userName);
-				user.authenticate('password', function(err, auth, reason) {
-					assert.ifError(err);
+        it('instance.authenticate( password, callback )', function(done) {
+            User.findOne({username: userName}, function(err, user) {
+                assert.ifError(err);
+                assert.ok(user);
+                assert.equal(user.username, userName);
+                user.authenticate('password', function(err, auth, reason) {
+                    assert.ifError(err);
 
-					assert.ok(auth);
-					done();
-				});
-			});
-		});
+                    assert.ok(auth);
+                    done();
+                });
+            });
+        });
 
-		it('Model.autheticate(username, password, callback)', function(done) {
-			User.authenticate()( userName, 'password', function(err, auth, reason){
-				assert.ifError(err);
-				assert.ok(auth);
+        it('Model.autheticate(username, password, callback)', function(done) {
+            User.authenticate()( userName, 'password', function(err, auth, reason){
+                assert.ifError(err);
+                assert.ok(auth);
 
-				done();
-			});
-		});
+                done();
+            });
+        });
     });
 });

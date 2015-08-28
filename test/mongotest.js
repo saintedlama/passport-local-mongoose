@@ -20,10 +20,10 @@ function dropCollections(collections, index, cb) {
 
 module.exports = {
     prepareDb : function(connectionString, options) {
-		// support use of non localhost MongoDB using env variable MONGO_SERVER
-		if (process.env.MONGO_SERVER) {
-			connectionString = connectionString.replace('mongodb://localhost', 'mongodb://' + process.env.MONGO_SERVER);
-		}
+        // support use of non localhost MongoDB using env variable MONGO_SERVER
+        if (process.env.MONGO_SERVER) {
+            connectionString = connectionString.replace('mongodb://localhost', 'mongodb://' + process.env.MONGO_SERVER);
+        }
 
 
         options = options || {};
