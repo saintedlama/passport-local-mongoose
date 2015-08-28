@@ -173,12 +173,15 @@ describe('passportLocalMongoose', function () {
 
             var user = new DefaultUser();
 
-            setPasswordAndAuthenticate(user, 'password', 'nopassword', function (err, result) {
-                assert.ifError(err);
-                assert.ok(result === false);
+			var testUser = DefaultUser.findById(user._id, function(err, user) {
 
-                done();
-            });
+				setPasswordAndAuthenticate(user, 'password', 'nopassword', function (err, result) {
+					assert.ifError(err);
+					assert.ok(result === false);
+
+					done();
+				});
+			});
         });
 
         it('should supply a message when authentication fails', function (done) {
@@ -196,7 +199,7 @@ describe('passportLocalMongoose', function () {
     });
 
     describe('static #authenticate()', function () {
-        beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
+        beforeEach(mongotest.prepareDb('mongodb://boot2docker/passportlocalmongoosetests'));
         afterEach(mongotest.disconnect());
 
         it('should yield false with message option for authenticate', function (done) {
@@ -334,7 +337,7 @@ describe('passportLocalMongoose', function () {
                                   debugger;
                                     expect(err).to.not.exist;
                                     expect(result).to.be.false;
-                                    
+
                                     done();
                                 });
                             });
@@ -436,7 +439,7 @@ describe('passportLocalMongoose', function () {
     });
 
     describe('static #deserializeUser()', function () {
-        beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
+        beforeEach(mongotest.prepareDb('mongodb://boot2docker/passportlocalmongoosetests'));
         afterEach(mongotest.disconnect());
 
         it('should define a static deserializeUser function for passport', function () {
@@ -480,7 +483,7 @@ describe('passportLocalMongoose', function () {
     });
 
     describe('static #findByUsername()', function () {
-        beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
+        beforeEach(mongotest.prepareDb('mongodb://boot2docker/passportlocalmongoosetests'));
         afterEach(mongotest.disconnect());
 
         it('should define static findByUsername helper function', function () {
@@ -607,7 +610,7 @@ describe('passportLocalMongoose', function () {
     });
 
     describe('static #register()', function () {
-        beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
+        beforeEach(mongotest.prepareDb('mongodb://boot2docker/passportlocalmongoosetests'));
         afterEach(mongotest.disconnect());
 
         it('should define static register helper function', function () {
@@ -673,7 +676,7 @@ describe('passportLocalMongoose', function () {
                 });
             });
         });
-        
+
         it('should not authenticate registered user with wrong password', function (done) {
             this.timeout(5000); // Five seconds - mongo db access needed
 
@@ -693,7 +696,7 @@ describe('passportLocalMongoose', function () {
                 });
             });
         });
-        
+
         it('it should add username existing user without username', function (done) {
             this.timeout(5000); // Five seconds - mongo db access needed
 
