@@ -170,31 +170,41 @@ describe('issues', function () {
         });
     });
 
-    it.only('authentication should work with salt/hash field marked as select: false - Issue #96', function(done) {
-        this.timeout(5000); // Five seconds - mongo db access needed
+	describe('authentication should work with salt/hash field marked as select: false - Issue #96', function() {
+		this.timeout(5000); // Five seconds - mongo db access needed
+		var UserSchema = new Schema({});
+		UserSchema.plugin(passportLocalMongoose, { });
+		var userName = 'user_' + Math.random();
+		var User = mongoose.model('ShouldAuthenticateWithSaltAndHashNotExposed_Issue_96', UserSchema);
+		beforeEach(function(done) {
+			User.register({username: userName}, 'password', function (err, user) {
+				assert.ifError(err);
+				assert.ok(user);
+				done();
+			});
+		});
 
-        var UserSchema = new Schema({});
-
-        UserSchema.plugin(passportLocalMongoose, { });
-        var User = mongoose.model('ShouldAuthenticateWithSaltAndHashNotExposed_Issue_96', UserSchema);
-
-        User.register({username: 'nicolascage'}, 'password', function (err, user) {
-            assert.ifError(err);
-            assert.ok(user);
-            User.findOne({username: 'nicolascage'}, function(err, user) {
-                assert.ifError(err);
-                assert.ok(user);
-                assert.equal(user.username, 'nicolascage');
+		it('instance.authenticate( password, callback )', function(done) {
+			User.findOne({username: userName}, function(err, user) {
+				assert.ifError(err);
+				assert.ok(user);
+				assert.equal(user.username, userName);
 				user.authenticate('password', function(err, auth, reason) {
-					console.log(err)
 					assert.ifError(err);
 
-					console.log(reason);
-                    assert.ok(auth);
-
+					assert.ok(auth);
 					done();
 				});
-            });
-        });
+			});
+		});
+
+		it('Model.autheticate(username, password, callback)', function(done) {
+			User.authenticate()( userName, 'password', function(err, auth, reason){
+				assert.ifError(err);
+				assert.ok(auth);
+
+				done();
+			});
+		});
     });
 });

@@ -173,7 +173,6 @@ describe('passportLocalMongoose', function () {
 
             var user = new DefaultUser();
 
-			var testUser = DefaultUser.findById(user._id, function(err, user) {
 
 				setPasswordAndAuthenticate(user, 'password', 'nopassword', function (err, result) {
 					assert.ifError(err);
@@ -181,7 +180,6 @@ describe('passportLocalMongoose', function () {
 
 					done();
 				});
-			});
         });
 
         it('should supply a message when authentication fails', function (done) {
