@@ -1,7 +1,7 @@
 {
   "name": "passport-local-mongoose",
   "description": "Mongoose plugin that simplifies building username and password login with Passport",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "lib/passport-local-mongoose.js",
   "repository": "git://github.com/saintedlama/passport-local-mongoose.git",
   "author": "Christoph Walcher <christoph.walcher@gmail.com>",
@@ -28,6 +28,6 @@
   "scripts": {
     "test": "mocha -R spec test/",
     "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report html -- -R spec",
-    "release": "node release.js" 
+    "release": "node release.js"
   }
 }

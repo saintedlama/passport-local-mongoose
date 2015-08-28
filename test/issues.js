@@ -81,8 +81,7 @@ describe('issues', function () {
 
                 authenticate('hugo', 'password', function(err, result) {
                     assert.ifError(err);
-
-                    assert.ok(result instanceof User);
+					assert.ok(result instanceof User);
 
                     done();
                 });
