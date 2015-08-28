@@ -79,10 +79,13 @@ describe('issues', function () {
 
                 var authenticate = User.authenticate();
 
-                authenticate('hugo', 'password', function(err, result) {
+                authenticate('hugo', 'password', function(err, auth, reason) {
                     assert.ifError(err);
 
-                    assert.ok(result instanceof User);
+                    assert.equal(false, auth);
+                    assert.ok(reason);
+
+                    assert.equal('Authentication not possible. No salt value stored in mongodb collection!', reason.message);
 
                     done();
                 });
@@ -145,28 +148,6 @@ describe('issues', function () {
         User.register({username: "nicolascage"}, 'password', function (err, user) {
             assert.equal(err, "My nasty error");
             done();
-        });
-    });
-
-    it('should not expose hash and salt fields - Issue #72', function(done) {
-        this.timeout(5000); // Five seconds - mongo db access needed
-
-        var UserSchema = new Schema({});
-
-        UserSchema.plugin(passportLocalMongoose, { });
-        var User = mongoose.model('ShouldNotExposeHashAndSaltFields_Issue_72', UserSchema);
-
-        User.register({username: "nicolascage"}, 'password', function (err, user) {
-            assert.ifError(err);
-            assert.ok(user);
-            User.findOne({username: "nicolascage"}, function(err, user) {
-                assert.ifError(err);
-                assert.ok(user);
-                assert.equal(user.username, "nicolascage");
-                assert.strictEqual(user.hash, undefined);
-                assert.strictEqual(user.salt, undefined);
-                done();
-            });
         });
     });
 });
