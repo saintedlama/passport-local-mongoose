@@ -197,7 +197,7 @@ describe('passportLocalMongoose', function () {
     });
 
     describe('static #authenticate()', function () {
-        beforeEach(mongotest.prepareDb('mongodb://boot2docker/passportlocalmongoosetests'));
+        beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
         afterEach(mongotest.disconnect());
 
         it('should yield false with message option for authenticate', function (done) {
@@ -437,7 +437,7 @@ describe('passportLocalMongoose', function () {
     });
 
     describe('static #deserializeUser()', function () {
-        beforeEach(mongotest.prepareDb('mongodb://boot2docker/passportlocalmongoosetests'));
+        beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
         afterEach(mongotest.disconnect());
 
         it('should define a static deserializeUser function for passport', function () {
@@ -481,7 +481,7 @@ describe('passportLocalMongoose', function () {
     });
 
     describe('static #findByUsername()', function () {
-        beforeEach(mongotest.prepareDb('mongodb://boot2docker/passportlocalmongoosetests'));
+        beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
         afterEach(mongotest.disconnect());
 
         it('should define static findByUsername helper function', function () {
@@ -608,7 +608,7 @@ describe('passportLocalMongoose', function () {
     });
 
     describe('static #register()', function () {
-        beforeEach(mongotest.prepareDb('mongodb://boot2docker/passportlocalmongoosetests'));
+        beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
         afterEach(mongotest.disconnect());
 
         it('should define static register helper function', function () {

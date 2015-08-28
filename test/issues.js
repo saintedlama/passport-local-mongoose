@@ -5,7 +5,7 @@ var passportLocalMongoose = require('../lib/passport-local-mongoose');
 var mongotest = require('./mongotest');
 
 describe('issues', function () {
-    beforeEach(mongotest.prepareDb('mongodb://boot2docker/passportlocalmongooseissues'));
+    beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongooseissues'));
     afterEach(mongotest.disconnect());
 
     it('should support nested fields - Issue #9', function(done) {
