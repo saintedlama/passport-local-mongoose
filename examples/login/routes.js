@@ -3,7 +3,7 @@ var Account = require('./models/account');
 var router = require('express').Router();
 
 router.get('/', function(req, res) {
-  res.render('index', { user: req.user });
+  res.render('index', {user: req.user});
 });
 
 router.get('/register', function(req, res) {
@@ -12,8 +12,11 @@ router.get('/register', function(req, res) {
 
 router.post('/register', function(req, res, next) {
   console.log('registering user');
-  Account.register(new Account({ username: req.body.username }), req.body.password, function(err) {
-    if (err) { console.log('error while user register!', err); return next(err); }
+  Account.register(new Account({username: req.body.username}), req.body.password, function(err) {
+    if (err) {
+      console.log('error while user register!', err);
+      return next(err);
+    }
 
     console.log('user registered!');
 
@@ -22,7 +25,7 @@ router.post('/register', function(req, res, next) {
 });
 
 router.get('/login', function(req, res) {
-  res.render('login', { user: req.user });
+  res.render('login', {user: req.user});
 });
 
 router.post('/login', passport.authenticate('local'), function(req, res) {
