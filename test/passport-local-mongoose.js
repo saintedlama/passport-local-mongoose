@@ -334,7 +334,7 @@ describe('passportLocalMongoose', function () {
                                   debugger;
                                     expect(err).to.not.exist;
                                     expect(result).to.be.false;
-                                    
+
                                     done();
                                 });
                             });
@@ -673,7 +673,7 @@ describe('passportLocalMongoose', function () {
                 });
             });
         });
-        
+
         it('should not authenticate registered user with wrong password', function (done) {
             this.timeout(5000); // Five seconds - mongo db access needed
 
@@ -693,7 +693,7 @@ describe('passportLocalMongoose', function () {
                 });
             });
         });
-        
+
         it('it should add username existing user without username', function (done) {
             this.timeout(5000); // Five seconds - mongo db access needed
 

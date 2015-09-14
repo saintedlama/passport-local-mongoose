@@ -79,13 +79,9 @@ describe('issues', function () {
 
                 var authenticate = User.authenticate();
 
-                authenticate('hugo', 'password', function(err, auth, reason) {
+                authenticate('hugo', 'password', function(err, result) {
                     assert.ifError(err);
-
-                    assert.equal(false, auth);
-                    assert.ok(reason);
-
-                    assert.equal('Authentication not possible. No salt value stored in mongodb collection!', reason.message);
+                    assert.ok(result instanceof User);
 
                     done();
                 });
@@ -148,6 +144,66 @@ describe('issues', function () {
         User.register({username: "nicolascage"}, 'password', function (err, user) {
             assert.equal(err, "My nasty error");
             done();
+        });
+    });
+
+    it('should not expose hash and salt fields - Issue #72', function(done) {
+        this.timeout(5000); // Five seconds - mongo db access needed
+
+        var UserSchema = new Schema({});
+
+        UserSchema.plugin(passportLocalMongoose, { });
+        var User = mongoose.model('ShouldNotExposeHashAndSaltFields_Issue_72', UserSchema);
+
+        User.register({username: "nicolascage"}, 'password', function (err, user) {
+            assert.ifError(err);
+            assert.ok(user);
+            User.findOne({username: "nicolascage"}, function(err, user) {
+                assert.ifError(err);
+                assert.ok(user);
+                assert.equal(user.username, "nicolascage");
+                assert.strictEqual(user.hash, undefined);
+                assert.strictEqual(user.salt, undefined);
+                done();
+            });
+        });
+    });
+
+    describe('authentication should work with salt/hash field marked as select: false - Issue #96', function() {
+        this.timeout(5000); // Five seconds - mongo db access needed
+        var UserSchema = new Schema({});
+        UserSchema.plugin(passportLocalMongoose, { });
+        var userName = 'user_' + Math.random();
+        var User = mongoose.model('ShouldAuthenticateWithSaltAndHashNotExposed_Issue_96', UserSchema);
+        beforeEach(function(done) {
+            User.register({username: userName}, 'password', function (err, user) {
+                assert.ifError(err);
+                assert.ok(user);
+                done();
+            });
+        });
+
+        it('instance.authenticate( password, callback )', function(done) {
+            User.findOne({username: userName}, function(err, user) {
+                assert.ifError(err);
+                assert.ok(user);
+                assert.equal(user.username, userName);
+                user.authenticate('password', function(err, auth, reason) {
+                    assert.ifError(err);
+
+                    assert.ok(auth);
+                    done();
+                });
+            });
+        });
+
+        it('Model.autheticate(username, password, callback)', function(done) {
+            User.authenticate()( userName, 'password', function(err, auth, reason){
+                assert.ifError(err);
+                assert.ok(auth);
+
+                done();
+            });
         });
     });
 });
