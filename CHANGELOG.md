@@ -1,8 +1,27 @@
 ## Change Log
 
+### upcoming (2015/09/14 10:59 +00:00)
+- [14c69e3](https://github.com/saintedlama/passport-local-mongoose/commit/14c69e359a4f1fcc015d2ff64fb0408b7dd02f79) Add upgrade warning and document new default digest algorithm (@saintedlama)
+- [a1a93ea](https://github.com/saintedlama/passport-local-mongoose/commit/a1a93ea86be6fce431f14d899a39bc74963f4097) Add node.js 4.0.0 as build target (@saintedlama)
+- [65b37f4](https://github.com/saintedlama/passport-local-mongoose/commit/65b37f489aa0bc150c41e7ddcb83b370fd0c4524) Reformat code (@saintedlama)
+- [b1b25e9](https://github.com/saintedlama/passport-local-mongoose/commit/b1b25e9ddb930494bebb7151ebb1a5b71a7050e0) Add editorconfig (@saintedlama)
+- [32b0e4e](https://github.com/saintedlama/passport-local-mongoose/commit/32b0e4e73903871df505d321a1c39ac4e0afb549) Update dependencies (@saintedlama)
+
+### v1.3.0 (2015/09/14 10:33 +00:00)
+- [1b6b3d4](https://github.com/saintedlama/passport-local-mongoose/commit/1b6b3d4f93a33fe6f42517380d738d76d71ace5a) 1.3.0 (@saintedlama)
+- [55572e5](https://github.com/saintedlama/passport-local-mongoose/commit/55572e58a50a120419aba4410bad957d8e4f0192) Remove superfluous queryParameters declaration (@saintedlama)
+- [97e0ae8](https://github.com/saintedlama/passport-local-mongoose/commit/97e0ae841e56069acfc9f777b65e476afc9df616) Add missing semicolon (@saintedlama)
+- [#98](https://github.com/saintedlama/passport-local-mongoose/pull/98) Merge pull request #98 from theanimal666/master (@theanimal666)
+- [bc6f19a](https://github.com/saintedlama/passport-local-mongoose/commit/bc6f19ae385c6a0a0079891ddafcbc8b31ab9367) Replace my tabs with spaces to macth project coding style (@theanimal666)
+- [70b5d85](https://github.com/saintedlama/passport-local-mongoose/commit/70b5d85c5e04c5b4eb77e70fcc61cd745b2b6885) Support test MongoDB server other then localhost (@theanimal666)
+- [6a5f897](https://github.com/saintedlama/passport-local-mongoose/commit/6a5f897c558868e89704c33b14d2ce956742e482) Merge remote-tracking branch 'upstream/master' (@theanimal666)
+- [850748c](https://github.com/saintedlama/passport-local-mongoose/commit/850748c6541d76b73523e950879bb0d48672e14f) Make authenticate work without salt/hash selected by default (@theanimal666)
+- [5ae540b](https://github.com/saintedlama/passport-local-mongoose/commit/5ae540bd8020b496adbe49f5cc2640a274b0518b) Add a generated changelog (@saintedlama)
+
 ### v1.2.0 (2015/08/28 14:51 +00:00)
 - [f6cc992](https://github.com/saintedlama/passport-local-mongoose/commit/f6cc992f3c737ab66458aa867328c13fc0d139ee) 1.2.0 (@saintedlama)
 - [37f7da7](https://github.com/saintedlama/passport-local-mongoose/commit/37f7da73245a2b38d054b7dac7ecbb948690264d) Manually revert commit b1fba9ab277765cad8fd32bb56f08648684706aa (@saintedlama)
+- [3052f2d](https://github.com/saintedlama/passport-local-mongoose/commit/3052f2d39a7019a1c5e1d5ad3732c9498bf5d49c) Add test for Issue #96 (@theanimal666)
 - [15e8981](https://github.com/saintedlama/passport-local-mongoose/commit/15e8981baee088a0af4627a6febf67c9897993a9) Fix package.json syntax (@saintedlama)
 - [f54820d](https://github.com/saintedlama/passport-local-mongoose/commit/f54820d79d5bd235309468e560d2adc076655cf1) Get rid of gulp (@saintedlama)
 - [abf1ab9](https://github.com/saintedlama/passport-local-mongoose/commit/abf1ab9bcaf6bb4565add4779a62d63866428e7d) Add git push and npm publish commands (@saintedlama)
