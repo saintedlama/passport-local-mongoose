@@ -20,9 +20,9 @@
     "scmp": "^1.0.0"
   },
   "devDependencies": {
-    "chai": "^1.10.0",
-    "mocha": "^1.21.4",
-    "mongoose": "3.8.x",
+    "chai": "^3.2.0",
+    "mocha": "^2.3.2",
+    "mongoose": "4.1.x",
     "shelljs": "^0.5.3"
   },
   "scripts": {
