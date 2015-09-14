@@ -21,6 +21,12 @@ In case you need to install the whole set of dependencies
 
     $ npm install passport passport-local mongoose passport-local-mongoose --save
 
+### Updating from 1.x to 2.x
+The default digest algorithm was changed due to security implications from **sha1** to **sha256**. If you decide
+to upgrade a production system from 1.x to 2.x your users **will not be able to login** since the digest
+algorithm was changed! In these cases plan some migration strategy and/or use the **sha1** option for the 
+digest algorithm.
+
 ## Usage
 
 ### Plugin Passport-Local Mongoose
@@ -87,7 +93,7 @@ __Main Options__
 * saltlen: specifies the salt length in bytes. Default: 32
 * iterations: specifies the number of iterations used in pbkdf2 hashing algorithm. Default: 25000
 * keylen: specifies the length in byte of the generated key. Default: 512
-* digestAlgorithm: specifies the pbkdf2 digest algorithm. Default: sha1. (get a list of supported algorithms with crypto.getHashes())
+* digestAlgorithm: specifies the pbkdf2 digest algorithm. Default: sha256. (get a list of supported algorithms with crypto.getHashes())
 * interval: specifies the interval in milliseconds between login attempts. Default: 100
 * usernameField: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different 
 field to hold the username for example "email".
