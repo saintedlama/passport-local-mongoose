@@ -1,10 +1,10 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var BadRequestError = require('../lib/badrequesterror');
-var passportLocalMongoose = require('../lib/passport-local-mongoose');
+var Err = require('../lib/error.js');
+var passportLocalMongoose = require('../lib/passport-local-mongoose.js');
 var assert = require('assert');
 var expect = require('chai').expect;
-var mongotest = require('./mongotest');
+var mongotest = require('./mongotest.js');
 
 var DefaultUserSchema = new Schema();
 DefaultUserSchema.plugin(passportLocalMongoose);
@@ -723,7 +723,7 @@ describe('passportLocalMongoose', function() {
       });
     });
 
-    it('should result in BadRequest error in case no username was given', function(done) {
+    it('should result in AuthenticationError error in case no username was given', function(done) {
       this.timeout(5000); // Five seconds - mongo db access needed
 
       var UserSchema = new Schema({});
@@ -731,12 +731,12 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('RegisterUserWithoutUsername', UserSchema);
 
       User.register({}, 'password', function(err) {
-        expect(err).to.be.instanceof(BadRequestError);
+        expect(err).to.be.instanceof(Err.AuthenticationError);
         done();
       });
     });
 
-    it('should result in BadRequest error in case no password was given', function(done) {
+    it('should result in AuthenticationError error in case no password was given', function(done) {
       this.timeout(5000); // Five seconds - mongo db access needed
 
       var UserSchema = new Schema({});
@@ -744,7 +744,7 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('RegisterUserWithoutPassword', UserSchema);
 
       User.register({username: 'hugo'}, undefined, function(err) {
-        expect(err).to.be.instanceof(BadRequestError);
+        expect(err).to.be.instanceof(Err.AuthenticationError);
         done();
       });
     });

@@ -111,16 +111,6 @@ field to hold the username for example "email".
 * passwordValidator: specifies your custom validation function for the password in the form 'function(password,cb)'. Default: validates non-empty passwords.
 * usernameQueryFields: specifies alternative fields of the model for identifying a user (e.g. email).
 
-__Error Message Options__
-
-* incorrectPasswordError: specifies the error message returned when the password is incorrect. Defaults to 'Incorrect password'.
-* incorrectUsernameError: specifies the error message returned when the username is incorrect. Defaults to 'Incorrect username'.
-* missingUsernameError: specifies the error message returned when the username has not been set during registration. Defaults to 'Field %s is not set'.
-* missingPasswordError: specifies the error message returned when the password has not been set during registration. Defaults to 'Password argument not set!'.
-* userExistsError: specifies the error message returned when the user already exists during registration. Defaults to 'User already exists with name %s'.
-* noSaltValueStored: specifies the error message returned in case no salt value is stored in the mongodb collection. Defaults to 'Authentication not possible. No salt value stored in mongodb collection!'
-* tooManyAttemptsError: specifies the error message returned when the user's account is locked due to too many failed login attempts. Defaults to 'Account locked due to too many failed login attempts'.
-
 *Attention!* Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
 
 ### Hash Algorithm
@@ -151,10 +141,24 @@ asynchronous method to reset a user's number of failed password attempts (only d
 - thisModel
   - the model getting authenticated *if* authentication was successful otherwise false
 - passwordErr
-  - the reason the password failed, else undefined ex. `{message: "Incorrect password"}
+  - an instance of `AuthenticationError` describing the reason the password failed, else undefined.
 
 Using `setPassword()` will only update the document's password fields, but will not save the document.
 To commit the changed document, remember to use Mongoose's `document.save()` after using `setPassword()`.
+
+**Error Handling**  
+
+* `IncorrectPasswordError`: specifies the error message returned when the password is incorrect. Defaults to 'Incorrect password'.
+* `IncorrectUsernameError`: specifies the error message returned when the username is incorrect. Defaults to 'Incorrect username'.
+* `MissingUsernameError`: specifies the error message returned when the username has not been set during registration. Defaults to 'Field %s is not set'.
+* `MissingPasswordError`: specifies the error message returned when the password has not been set during registration. Defaults to 'Password argument not set!'.
+* `UserExistsError`: specifies the error message returned when the user already exists during registration. Defaults to 'User already exists with name %s'.
+* `NoSaltValueStored`: Occurs in case no salt value is stored in the MongoDB collection.
+* `AttemptTooSoonError`: Occurs if the option `limitAttempts` is set to true and a login attept occures while the user is still penalized.
+* `TooManyAttemptsError`: Returned when the user's account is locked due to too many failed login attempts.
+
+All those errors inherit from `AuthenticationError`, if you need a more general error class for checking.
+
 
 ### Static methods
 Static methods are exposed on the model constructor. For example to use createStrategy function use
