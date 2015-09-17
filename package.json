@@ -16,6 +16,7 @@
     "node": ">= 0.9"
   },
   "dependencies": {
+    "generaterr": "^1.2.0",
     "passport-local": "^1.0.0",
     "scmp": "^1.0.0"
   },

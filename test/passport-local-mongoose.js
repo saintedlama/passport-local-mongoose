@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var errors = require('../lib/error.js');
+var errors = require('../lib/errors.js');
 var passportLocalMongoose = require('../lib/passport-local-mongoose.js');
 var assert = require('assert');
 var expect = require('chai').expect;
@@ -21,6 +21,10 @@ var setPasswordAndAuthenticate = function(user, passwordToSet, passwordToAuthent
 };
 
 describe('passportLocalMongoose', function() {
+  it('should expose errors', function() {
+    expect(passportLocalMongoose.errors).to.exist;
+  });
+
   describe('#plugin()', function() {
     it('should add "username" field to model', function() {
       var user = new DefaultUser({username: 'username'});

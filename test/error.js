@@ -1,4 +1,4 @@
-var errors = require('../lib/error.js');
+var errors = require('../lib/errors.js');
 var expect = require('chai').expect;
 
 describe('AuthenticationError', function() {
@@ -15,9 +15,9 @@ describe('AuthenticationError', function() {
     expect(error.message).to.equal('Test');
   });
 
-  it('should construct a bad request error with null message if no message was passed', function() {
+  it('should construct an AuthenticationError with empty message if no message was passed', function() {
     var error = new errors.AuthenticationError();
 
-    expect(error.message).to.equal(null);
+    expect(error.message).to.equal('');
   });
 });
