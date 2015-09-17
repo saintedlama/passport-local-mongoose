@@ -4,7 +4,7 @@ var Err = require('../lib/error.js');
 var passportLocalMongoose = require('../lib/passport-local-mongoose.js');
 var assert = require('assert');
 var expect = require('chai').expect;
-var mongotest = require('./mongotest.js');
+var mongotest = require('./helpers/mongotest.js');
 
 var DefaultUserSchema = new Schema();
 DefaultUserSchema.plugin(passportLocalMongoose);

@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var assert = require('assert');
 var passportLocalMongoose = require('../lib/passport-local-mongoose');
-var mongotest = require('./mongotest');
+var mongotest = require('./helpers/mongotest');
 
 describe('issues', function() {
   beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongooseissues'));
