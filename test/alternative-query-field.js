@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var assert = require('assert');
-var passportLocalMongoose = require('../lib/passport-local-mongoose');
+var passportLocalMongoose = require('../');
 var mongotest = require('./helpers/mongotest');
 
 describe('alternative query field', function() {

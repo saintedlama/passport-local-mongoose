@@ -2,7 +2,7 @@
   "name": "passport-local-mongoose",
   "description": "Mongoose plugin that simplifies building username and password login with Passport",
   "version": "2.0.0",
-  "main": "lib/passport-local-mongoose.js",
+  "main": "index.js",
   "repository": "git://github.com/saintedlama/passport-local-mongoose.git",
   "author": "Christoph Walcher <christoph.walcher@gmail.com>",
   "license": "MIT",
@@ -13,7 +13,7 @@
     "login"
   ],
   "engines": {
-    "node": ">= 0.9"
+    "node": ">= 0.12"
   },
   "dependencies": {
     "generaterr": "^1.2.0",

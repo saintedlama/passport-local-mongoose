@@ -1,6 +1,6 @@
 var crypto = require('crypto');
 var LocalStrategy = require('passport-local').Strategy;
-var errors = require('./errors.js');
+var errors = require('./lib/errors.js');
 var scmp = require('scmp');
 
 module.exports = function(schema, options) {
