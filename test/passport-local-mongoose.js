@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var Err = require('../lib/error.js');
+var errors = require('../lib/error.js');
 var passportLocalMongoose = require('../lib/passport-local-mongoose.js');
 var assert = require('assert');
 var expect = require('chai').expect;
@@ -731,7 +731,7 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('RegisterUserWithoutUsername', UserSchema);
 
       User.register({}, 'password', function(err) {
-        expect(err).to.be.instanceof(Err.AuthenticationError);
+        expect(err).to.be.instanceof(errors.AuthenticationError);
         done();
       });
     });
@@ -744,7 +744,7 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('RegisterUserWithoutPassword', UserSchema);
 
       User.register({username: 'hugo'}, undefined, function(err) {
-        expect(err).to.be.instanceof(Err.AuthenticationError);
+        expect(err).to.be.instanceof(errors.AuthenticationError);
         done();
       });
     });
