@@ -1,13 +1,25 @@
-## Changes since 2015-09-14T10:59:55.456Z
-
- * @fhemberger: Error handling: Always return instance of 'AuthenticationError' (#105)
- * @fhemberger: Update default digestAlgorithm from sha1 to sha256 (#104)
- * @prtome: problem with changing password (#103)
- * @dnlsandiego: Salt and hash fields still being exposed. (#100)
-
 ## Change Log
 
-### upcoming (2015/09/14 10:59 +00:00)
+### v3.1.0 (2015/10/05 09:50 +00:00)
+- [5319635](https://github.com/saintedlama/passport-local-mongoose/commit/531963585b259a5c3c1859b9af73aa74d1a8e291) 3.1.0 (@saintedlama)
+- [e9a4665](https://github.com/saintedlama/passport-local-mongoose/commit/e9a4665cad716b1a4b57f0f06f4c0bc89fa047f6) Bring back customizable error messages (@saintedlama)
+
+### v3.0.0 (2015/09/21 07:33 +00:00)
+- [225efcc](https://github.com/saintedlama/passport-local-mongoose/commit/225efcc48259c2d510ee9eaf8fce82661b50bb63) 3.0.0 (@saintedlama)
+- [e10ef5b](https://github.com/saintedlama/passport-local-mongoose/commit/e10ef5be7f06dfca8b676d577ba178f6bbc98753) Make the example depend on the latest npm version (@saintedlama)
+- [e9cd117](https://github.com/saintedlama/passport-local-mongoose/commit/e9cd117b371db8c75cb96ac05a0e698814fafe8a) Move main file to index.js to simplify the package (@saintedlama)
+- [7934088](https://github.com/saintedlama/passport-local-mongoose/commit/7934088bd8b6d0a965d9dc1b35fa8e11fee37dbf) Refactor error generation and yielding (@saintedlama)
+- [d733cae](https://github.com/saintedlama/passport-local-mongoose/commit/d733cae007117d68e4a3a5b305f5753b0b81dca4) Rename variable Err to errors (@saintedlama)
+- [d734b5c](https://github.com/saintedlama/passport-local-mongoose/commit/d734b5c767cfdd0f8988c5183f50c7b31acf1bc1) Move mongotest module to helpers (@saintedlama)
+- [#105](https://github.com/saintedlama/passport-local-mongoose/pull/105) Merge pull request #105 from opencharterhub/fix/error-handling (@opencharterhub)
+- [a29f04d](https://github.com/saintedlama/passport-local-mongoose/commit/a29f04da8b648986418c9f7f4e586afd12a71a34) Lint: Add some semicolons (@fhemberger)
+- [fcf4b41](https://github.com/saintedlama/passport-local-mongoose/commit/fcf4b41ccfac4b6b45f3282a14205b85a1c2df30) Lint: Handle error case (@fhemberger)
+- [6510899](https://github.com/saintedlama/passport-local-mongoose/commit/651089933c3a1b869049a8d2fdd8f7c3dc69cde5) Lint: Don't shadow variable names (@fhemberger)
+- [6e0388b](https://github.com/saintedlama/passport-local-mongoose/commit/6e0388bcb749ed434ad5fe247d2ec64181e57711) Error handling: Always return instance of 'AuthenticationError' (@fhemberger)
+
+### v2.0.0 (2015/09/14 11:00 +00:00)
+- [f1eedda](https://github.com/saintedlama/passport-local-mongoose/commit/f1eeddaf0da0149c216aa07960f050ce0babeccd) 2.0.0 (@saintedlama)
+- [42c7354](https://github.com/saintedlama/passport-local-mongoose/commit/42c73543f290fb832b7f819f3c9cf076ca61688d) Update changelog (@saintedlama)
 - [14c69e3](https://github.com/saintedlama/passport-local-mongoose/commit/14c69e359a4f1fcc015d2ff64fb0408b7dd02f79) Add upgrade warning and document new default digest algorithm (@saintedlama)
 - [a1a93ea](https://github.com/saintedlama/passport-local-mongoose/commit/a1a93ea86be6fce431f14d899a39bc74963f4097) Add node.js 4.0.0 as build target (@saintedlama)
 - [65b37f4](https://github.com/saintedlama/passport-local-mongoose/commit/65b37f489aa0bc150c41e7ddcb83b370fd0c4524) Reformat code (@saintedlama)
