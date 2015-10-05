@@ -38,6 +38,16 @@ module.exports = function(schema, options) {
     options.maxAttempts = options.maxAttempts || Infinity;
   }
 
+  options.errorMessages = options.errorMessages || {};
+  options.errorMessages.MissingPasswordError = options.errorMessages.MissingPasswordError || 'No password was given';
+  options.errorMessages.AttemptTooSoonError = options.errorMessages.AttemptTooSoonError || 'Account is currently locked. Try again later';
+  options.errorMessages.TooManyAttemptsError = options.errorMessages.TooManyAttemptsError || 'Account locked due to too many failed login attempts';
+  options.errorMessages.NoSaltValueStoredError = options.errorMessages.NoSaltValueStoredError || 'Authentication not possible. No salt value stored';
+  options.errorMessages.IncorrectPasswordError = options.errorMessages.IncorrectPasswordError || 'Password or username are incorrect';
+  options.errorMessages.IncorrectUsernameError = options.errorMessages.IncorrectUsernameError || 'Password or username are incorrect';
+  options.errorMessages.MissingUsernameError = options.errorMessages.MissingUsernameError|| 'No username was given';
+  options.errorMessages.UserExistsError = options.errorMessages.UserExistsError|| 'A user with the given username is already registered';
+
   var pbkdf2 = function(password, salt, callback) {
     if (crypto.pbkdf2.length >= 6) {
       crypto.pbkdf2(password, salt, options.iterations, options.keylen, options.digestAlgorithm, callback);
@@ -72,7 +82,7 @@ module.exports = function(schema, options) {
 
   schema.methods.setPassword = function(password, cb) {
     if (!password) {
-      return cb(new errors.MissingPasswordError('No password was given'));
+      return cb(new errors.MissingPasswordError(options.errorMessages.MissingPasswordError));
     }
 
     var self = this;
@@ -111,16 +121,16 @@ module.exports = function(schema, options) {
       if (Date.now() - user.get(options.lastLoginField) < calculatedInterval) {
         user.set(options.lastLoginField, Date.now());
         user.save();
-        return cb(null, false, new errors.AttemptTooSoonError('Account is currently locked. Try again later'));
+        return cb(null, false, new errors.AttemptTooSoonError(options.errorMessages.AttemptTooSoonError));
       }
 
       if (user.get(options.attemptsField) >= options.maxAttempts) {
-        return cb(null, false, new errors.TooManyAttemptsError('Account locked due to too many failed login attempts'));
+        return cb(null, false, new errors.TooManyAttemptsError(options.errorMessages.TooManyAttemptsError));
       }
     }
 
     if (!user.get(options.saltField)) {
-      return cb(null, false, new errors.NoSaltValueStoredError('Authentication not possible. No salt value stored'));
+      return cb(null, false, new errors.NoSaltValueStoredError(options.errorMessages.NoSaltValueStoredError));
     }
 
     pbkdf2(password, user.get(options.saltField), function(err, hashRaw) {
@@ -144,13 +154,13 @@ module.exports = function(schema, options) {
           user.save(function(saveErr) {
             if (saveErr) { return cb(saveErr); }
             if (user.get(options.attemptsField) >= options.maxAttempts) {
-              return cb(null, false, new errors.TooManyAttemptsError('Account locked due to too many failed login attempts'));
+              return cb(null, false, new errors.TooManyAttemptsError(options.errorMessages.TooManyAttemptsError));
             } else {
-              return cb(null, false, new errors.IncorrectPasswordError('Password or username are incorrect'));
+              return cb(null, false, new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError));
             }
           });
         } else {
-          return cb(null, false, new errors.IncorrectPasswordError('Password or username are incorrect'));
+          return cb(null, false, new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError));
         }
       }
     });
@@ -168,7 +178,7 @@ module.exports = function(schema, options) {
         if (user) {
           return authenticate(user, password, cb);
         } else {
-          return cb(null, false, new errors.IncorrectUsernameError('Password or username are incorrect'));
+          return cb(null, false, new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError));
         }
       });
     } else {
@@ -193,7 +203,7 @@ module.exports = function(schema, options) {
         if (user) {
           return user.authenticate(password, cb);
         } else {
-          return cb(null, false, new errors.IncorrectUsernameError('Password or username are incorrect'));
+          return cb(null, false, new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError));
         }
       });
     };
@@ -220,7 +230,7 @@ module.exports = function(schema, options) {
     }
 
     if (!user.get(options.usernameField)) {
-      return cb(new errors.MissingUsernameError('No username was given'));
+      return cb(new errors.MissingUsernameError(options.errorMessages.MissingUsernameError));
     }
 
     var self = this;
@@ -228,7 +238,7 @@ module.exports = function(schema, options) {
       if (err) { return cb(err); }
 
       if (existingUser) {
-        return cb(new errors.UserExistsError('A user with the given username is already registered'));
+        return cb(new errors.UserExistsError(options.errorMessages.UserExistsError));
       }
 
       user.setPassword(password, function(setPasswordErr, user) {

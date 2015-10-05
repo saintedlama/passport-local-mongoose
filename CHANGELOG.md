@@ -1,3 +1,10 @@
+## Changes since 2015-09-14T10:59:55.456Z
+
+ * @fhemberger: Error handling: Always return instance of 'AuthenticationError' (#105)
+ * @fhemberger: Update default digestAlgorithm from sha1 to sha256 (#104)
+ * @prtome: problem with changing password (#103)
+ * @dnlsandiego: Salt and hash fields still being exposed. (#100)
+
 ## Change Log
 
 ### upcoming (2015/09/14 10:59 +00:00)

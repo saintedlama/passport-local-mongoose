@@ -113,6 +113,18 @@ field to hold the username for example "email".
 
 *Attention!* Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
 
+#### Error Messages
+Override default error messages by setting options.errorMessages.
+
+* MissingPasswordError  'No password was given'
+* AttemptTooSoonError 'Account is currently locked. Try again later'
+* TooManyAttemptsError 'Account locked due to too many failed login attempts'
+* NoSaltValueStoredError 'Authentication not possible. No salt value stored'
+* IncorrectPasswordError 'Password or username are incorrect'
+* IncorrectUsernameError 'Password or username are incorrect'
+* MissingUsernameError 'No username was given'
+* UserExistsError 'A user with the given username is already registered'
+  
 ### Hash Algorithm
 Passport-Local Mongoose use the pbkdf2 algorithm of the node crypto library. 
 [Pbkdf2](http://en.wikipedia.org/wiki/PBKDF2) was chosen because platform independent
