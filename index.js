@@ -2,9 +2,6 @@ var crypto = require('crypto');
 var LocalStrategy = require('passport-local').Strategy;
 var errors = require('./lib/errors.js');
 var scmp = require('scmp');
-var semver = require('semver');
-
-var pbkdf2DigestSupport = semver.gte(process.version, '0.12.0');
 
 module.exports = function(schema, options) {
   options = options || {};
@@ -52,7 +49,7 @@ module.exports = function(schema, options) {
   options.errorMessages.UserExistsError = options.errorMessages.UserExistsError|| 'A user with the given username is already registered';
 
   var pbkdf2 = function(password, salt, callback) {
-    if (pbkdf2DigestSupport) {
+    if (crypto.pbkdf2.length >= 6) {
       crypto.pbkdf2(password, salt, options.iterations, options.keylen, options.digestAlgorithm, callback);
     } else {
       crypto.pbkdf2(password, salt, options.iterations, options.keylen, callback);
