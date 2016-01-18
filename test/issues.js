@@ -206,4 +206,28 @@ describe('issues', function() {
       });
     });
   });
+
+  describe('backward compatible #authenticate()', function() {
+    it('should authenticate a user created in a 3.x version - issue #115', function(done) {
+      var UserSchema = new Schema();
+      UserSchema.plugin(passportLocalMongoose, {usernameLowerCase: true});
+      var User = mongoose.model('AuthenticateBackwardCompatible', UserSchema);
+
+      // 3.0 generated hash and salt of 'username', 'password'
+      User.create({
+        "salt" : "fd4bb06e65cd4d582efde28427ffdeb8839c64169d72cfe131bd971f70dc08f8",
+        "hash" : "a52bb794337735fc69ce6c3af132e2854a10461a060e4ce07e3454a9ac65a4ad3e792ff1e17ebf3b20298fd11c737fd89a4bcb142d24f10673e0304833a858c94c798f967671b5923f43435941f9f54cc62a884d228c200f5ccfe52c680e2633d1335aaede1ec44e357dcacf832529974332aeac31f9fd10a0fded655f9117d9a6bea6c453e9499975ad7f7322b584910b843ef6af3324858bf635b26a3edc050e2e871c06bfc0a47d59449c9b6ffc6496c10b5cf3e688cfa699228a77f9457514a1203b98e5b8c37ee976d578ed3a9f0e530353ebb433ae06b1674282d173f52d5fd14e29498f4fa24c5b66223c4c0eb9cddf45c62590747d32109dbb94b8c57f9eaf671af6b15367b9cb184eff893f063d00ef3e1226337b30391a1411f6f6c50762a362ceec4411726856e298e179097c7ffc69f72c737424df901349cf6ce83da3d34bdc5117b2365634cf6069a0fb8363c1f5f2c8f994a7c1601980efd1135c76b88ac19d2a1547fe02c553dfb7d84b15438be90ecbb20bc69d0e6c11e370bf63a3b3efe03d84ef46d64cdca450c021593a4a483793f4ef2496125a1a5584a7f8b91df45db1723ab89b746cf100e655ca9cf64df4673eddbb13476ae7c9261f3389a14227f5103a31f1c2bce73c52e85cb6816dbb8fa9eb979b47ae003ad14cae156e6d832c743a0ad3ae9330a1c8528d3c896e3570019a959910ff9dd2",
+        "username" : "username"
+      }, function(err) {
+        assert.ifError(err);
+
+        User.authenticate()('username', 'password', function(err, authenticated) {
+          assert.ifError(err);
+          assert(authenticated);
+
+          done();
+        });
+      });
+    });
+  });
 });
