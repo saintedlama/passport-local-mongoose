@@ -110,7 +110,7 @@ field to hold the username for example "email".
 * maxAttempts: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
 * passwordValidator: specifies your custom validation function for the password in the form 'function(password,cb)'. Default: validates non-empty passwords.
 * usernameQueryFields: specifies alternative fields of the model for identifying a user (e.g. email).
-* preventReuse: specifies how many old hash/salt to keep around. if set to a positive integer, prevent reuse of passwords for that many successive password changes. Default: 0.
+* preventReuse: specifies how many old hash/salt pairs to keep around. If set to a positive integer, prevent reuse of passwords for that many successive password changes. Default: 0.
 * historyField: specifies the field name that holds the back history of hash/salt pairs. Defaults to 'passHistory'.
 
 *Attention!* Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
