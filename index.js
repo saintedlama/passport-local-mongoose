@@ -15,6 +15,9 @@ module.exports = function(schema, options) {
   options.digestAlgorithm = options.digestAlgorithm || 'sha256'; // To get a list of supported hashes use crypto.getHashes()
   options.passwordValidator = options.passwordValidator || function(password, cb) { cb(null); };
 
+  // decline new passwords if they have been already used, looking back up to n times
+  options.preventReuse = options.preventReuse || 0;
+
   // Populate field names with defaults if not set
   options.usernameField = options.usernameField || 'username';
   options.usernameUnique = options.usernameUnique === undefined ? true : options.usernameUnique;
@@ -41,6 +44,10 @@ module.exports = function(schema, options) {
     options.maxAttempts = options.maxAttempts || Infinity;
   }
 
+  if (options.preventReuse) {
+    options.historyField = options.historyField || 'passHistory';
+  }
+
   options.errorMessages = options.errorMessages || {};
   options.errorMessages.MissingPasswordError = options.errorMessages.MissingPasswordError || 'No password was given';
   options.errorMessages.AttemptTooSoonError = options.errorMessages.AttemptTooSoonError || 'Account is currently locked. Try again later';
@@ -50,6 +57,7 @@ module.exports = function(schema, options) {
   options.errorMessages.IncorrectUsernameError = options.errorMessages.IncorrectUsernameError || 'Password or username are incorrect';
   options.errorMessages.MissingUsernameError = options.errorMessages.MissingUsernameError|| 'No username was given';
   options.errorMessages.UserExistsError = options.errorMessages.UserExistsError|| 'A user with the given username is already registered';
+  options.errorMessages.PasswordReuseError = options.errorMessages.PasswordReuseError|| 'Password reuse detected';
 
   var pbkdf2 = function(password, salt, callback) {
     if (pbkdf2DigestSupport) {
@@ -70,6 +78,10 @@ module.exports = function(schema, options) {
   if (options.limitAttempts) {
     schemaFields[options.attemptsField] = {type: Number, default: 0};
     schemaFields[options.lastLoginField] = {type: Date, default: Date.now};
+  }
+
+  if (options.preventReuse) {
+    schemaFields[options.historyField] = {type: Array, default: []};
   }
 
   schema.add(schemaFields);
@@ -105,6 +117,13 @@ module.exports = function(schema, options) {
         pbkdf2(password, salt, function(pbkdf2Err, hashRaw) {
           if (pbkdf2Err) {
             return cb(pbkdf2Err);
+          }
+
+          var oldHash = self.get(options.hashField);
+          if (options.preventReuse && oldHash) { // store the old values
+            var history = self.get(options.historyField) || [];
+            history.unshift([oldHash, self.get(options.saltField)]);
+            self.set( options.historyField, history.slice(0, options.preventReuse));
           }
 
           self.set(options.hashField, new Buffer(hashRaw, 'binary').toString(options.encoding));
