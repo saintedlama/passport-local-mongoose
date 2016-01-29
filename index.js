@@ -81,7 +81,7 @@ module.exports = function(schema, options) {
   }
 
   if (options.preventReuse) {
-    schemaFields[options.historyField] = {type: Array, default: []};
+    schemaFields[options.historyField] = {type: Array, default: [], select: false};
   }
 
   schema.add(schemaFields);
@@ -95,6 +95,51 @@ module.exports = function(schema, options) {
     next();
   });
 
+
+  function validateAndCheckHistory (user, password, cb) {
+    options.passwordValidator ( password, function (validatorError) {
+      if (validatorError || !options.preventReuse) {
+        return cb(validatorError);
+      }
+      var count = 0, returned = false,
+          history = (user.get(options.historyField) || []).slice(),
+          currentHash = user.get(options.hashField);
+      if (currentHash) {
+        history.push([currentHash, user.get(options.saltField)]);
+      }
+      if (!history.length) {
+        return cb();
+      }
+      history.forEach(function (pair) {
+        checkHistoryPair(pair, password, function (err) {
+          if (returned) { return; }
+          if (err) {
+            returned = true;
+            return cb(err);
+          }
+          count += 1;
+          if (count === history.length) {
+            return cb();
+          }
+        });
+      });
+    });
+  }
+
+  function checkHistoryPair (pair, password, cb) {
+    pbkdf2(password, pair[1], function(err, hashRaw) {
+      if (err) {
+        return cb(err);
+      }
+      if (scmp(new Buffer(hashRaw, 'binary').toString(options.encoding), pair[0])) {
+        cb(new errors.PasswordReuseError(options.errorMessages.PasswordReuseError));
+      }
+      else {
+        cb();
+      }
+    });
+  }
+
   schema.methods.setPassword = function(password, cb) {
     if (!password) {
       return cb(new errors.MissingPasswordError(options.errorMessages.MissingPasswordError));
@@ -102,7 +147,7 @@ module.exports = function(schema, options) {
 
     var self = this;
 
-    options.passwordValidator(password, function(err) {
+    validateAndCheckHistory(this, password, function(err) {
       if (err) {
         return cb(err);
       }

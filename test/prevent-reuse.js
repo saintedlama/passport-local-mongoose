@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 var expect = require('chai').expect;
 var passportLocalMongoose = require('../');
 var mongotest = require('./helpers/mongotest');
+var errors = require('../lib/errors.js');
 
 describe('prevent password reuse', function() {
   beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosereuse'));
@@ -17,10 +18,10 @@ describe('prevent password reuse', function() {
   });
 
   it('should save old hash/salt pairs', function (done) {
-      this.timeout(5000); // Five seconds - heavy crypto in background
+      this.timeout(5000); // Five seconds - mongo db access needed
 
       var UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {preventReuse: 2});
+      UserSchema.plugin(passportLocalMongoose, {preventReuse: 2, iterations: 1});
       var User = mongoose.model('PreventReuseSavesOld', UserSchema);
 
       User.register({username: 'adrien'}, 'password', function(err, user) {
@@ -49,4 +50,44 @@ describe('prevent password reuse', function() {
 
   });
 
+  it('should work', function (done) {
+      this.timeout(5000); // Five seconds - mongo db access needed
+
+      var UserSchema = new Schema({});
+      UserSchema.plugin(passportLocalMongoose, {preventReuse: 2, iterations: 1});
+      var User = mongoose.model('PreventReuseWorks', UserSchema);
+
+      User.register({username: 'bob'}, 'password', function(err, user) {
+        expect(err).to.not.exist;
+
+        user.setPassword('password', function (err2, user2) {
+          expect(err2).to.be.instanceof(errors.PasswordReuseError);
+
+          done();
+        });
+      });
+
+  });
+
+  it('should not expose historyField', function(done) {
+    this.timeout(5000); // Five seconds - mongo db access needed
+
+    var UserSchema = new Schema({});
+    UserSchema.plugin(passportLocalMongoose, {preventReuse: 2, iterations: 1});
+    var User = mongoose.model('PreventReuseNoExposure', UserSchema);
+
+    User.register({username: 'bob'}, 'password', function(err) {
+      expect(err).to.not.exist;
+
+      User.findOne({username: 'bob'}, function(err2, user) {
+        expect(err2).to.not.exist;
+
+        expect(user.username).to.equal('bob');
+        expect(user.passHistory).to.be.undefined;
+
+        done();
+      });
+    });
+
+  });
 });
