@@ -74,14 +74,15 @@ module.exports = function(schema, options) {
 
   schema.add(schemaFields);
 
-  schema.pre('save', function(next) {
-    // if specified, convert the username to lowercase
-    if (options.usernameLowerCase && this[options.usernameField]) {
-      this[options.usernameField] = this[options.usernameField].toLowerCase();
-    }
+  if (options.usernameLowerCase) {
+    schema.pre('save', function(next) {
+      if (this[options.usernameField]) {
+        this[options.usernameField] = this[options.usernameField].toLowerCase();
+      }
 
-    next();
-  });
+      next();
+    });
+  }
 
   schema.methods.setPassword = function(password, cb) {
     if (!password) {
