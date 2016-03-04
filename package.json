@@ -24,8 +24,8 @@
   "devDependencies": {
     "chai": "^3.2.0",
     "mocha": "^2.3.2",
-    "mongoose": "4.1.x",
-    "shelljs": "^0.5.3"
+    "mongoose": "4.4.x",
+    "shelljs": "^0.6.0"
   },
   "scripts": {
     "test": "mocha -R spec test/",
