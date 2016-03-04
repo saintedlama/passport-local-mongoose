@@ -3,7 +3,7 @@
   "description": "Mongoose plugin that simplifies building username and password login with Passport",
   "version": "4.0.0",
   "main": "index.js",
-  "repository": "git://github.com/saintedlama/passport-local-mongoose.git",
+  "repository": "saintedlama/passport-local-mongoose",
   "author": "Christoph Walcher <christoph.walcher@gmail.com>",
   "license": "MIT",
   "keywords": [
