@@ -115,6 +115,32 @@ module.exports = function(schema, options) {
       });
     });
   };
+  
+  schema.methods.changePassword = function(oldPassword, newPassword, cb) {
+    if (!oldPassword || !newPassword) {
+      return cb(new errors.MissingPasswordError(options.errorMessages.MissingPasswordError));
+    }
+
+    if (!this.get(options.saltField)) {
+      return cb(new errors.NoSaltValueStoredError(options.errorMessages.NoSaltValueStoredError));
+    }
+    
+    var self = this;
+    
+    pbkdf2(oldPassword, this.get(options.saltField), function(err, hashRaw) {
+      if (err) {
+        return cb(err);
+      }
+
+      var hash = new Buffer(hashRaw, 'binary').toString(options.encoding);
+
+      if (scmp(hash, self.get(options.hashField))) {
+        self.setPassword(newPassword, cb);
+      } else {
+        return cb(new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError));
+      }
+    });
+  };
 
   function authenticate(user, password, cb) {
     if (options.limitAttempts) {
@@ -167,7 +193,6 @@ module.exports = function(schema, options) {
         }
       }
     });
-
   }
 
   schema.methods.authenticate = function(password, cb) {

@@ -170,6 +170,49 @@ describe('passportLocalMongoose', function() {
       });
     });
   });
+  
+  describe('#changePassword()', function() {
+    it('should change password', function(done) {
+      var user = new DefaultUser();
+
+      user.setPassword('password1', function(err) {
+        assert.ifError(err);
+        
+        user.changePassword('password1', 'password2', function(err) {
+          assert.ifError(err);
+          
+          user.authenticate('password2', function(err, result, data) {
+            assert.ifError(err);
+            assert.ok(result);
+            
+            done();
+          })
+        })
+      });
+    })
+    
+    it('should fail on wrong password', function(done) {
+      var user = new DefaultUser();
+
+      user.setPassword('password1', function(err) {
+        assert.ifError(err);
+        
+        user.changePassword('password2', 'password2', function(err) {
+          assert.ok(err);
+          done();
+        })
+      });
+    })
+    
+    it('should fail when password not set', function(done) {
+        var user = new DefaultUser();
+        
+        user.changePassword('', 'password', function(err) {
+            assert.ok(err);
+            done();
+        });
+    });
+  });
 
   describe('#authenticate()', function() {
     it('should yield false in case user cannot be authenticated', function(done) {
