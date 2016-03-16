@@ -207,7 +207,7 @@ describe('passportLocalMongoose', function() {
     it('should fail when password not set', function(done) {
         var user = new DefaultUser();
         
-        user.changePassword('', 'password', function(err) {
+        user.changePassword(undefined, 'password', function(err) {
             assert.ok(err);
             done();
         });
