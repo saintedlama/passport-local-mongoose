@@ -135,6 +135,9 @@ module.exports = function(schema, options) {
       var hash = new Buffer(hashRaw, 'binary').toString(options.encoding);
 
       if (scmp(hash, self.get(options.hashField))) {
+        if (oldPassword === newPassword) {
+            return cb(null, self);
+        }
         self.setPassword(newPassword, cb);
       } else {
         return cb(new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError));

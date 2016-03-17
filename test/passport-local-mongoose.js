@@ -178,8 +178,9 @@ describe('passportLocalMongoose', function() {
       user.setPassword('password1', function(err) {
         assert.ifError(err);
         
-        user.changePassword('password1', 'password2', function(err) {
+        user.changePassword('password1', 'password2', function(err, user) {
           assert.ifError(err);
+          assert.ok(user);
           
           user.authenticate('password2', function(err, result, data) {
             assert.ifError(err);
@@ -197,7 +198,7 @@ describe('passportLocalMongoose', function() {
       user.setPassword('password1', function(err) {
         assert.ifError(err);
         
-        user.changePassword('password2', 'password2', function(err) {
+        user.changePassword('password2', 'password2', function(err, user) {
           assert.ok(err);
           done();
         })
@@ -205,13 +206,28 @@ describe('passportLocalMongoose', function() {
     })
     
     it('should fail when password not set', function(done) {
-        var user = new DefaultUser();
+      var user = new DefaultUser();
         
-        user.changePassword(undefined, 'password', function(err) {
-            assert.ok(err);
-            done();
-        });
+      user.changePassword(undefined, 'password', function(err, user) {
+        assert.ok(err);
+        done();
+      });
     });
+    
+    it('should not fail when passwords are the same', function(done) {
+      var user = new DefaultUser();
+
+      user.setPassword('password1', function(err) {
+        assert.ifError(err);
+        
+        user.changePassword('password1', 'password1', function(err, user) {
+          assert.ifError(err);
+          assert.ok(user);
+          
+          done();
+        })
+      });
+    })
   });
 
   describe('#authenticate()', function() {
