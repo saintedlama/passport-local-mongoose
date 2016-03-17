@@ -116,33 +116,48 @@ module.exports = function(schema, options) {
     });
   };
   
-  schema.methods.changePassword = function(oldPassword, newPassword, cb) {
+  function changePassword(user, oldPassword, newPassword, cb) {
     if (!oldPassword || !newPassword) {
       return cb(new errors.MissingPasswordError(options.errorMessages.MissingPasswordError));
     }
-
-    if (!this.get(options.saltField)) {
+    
+    if (!user.get(options.saltField)) {
       return cb(new errors.NoSaltValueStoredError(options.errorMessages.NoSaltValueStoredError));
     }
     
-    var self = this;
-    
-    pbkdf2(oldPassword, this.get(options.saltField), function(err, hashRaw) {
+    pbkdf2(oldPassword, user.get(options.saltField), function(err, hashRaw) {
       if (err) {
         return cb(err);
       }
 
       var hash = new Buffer(hashRaw, 'binary').toString(options.encoding);
 
-      if (scmp(hash, self.get(options.hashField))) {
+      if (scmp(hash, user.get(options.hashField))) {
         if (oldPassword === newPassword) {
-            return cb(null, self);
+            return cb(null, user);
         }
-        self.setPassword(newPassword, cb);
+        user.setPassword(newPassword, cb);
       } else {
         return cb(new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError));
       }
     });
+  }
+  
+  schema.methods.changePassword = function(oldPassword, newPassword, cb) {
+    var self = this;
+    
+    if (!self.get(options.saltField)) {
+      self.constructor.findByUsername(self.get(options.usernameField), true, function(err, user) {
+        if (err) return cb(err);
+        if (user) {
+          return changePassword(user, oldPassword, newPassword, cb);
+        } else {
+          return cb(new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError));
+        }
+      });
+    } else {
+      return changePassword(self, oldPassword, newPassword, cb);
+    }
   };
 
   function authenticate(user, password, cb) {

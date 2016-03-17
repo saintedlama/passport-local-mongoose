@@ -173,6 +173,8 @@ describe('passportLocalMongoose', function() {
   
   describe('#changePassword()', function() {
     it('should change password', function(done) {
+      this.timeout(5000); // Five seconds - heavy crypto in background
+      
       var user = new DefaultUser();
 
       user.setPassword('password1', function(err) {
@@ -187,12 +189,14 @@ describe('passportLocalMongoose', function() {
             assert.ok(result);
             
             done();
-          })
-        })
+          });
+        });
       });
-    })
+    });
     
     it('should fail on wrong password', function(done) {
+      this.timeout(5000); // Five seconds - heavy crypto in background
+        
       var user = new DefaultUser();
 
       user.setPassword('password1', function(err) {
@@ -203,18 +207,11 @@ describe('passportLocalMongoose', function() {
           done();
         })
       });
-    })
-    
-    it('should fail when password not set', function(done) {
-      var user = new DefaultUser();
-        
-      user.changePassword(undefined, 'password', function(err, user) {
-        assert.ok(err);
-        done();
-      });
     });
     
     it('should not fail when passwords are the same', function(done) {
+      this.timeout(5000); // Five seconds - heavy crypto in background
+      
       var user = new DefaultUser();
 
       user.setPassword('password1', function(err) {
@@ -225,9 +222,29 @@ describe('passportLocalMongoose', function() {
           assert.ok(user);
           
           done();
-        })
+        });
       });
-    })
+    });
+    
+    it('should change password when user model doesnt include salt/hash fields', function(done) {
+      this.timeout(5000); // Five seconds - heavy crypto in background
+      
+      var user = new DefaultUser();
+
+      user.setPassword('password1', function(err) {
+        assert.ifError(err);
+        
+        delete user.salt;
+        delete user.hash;
+        
+        user.changePassword('password1', 'password2', function(err, user) {
+          assert.ifError(err);
+          assert.ok(user);
+          
+          done();
+        });
+      });
+    });
   });
 
   describe('#authenticate()', function() {
