@@ -1,10 +1,8 @@
-var crypto = require('crypto');
 var LocalStrategy = require('passport-local').Strategy;
 var errors = require('./lib/errors.js');
+var pbkdf2 = require('./lib/pbkdf2');
+var crypto = require('crypto');
 var scmp = require('scmp');
-var semver = require('semver');
-
-var pbkdf2DigestSupport = semver.gte(process.version, '0.12.0');
 
 module.exports = function(schema, options) {
   options = options || {};
@@ -51,14 +49,6 @@ module.exports = function(schema, options) {
   options.errorMessages.MissingUsernameError = options.errorMessages.MissingUsernameError|| 'No username was given';
   options.errorMessages.UserExistsError = options.errorMessages.UserExistsError|| 'A user with the given username is already registered';
 
-  var pbkdf2 = function(password, salt, callback) {
-    if (pbkdf2DigestSupport) {
-      crypto.pbkdf2(password, salt, options.iterations, options.keylen, options.digestAlgorithm, callback);
-    } else {
-      crypto.pbkdf2(password, salt, options.iterations, options.keylen, callback);
-    }
-  };
-
   var schemaFields = {};
 
   if (!schema.path(options.usernameField)) {
@@ -74,15 +64,14 @@ module.exports = function(schema, options) {
 
   schema.add(schemaFields);
 
-  if (options.usernameLowerCase) {
-    schema.pre('save', function(next) {
-      if (this[options.usernameField]) {
-        this[options.usernameField] = this[options.usernameField].toLowerCase();
-      }
+  schema.pre('save', function(next) {
+    // if specified, convert the username to lowercase
+    if (options.usernameLowerCase && this[options.usernameField]) {
+      this[options.usernameField] = this[options.usernameField].toLowerCase();
+    }
 
-      next();
-    });
-  }
+    next();
+  });
 
   schema.methods.setPassword = function(password, cb) {
     if (!password) {
@@ -103,7 +92,7 @@ module.exports = function(schema, options) {
 
         var salt = buf.toString(options.encoding);
 
-        pbkdf2(password, salt, function(pbkdf2Err, hashRaw) {
+        pbkdf2(password, salt, options, function(pbkdf2Err, hashRaw) {
           if (pbkdf2Err) {
             return cb(pbkdf2Err);
           }
@@ -117,60 +106,6 @@ module.exports = function(schema, options) {
     });
   };
 
-  function authenticate(user, password, cb) {
-    if (options.limitAttempts) {
-      var attemptsInterval = Math.pow(options.interval, Math.log(user.get(options.attemptsField) + 1));
-      var calculatedInterval = (attemptsInterval < options.maxInterval) ? attemptsInterval : options.maxInterval;
-
-      if (Date.now() - user.get(options.lastLoginField) < calculatedInterval) {
-        user.set(options.lastLoginField, Date.now());
-        user.save();
-        return cb(null, false, new errors.AttemptTooSoonError(options.errorMessages.AttemptTooSoonError));
-      }
-
-      if (user.get(options.attemptsField) >= options.maxAttempts) {
-        return cb(null, false, new errors.TooManyAttemptsError(options.errorMessages.TooManyAttemptsError));
-      }
-    }
-
-    if (!user.get(options.saltField)) {
-      return cb(null, false, new errors.NoSaltValueStoredError(options.errorMessages.NoSaltValueStoredError));
-    }
-
-    pbkdf2(password, user.get(options.saltField), function(err, hashRaw) {
-      if (err) {
-        return cb(err);
-      }
-
-      var hash = new Buffer(hashRaw, 'binary').toString(options.encoding);
-
-      if (scmp(hash, user.get(options.hashField))) {
-        if (options.limitAttempts) {
-          user.set(options.lastLoginField, Date.now());
-          user.set(options.attemptsField, 0);
-          user.save();
-        }
-        return cb(null, user);
-      } else {
-        if (options.limitAttempts) {
-          user.set(options.lastLoginField, Date.now());
-          user.set(options.attemptsField, user.get(options.attemptsField) + 1);
-          user.save(function(saveErr) {
-            if (saveErr) { return cb(saveErr); }
-            if (user.get(options.attemptsField) >= options.maxAttempts) {
-              return cb(null, false, new errors.TooManyAttemptsError(options.errorMessages.TooManyAttemptsError));
-            } else {
-              return cb(null, false, new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError));
-            }
-          });
-        } else {
-          return cb(null, false, new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError));
-        }
-      }
-    });
-
-  }
-
   schema.methods.authenticate = function(password, cb) {
     var self = this;
 
@@ -180,13 +115,13 @@ module.exports = function(schema, options) {
         if (err) { return cb(err); }
 
         if (user) {
-          return authenticate(user, password, cb);
+          return authenticate(user, password, options, cb);
         } else {
           return cb(null, false, new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError));
         }
       });
     } else {
-      return authenticate(self, password, cb);
+      return authenticate(self, password, options, cb);
     }
   };
 
