@@ -23,13 +23,14 @@
   },
   "devDependencies": {
     "chai": "^3.2.0",
+    "cross-env": "^1.0.8",
     "mocha": "^2.3.2",
     "mongoose": "4.4.x",
-    "shelljs": "^0.6.0"
+    "shelljs": "^0.7.0"
   },
   "scripts": {
-    "test": "mocha -R spec test/",
-    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report html -- -R spec",
+    "test": "cross-env NODE_ENV=test mocha -R spec test/",
+    "cover": "cross-env NODE_ENV=test istanbul cover ./node_modules/mocha/bin/_mocha --report html -- -R spec",
     "release": "node release.js"
   }
 }
