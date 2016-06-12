@@ -1,18 +1,30 @@
-sudo: false
 language: node_js
-node_js:
-  - "0.10"
-  - "0.12"
-  - "4"
-  - "5"
 
-services:
-  - mongodb
+sudo: false
+
+node_js:
+  - "6"
+  - "5"
+  - "4"
+  - "0.12"
+  - "0.10"
+
+env:
+  - MONGODB_VERSION="2.6.11"
+  - MONGODB_VERSION="3.0.7"
+  - MONGODB_VERSION="3.2.0"
 
 before_script:
   - npm install -g istanbul
   - npm install coveralls
   - npm install mocha-lcov-reporter
+  -
+  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB_VERSION}.tgz -O /tmp/mongodb.tgz
+  - tar -xvf /tmp/mongodb.tgz
+  - mkdir /tmp/data
+  - ${PWD}/mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod --dbpath /tmp/data &> /dev/null &
+  - ${PWD}/mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod --version
+  - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
 
 after_script:
   - NODE_ENV=test istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
