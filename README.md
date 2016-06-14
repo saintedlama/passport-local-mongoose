@@ -110,6 +110,8 @@ field to hold the username for example "email".
 * maxAttempts: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
 * passwordValidator: specifies your custom validation function for the password in the form 'function(password,cb)'. Default: validates non-empty passwords.
 * usernameQueryFields: specifies alternative fields of the model for identifying a user (e.g. email).
+* preventReuse: specifies how many old hash/salt pairs to keep around. If set to a positive integer, prevent reuse of passwords for that many successive password changes. Default: 0.
+* historyField: specifies the field name that holds the back history of hash/salt pairs. Defaults to 'passHistory'.
 
 *Attention!* Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
 
@@ -124,7 +126,8 @@ Override default error messages by setting options.errorMessages.
 * IncorrectUsernameError 'Password or username are incorrect'
 * MissingUsernameError 'No username was given'
 * UserExistsError 'A user with the given username is already registered'
-  
+* PasswordReuseError 'Password reuse detected'
+
 ### Hash Algorithm
 Passport-Local Mongoose use the pbkdf2 algorithm of the node crypto library. 
 [Pbkdf2](http://en.wikipedia.org/wiki/PBKDF2) was chosen because platform independent
@@ -168,6 +171,7 @@ To commit the changed document, remember to use Mongoose's `document.save()` aft
 * `NoSaltValueStored`: Occurs in case no salt value is stored in the MongoDB collection.
 * `AttemptTooSoonError`: Occurs if the option `limitAttempts` is set to true and a login attept occures while the user is still penalized.
 * `TooManyAttemptsError`: Returned when the user's account is locked due to too many failed login attempts.
+* `PasswordReuseError`: Occurs when the `preventReuse` option is enabled and the password is being set to a previously used value.
 
 All those errors inherit from `AuthenticationError`, if you need a more general error class for checking.
 
