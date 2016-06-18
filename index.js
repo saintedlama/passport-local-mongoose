@@ -117,6 +117,8 @@ module.exports = function(schema, options) {
   };
 
   function checkPassword(user, password, cb) {
+    password = password || '';
+
     pbkdf2(password, user.get(options.saltField), function(err, hashRaw) {
       if (err) {
         return cb(err);
