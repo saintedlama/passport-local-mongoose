@@ -28,7 +28,7 @@
     "istanbul": "^0.4.3",
     "mocha": "^2.3.2",
     "mocha-lcov-reporter": "^1.2.0",
-    "mongoose": "4.4.x",
+    "mongoose": "4.5.2",
     "shelljs": "^0.7.0"
   },
   "scripts": {
