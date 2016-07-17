@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var assert = require('assert');
+var expect = require('chai').expect;
 var passportLocalMongoose = require('../');
 var mongotest = require('./helpers/mongotest');
 
@@ -20,12 +20,12 @@ describe('alternative query field', function() {
     var email = 'hugo@test.org';
     var user = new User({username: 'hugo', email: email});
     user.save(function(err) {
-      assert.ifError(err);
+      expect(err).to.not.exist;
 
       User.findByUsername(email, function(err, user) {
-        assert.ifError(err);
-        assert.ok(user);
-        assert.equal(user.email, email);
+        expect(err).to.not.exist;
+        expect(user).to.exist;
+        expect(user.email).to.equal(email);
 
         done();
       });
@@ -44,12 +44,12 @@ describe('alternative query field', function() {
     var email = 'hugo@test.org';
     var user = new User({username: 'hugo', email: email});
     User.register(user, 'password', function(err) {
-      assert.ifError(err);
+      expect(err).to.not.exist;
 
       User.authenticate()('hugo@test.org', 'password', function(err, user, message) {
-        assert.ifError(err);
-        assert.ok(user);
-        assert.ok(!message);
+        expect(err).to.not.exist;
+        expect(user).to.exist;
+        expect(!message).to.exist;
 
         done();
       });
@@ -68,12 +68,12 @@ describe('alternative query field', function() {
     var email = 'hugo@test.org';
     var user = new User({username: 'hugo', email: email});
     User.register(user, 'password', function(err) {
-      assert.ifError(err);
+      expect(err).to.not.exist;
 
       User.authenticate()('hugo', 'password', function(err, user, message) {
-        assert.ifError(err);
-        assert.ok(user);
-        assert.ok(!message);
+        expect(err).to.not.exist;
+        expect(user).to.exist;
+        expect(!message).to.exist;
 
         done();
       });
@@ -92,12 +92,12 @@ describe('alternative query field', function() {
     var email = 'hugo@test.org';
     var user = new User({username: 'hugo', email: email});
     User.register(user, 'password', function(err) {
-      assert.ifError(err);
+      expect(err).to.not.exist;
 
       User.authenticate()('hugo@test.org', 'password', function(err, user, message) {
-        assert.ifError(err);
-        assert.ok(!user);
-        assert.ok(message);
+        expect(err).to.not.exist;
+        expect(!user).to.exist;
+        expect(message).to.exist;
 
         done();
       });
