@@ -92,9 +92,7 @@ module.exports = function(schema, options) {
     var self = this;
 
     options.passwordValidator(password, function(err) {
-      if (err) {
-        return cb(err);
-      }
+      if (err) { return cb(err); }
 
       crypto.randomBytes(options.saltlen, function(randomBytesErr, buf) {
         if (randomBytesErr) {
