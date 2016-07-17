@@ -16,6 +16,7 @@
     "node": ">= 0.12"
   },
   "dependencies": {
+    "debug": "^2.2.0",
     "generaterr": "^1.2.0",
     "passport-local": "^1.0.0",
     "scmp": "^1.0.0",
@@ -24,11 +25,11 @@
   "devDependencies": {
     "chai": "^3.2.0",
     "coveralls": "^2.11.9",
-    "cross-env": "^1.0.8",
+    "cross-env": "^2.0.0",
     "istanbul": "^0.4.3",
     "mocha": "^2.3.2",
     "mocha-lcov-reporter": "^1.2.0",
-    "mongoose": "4.4.x",
+    "mongoose": "4.5.x",
     "shelljs": "^0.7.0"
   },
   "scripts": {
