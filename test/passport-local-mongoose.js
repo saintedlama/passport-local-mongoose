@@ -2,7 +2,6 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var errors = require('../lib/errors.js');
 var passportLocalMongoose = require('../');
-var assert = require('assert');
 var expect = require('chai').expect;
 var mongotest = require('./helpers/mongotest.js');
 
@@ -29,34 +28,34 @@ describe('passportLocalMongoose', function() {
     it('should add "username" field to model', function() {
       var user = new DefaultUser({username: 'username'});
 
-      assert.equal('username', user.username);
+      expect(user.username).to.equal('username');
     });
 
     it('should add "salt" field to model', function() {
       var user = new DefaultUser({salt: 'salt'});
 
-      assert.equal('salt', user.salt);
+      expect(user.salt).to.equal('salt')
     });
 
     it('should add "hash" field to model', function() {
       var user = new DefaultUser({hash: 'hash'});
 
-      assert.equal('hash', user.hash);
+      expect(user.hash).to.equal('hash')
     });
 
     it('should add "setPassword" function to model', function() {
       var user = new DefaultUser({});
 
-      assert.equal('function', typeof(user.setPassword));
+      expect(typeof(user.setPassword)).to.equal('function')
     });
 
     it('should add "authenticate" function to model', function() {
       var user = new DefaultUser();
-      assert.equal('function', typeof(user.authenticate));
+      expect(typeof(user.authenticate)).to.equal('function')
     });
 
     it('should add static "authenticate" function', function() {
-      assert.equal('function', typeof(DefaultUser.authenticate));
+      expect(typeof(DefaultUser.authenticate)).to.equal('function')
     });
 
     it('should allow overriding "username" field name', function() {
@@ -66,7 +65,7 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('UsernameOverriddenUser', UserSchema);
       var user = new User();
 
-      assert.ok(user.schema.path('email'));
+      expect(user.schema.path('email')).to.exist;
     });
 
     it('should allow overriding "salt" field name', function() {
@@ -76,7 +75,7 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('SaltOverriddenUser', UserSchema);
       var user = new User();
 
-      assert.ok(user.schema.path('passwordSalt'));
+      expect(user.schema.path('passwordSalt')).to.exist;
     });
 
     it('should allow overriding "hash" field name', function() {
@@ -86,7 +85,7 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('HashOverriddenUser', UserSchema);
       var user = new User();
 
-      assert.ok(user.schema.path('passwordHash'));
+      expect(user.schema.path('passwordHash')).to.exist;
     });
 
     it('should allow overriding "limitAttempts" option', function() {
@@ -96,7 +95,7 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('LimitOverriddenUser', UserSchema);
       var user = new User();
 
-      assert.ok(user.schema.path('attempts'));
+      expect(user.schema.path('attempts')).to.exist;
     });
 
     it('should allow overriding "attempts" field name', function() {
@@ -106,7 +105,7 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('AttemptsOverriddenUser', UserSchema);
       var user = new User();
 
-      assert.ok(user.schema.path('failures'));
+      expect(user.schema.path('failures')).to.exist;
     });
 
     it('should preserve "username" field if already defined in the schema', function() {
@@ -122,14 +121,14 @@ describe('passportLocalMongoose', function() {
       var UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose);
 
-      assert.strictEqual(true, UserSchema.path('username').options.unique);
+      expect(UserSchema.path('username').options.unique).to.equal(true);
     });
 
     it('should add "username" field to as non unique if specified by option', function() {
       var UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {usernameUnique: false});
 
-      assert.strictEqual(false, UserSchema.path('username').options.unique);
+      expect(UserSchema.path('username').options.unique).to.equal(false);
     });
   });
 
@@ -138,7 +137,7 @@ describe('passportLocalMongoose', function() {
       var user = new DefaultUser();
 
       user.setPassword(undefined, function(err) {
-        assert.ok(err);
+        expect(err).to.exist;
         done();
       });
     });
@@ -149,9 +148,9 @@ describe('passportLocalMongoose', function() {
       var user = new DefaultUser();
 
       user.setPassword('password', function(err) {
-        assert.ifError(err);
-        assert.ok(user.hash);
-        assert.ok(user.salt);
+        expect(err).to.not.exist;
+        expect(user.hash).to.exist;
+        expect(user.salt).to.exist;
 
         done();
       });
@@ -163,8 +162,8 @@ describe('passportLocalMongoose', function() {
       var user = new DefaultUser();
 
       setPasswordAndAuthenticate(user, 'password', 'password', function(err, result) {
-        assert.ifError(err);
-        assert.equal(user, result);
+        expect(err).to.not.exist;
+        expect(result).to.equal(user);
 
         done();
       });
@@ -178,8 +177,8 @@ describe('passportLocalMongoose', function() {
       var user = new DefaultUser();
 
       setPasswordAndAuthenticate(user, 'password', 'nopassword', function(err, result) {
-        assert.ifError(err);
-        assert.ok(result === false);
+        expect(err).to.not.exist;
+        expect(result).to.equal(false);
 
         done();
       });
@@ -191,8 +190,8 @@ describe('passportLocalMongoose', function() {
       var user = new DefaultUser();
 
       setPasswordAndAuthenticate(user, 'password', 'nopassword', function(err, result, options) {
-        assert.ifError(err);
-        assert.ok(options.message);
+        expect(err).to.not.exist;
+        expect(options.message).to.exist;
 
         done();
       });
@@ -207,9 +206,9 @@ describe('passportLocalMongoose', function() {
       this.timeout(5000); // Five seconds - mongo db access needed
 
       DefaultUser.authenticate()('user', 'password', function(err, result, options) {
-        assert.ifError(err);
-        assert.ok(result === false);
-        assert.ok(options.message);
+        expect(err).to.not.exist;
+        expect(result).to.equal(false);
+        expect(options.message).to.exist;
 
         done();
       });
@@ -220,18 +219,18 @@ describe('passportLocalMongoose', function() {
 
       var user = new DefaultUser({username: 'user'});
       user.setPassword('password', function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         user.save(function(err) {
-          assert.ifError(err);
+          expect(err).to.not.exist;
 
           DefaultUser.authenticate()('user', 'password', function(err, result) {
-            assert.ifError(err);
+            expect(err).to.not.exist;
 
-            assert.ok(result instanceof DefaultUser);
-            assert.equal(user.username, result.username);
-            assert.equal(user.salt, result.salt);
-            assert.equal(user.hash, result.hash);
+            expect(result instanceof DefaultUser).to.exist;
+            expect(result.username).to.equal(user.username);
+            expect(result.salt).to.equal(user.salt);
+            expect(result.hash).to.equal(user.hash);
 
             done();
           });
@@ -248,13 +247,13 @@ describe('passportLocalMongoose', function() {
 
       var username = 'userName';
       User.register({username: username}, 'password', function(err, user) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         User.authenticate()('username', 'password', function(err, result) {
-          assert.ifError(err);
+          expect(err).to.not.exist;
 
-          assert.ok(result instanceof User);
-          assert.equal(result.username, 'username');
+          expect(result instanceof User).to.exist;
+          expect('username').to.equal(result.username);
 
           done();
         });
@@ -274,15 +273,15 @@ describe('passportLocalMongoose', function() {
 
       var email = 'emailUsedAsUsername';
       User.register({email: email}, 'password', function(err, user) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         User.authenticate()(email, 'password', function(err, result) {
-          assert.ifError(err);
+          expect(err).to.not.exist;
 
-          assert.ok(result instanceof User);
-          assert.equal(user.email, result.email);
-          assert.equal(user.saltValue, result.saltValue);
-          assert.equal(user.hashValue, result.hashValue);
+          expect(result instanceof User).to.exist;
+          expect(result.email).to.equal(user.email);
+          expect(result.saltValue).to.equal(user.saltValue);
+          expect(result.hashValue).to.equal(user.hashValue);
 
           done();
         });
@@ -294,15 +293,15 @@ describe('passportLocalMongoose', function() {
 
       var user = new DefaultUser({username: 'user'});
       user.setPassword('password', function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         user.save(function(err) {
-          assert.ifError(err);
+          expect(err).to.not.exist;
 
           DefaultUser.authenticate()('user', 'wrongpassword', function(err, result, options) {
-            assert.ifError(err);
-            assert.equal(result, false);
-            assert.ok(options.message);
+            expect(err).to.not.exist;
+            expect(result).to.equal(false);
+            expect(options.message).to.exist;
 
             done();
           });
@@ -320,10 +319,10 @@ describe('passportLocalMongoose', function() {
 
       var user = new User({username: 'user'});
       user.setPassword('password', function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         user.save(function(err) {
-          assert.ifError(err);
+          expect(err).to.not.exist;
 
           User.authenticate()('user', 'WRONGpassword', function(err, result, message) {
             expect(err).to.not.exist;
@@ -339,7 +338,6 @@ describe('passportLocalMongoose', function() {
 
                 // Last login attempt should lock the user!
                 User.authenticate()('user', 'password', function(err, result, message) {
-                  debugger;
                   expect(err).to.not.exist;
                   expect(result).to.be.false;
 
@@ -364,45 +362,51 @@ describe('passportLocalMongoose', function() {
 
       var User = mongoose.model('LockUserPermanentlyAfterLimitAttempts', UserSchema);
 
+      function authenticateWithWrongPassword(times, next) {
+        if (times == 0) {
+          return next();
+        }
+
+        User.authenticate()('user', 'WRONGpassword', function(err, result, data) {
+          expect(err).to.not.exist;
+          expect(result).to.be.false;
+
+          times--;
+
+          // Use should be locked at last login attempt
+          if (times == 0) {
+            expect(data.message).to.contain('locked');
+          } else {
+            expect(data.message).to.not.contain('locked');
+          }
+
+          authenticateWithWrongPassword(times, next);
+        });
+      }
+
       var user = new User({username: 'user'});
       user.setPassword('password', function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         user.save(function(err) {
-          assert.ifError(err);
+          expect(err).to.not.exist;
 
-          User.authenticate()('user', 'WRONGpassword', function(err, result, data) {
-            expect(err).to.not.exist;
-            expect(result).to.be.false;
-            expect(data.message).to.not.contain('locked');
-
-            User.authenticate()('user', 'WRONGpassword', function(err, result, data) {
+          authenticateWithWrongPassword(3, function() {
+            // Login attempt before should have locked the user!
+            User.authenticate()('user', 'password', function(err, result, data) {
               expect(err).to.not.exist;
               expect(result).to.be.false;
-              expect(data.message).to.not.contain('locked');
+              expect(data.message).to.contain('locked');
 
-              User.authenticate()('user', 'WRONGpassword', function(err, result, data) {
+              user.resetAttempts(function(err) {
                 expect(err).to.not.exist;
-                expect(result).to.be.false;
-                expect(data.message).to.contain('locked');
 
-                // Last login attempt should lock the user!
-                User.authenticate()('user', 'password', function(err, result, data) {
+                // User should be unlocked
+                User.authenticate()('user', 'password', function(err, result, message) {
                   expect(err).to.not.exist;
-                  expect(result).to.be.false;
-                  expect(data.message).to.contain('locked');
+                  expect(result).to.exist;
 
-                  user.resetAttempts(function(err) {
-                    assert.ifError(err);
-
-                    // User should be unlocked
-                    User.authenticate()('user', 'password', function(err, result, message) {
-                      expect(err).to.not.exist;
-                      expect(result).to.exist;
-
-                      done();
-                    });
-                  });
+                  done();
                 });
               });
             });
@@ -415,14 +419,14 @@ describe('passportLocalMongoose', function() {
 
   describe('static #serializeUser()', function() {
     it('should define a static serializeUser function for passport', function() {
-      assert.ok(DefaultUser.serializeUser);
+      expect(DefaultUser.serializeUser).to.exist;
     });
 
     it('should serialize existing user by username field', function(done) {
       var user = new DefaultUser({username: 'user'});
 
       DefaultUser.serializeUser()(user, function(err, username) {
-        assert.equal('user', username);
+        expect(username).to.equal('user');
 
         done();
       });
@@ -436,7 +440,7 @@ describe('passportLocalMongoose', function() {
       var user = new User({email: 'emailUsedForUsername'});
 
       User.serializeUser()(user, function(err, username) {
-        assert.equal('emailUsedForUsername', username);
+        expect(username).to.equal('emailUsedForUsername');
 
         done();
       });
@@ -448,18 +452,18 @@ describe('passportLocalMongoose', function() {
     afterEach(mongotest.disconnect());
 
     it('should define a static deserializeUser function for passport', function() {
-      assert.ok(DefaultUser.deserializeUser);
+      expect(DefaultUser.deserializeUser).to.exist;
     });
 
     it('should deserialize users by retrieving users from mongodb', function(done) {
       this.timeout(5000); // Five seconds - mongo db access needed
 
       DefaultUser.register({username: 'user'}, 'password', function(err, user) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         DefaultUser.deserializeUser()('user', function(err, loadedUser) {
-          assert.ifError(err);
-          assert.equal(user.username, loadedUser.username);
+          expect(err).to.not.exist;
+          expect(loadedUser.username).to.equal(user.username)
 
           done();
         });
@@ -475,11 +479,11 @@ describe('passportLocalMongoose', function() {
 
       var email = 'emailUsedForUsername';
       User.register({email: email}, 'password', function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         User.deserializeUser()(email, function(err, loadedUser) {
-          assert.ifError(err);
-          assert.equal(email, loadedUser.email);
+          expect(err).to.not.exist;
+          expect(loadedUser.email).to.equal(email);
 
           done();
         });
@@ -496,7 +500,7 @@ describe('passportLocalMongoose', function() {
       UserSchema.plugin(passportLocalMongoose, {});
       var User = mongoose.model('FindByUsernameDefined', UserSchema);
 
-      assert.ok(User.findByUsername);
+      expect(User.findByUsername).to.exist;
     });
 
     it('should retrieve saved user with findByUsername helper function', function(done) {
@@ -506,12 +510,12 @@ describe('passportLocalMongoose', function() {
 
       var user = new User({username: 'hugo'});
       user.save(function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         User.findByUsername('hugo', function(err, user) {
-          assert.ifError(err);
-          assert.ok(user);
-          assert.equal(user.username, 'hugo');
+          expect(err).to.not.exist;
+          expect(user).to.exist;
+          expect('hugo').to.equal(user.username);
 
           done();
         });
@@ -525,16 +529,16 @@ describe('passportLocalMongoose', function() {
 
       var user = new User({username: 'hugo'});
       user.save(function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
-        var query = User.findByUsername('hugo')
+        var query = User.findByUsername('hugo');
 
-        assert.ok(query);
+        expect(query).to.exist;
 
         query.exec(function(err, user) {
-          assert.ifError(err);
-          assert.ok(user);
-          assert.equal(user.username, 'hugo');
+          expect(err).to.not.exist;
+          expect(user).to.exist;
+          expect(user.username).to.equal('hugo');
 
           done();
         });
@@ -548,13 +552,13 @@ describe('passportLocalMongoose', function() {
 
       var user = new User({username: 'hugo', department: 'DevOps'});
       user.save(function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         User.findByUsername('hugo', function(err, user) {
-          assert.ifError(err);
-          assert.ok(user);
-          assert.equal(user.username, 'hugo');
-          assert.equal(user.department, 'DevOps');
+          expect(err).to.not.exist;
+          expect(user).to.exist;
+          expect(user.username).to.equal('hugo');
+          expect(user.department).to.equal('DevOps');
 
           done();
         });
@@ -568,13 +572,13 @@ describe('passportLocalMongoose', function() {
 
       var user = new User({username: 'hugo', department: 'DevOps'});
       user.save(function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         User.findByUsername('hugo', function(err, user) {
-          assert.ifError(err);
-          assert.ok(user);
-          assert.equal(user.username, 'hugo');
-          assert.equal(user.department, undefined);
+          expect(err).to.not.exist;
+          expect(user).to.exist;
+          expect(user.username).to.equal('hugo');
+          expect(user.department).to.equal(undefined);
 
           done();
         });
@@ -590,12 +594,12 @@ describe('passportLocalMongoose', function() {
       var user = new User({email: email});
 
       user.save(function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         User.findByUsername(email, function(err, user) {
-          assert.ifError(err);
-          assert.ok(user);
-          assert.equal(user.email, email);
+          expect(err).to.not.exist;
+          expect(user).to.exist;
+          expect(email).to.equal(user.email);
 
           done();
         });
@@ -608,7 +612,7 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('FindByUsernameWithUndefinedUsername', UserSchema);
 
       User.findByUsername(undefined, function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
         done();
       });
     });
@@ -623,7 +627,7 @@ describe('passportLocalMongoose', function() {
       UserSchema.plugin(passportLocalMongoose, {});
       var User = mongoose.model('RegisterDefined', UserSchema);
 
-      assert.ok(User.register);
+      expect(User.register).to.exist;
     });
 
     it('should register user', function(done) {
@@ -634,12 +638,12 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('RegisterUser', UserSchema);
 
       User.register({username: 'hugo'}, 'password', function(err, user) {
-        assert.ifError(err);
-        assert.ok(user);
+        expect(err).to.not.exist;
+        expect(user).to.exist;
 
         User.findByUsername('hugo', function(err, user) {
-          assert.ifError(err);
-          assert.ok(user);
+          expect(err).to.not.exist;
+          expect(user).to.exist;
           done();
         });
       });
@@ -653,10 +657,10 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('RegisterDuplicateUser', UserSchema);
 
       User.register({username: 'hugo'}, 'password', function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         User.register({username: 'hugo'}, 'password', function(err) {
-          assert.ok(err);
+          expect(err).to.exist;
           done();
         });
       });
@@ -670,12 +674,12 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('RegisterAndAuthenticateUser', UserSchema);
 
       User.register({username: 'hugo'}, 'password', function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         User.authenticate()('hugo', 'password', function(err, user, message) {
-          assert.ifError(err);
-          assert.ok(user);
-          assert.ok(!message);
+          expect(err).to.not.exist;
+          expect(user).to.exist;
+          expect(message).to.not.exist;
 
           done();
         });
@@ -690,12 +694,12 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('RegisterAndNotAuthenticateUser', UserSchema);
 
       User.register({username: 'hugo'}, 'password', function(err) {
-        assert.ifError(err);
+        expect(err).to.not.exist;
 
         User.authenticate()('hugo', 'wrong_password', function(err, user, message) {
-          assert.ifError(err);
-          assert.ok(!user);
-          assert.ok(message);
+          expect(err).to.not.exist;
+          expect(user).to.equal(false);
+          expect(message).to.exist;
 
           done();
         });
@@ -711,16 +715,17 @@ describe('passportLocalMongoose', function() {
 
       var existingUser = new User({});
       existingUser.save(function(err, user) {
-        assert.ifError(err);
-        assert.ok(user);
+        expect(err).to.not.exist;
+        expect(user).to.exist;
+
         user.username = 'hugo';
         User.register(user, 'password', function(err, user) {
-          assert.ifError(err);
-          assert.ok(user);
+          expect(err).to.not.exist;
+          expect(user).to.exist;
 
           User.findByUsername('hugo', function(err, user) {
-            assert.ifError(err);
-            assert.ok(user);
+            expect(err).to.not.exist;
+            expect(user).to.exist;
             done();
           });
         });
@@ -761,7 +766,7 @@ describe('passportLocalMongoose', function() {
       var User = mongoose.model('CreateStrategy', UserSchema);
 
       var strategy = User.createStrategy();
-      assert.ok(strategy);
+      expect(strategy).to.exist;
     });
   });
 });
