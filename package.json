@@ -20,7 +20,7 @@
     "generaterr": "^1.2.0",
     "passport-local": "^1.0.0",
     "scmp": "^1.0.0",
-    "semver": "^5.1.0"
+    "semver": "^5.2.0"
   },
   "devDependencies": {
     "chai": "^3.2.0",
