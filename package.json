@@ -26,7 +26,7 @@
     "chai": "^3.2.0",
     "coveralls": "^2.11.9",
     "cross-env": "^2.0.0",
-    "istanbul": "^0.4.3",
+    "istanbul": "^0.4.5",
     "mocha": "^2.3.2",
     "mocha-lcov-reporter": "^1.2.0",
     "mongoose": "^4.5.0",
