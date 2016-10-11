@@ -171,6 +171,37 @@ describe('passportLocalMongoose', function() {
     });
   });
 
+  describe('#checkPassword()', function() {
+    it('should return an error if the password checked does not match the user\'s password.', function(done) {
+      var user = new DefaultUser();
+
+      user.setPassword('password', function(err) {
+        assert.ifError(err);
+
+        user.checkPassword('notpassword', function(err, result, options) {
+          assert.ifError(err);
+          assert.equal(result, false);
+          assert.ok(options.message);
+          done();
+        });
+      });
+    });
+
+    it('should return the user if the passwords match', function(done) {
+      var user = new DefaultUser();
+
+      user.setPassword('password', function(err) {
+        assert.ifError(err);
+
+        user.checkPassword('password', function(err, result) {
+          assert.ifError(err);
+          assert.equal(user, result);
+          done();
+        });
+      });
+    });
+  });
+
   describe('#authenticate()', function() {
     it('should yield false in case user cannot be authenticated', function(done) {
       this.timeout(5000); // Five seconds - heavy crypto in background

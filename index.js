@@ -127,9 +127,9 @@ module.exports = function(schema, options) {
       var hash = new Buffer(hashRaw, 'binary').toString(options.encoding);
 
       if (scmp(hash, user.get(options.hashField))) {
-        return cb(null, true);
+        return cb(null, user);
       } else {
-        return cb(null, false);
+        return cb(null, false, new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError));
       }
     });
   }
