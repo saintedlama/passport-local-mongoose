@@ -16,7 +16,7 @@
     "node": ">= 0.12"
   },
   "dependencies": {
-    "debug": "^2.2.0",
+    "debug": "^2.4.0",
     "generaterr": "^1.2.0",
     "passport-local": "^1.0.0",
     "scmp": "^1.0.0",
