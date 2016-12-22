@@ -135,14 +135,12 @@ module.exports = function(schema, options) {
       return cb(null, false, new errors.NoSaltValueStoredError(options.errorMessages.NoSaltValueStoredError));
     }
 
-    pbkdf2(password, user.get(options.saltField), function(err, hashRaw) {
+    pbkdf2(password, user.get(options.saltField), function(err, hashBuffer) {
       if (err) {
         return cb(err);
       }
 
-      var hash = new Buffer(hashRaw, 'binary').toString(options.encoding);
-
-      if (scmp(hash, user.get(options.hashField))) {
+      if (scmp(hashBuffer, new Buffer(user.get(options.hashField), options.encoding))) {
         if (options.limitAttempts) {
           user.set(options.lastLoginField, Date.now());
           user.set(options.attemptsField, 0);
