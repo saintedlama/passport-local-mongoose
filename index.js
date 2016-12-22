@@ -115,6 +115,24 @@ module.exports = function(schema, options) {
     });
   };
 
+  function checkPassword(user, password, cb) {
+    password = password || '';
+
+    pbkdf2(password, user.get(options.saltField), function(err, hashRaw) {
+      if (err) {
+        return cb(err);
+      }
+
+      var hash = new Buffer(hashRaw, 'binary').toString(options.encoding);
+
+      if (scmp(hash, user.get(options.hashField))) {
+        return cb(null, user);
+      } else {
+        return cb(null, false, new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError));
+      }
+    });
+  }
+
   function authenticate(user, password, cb) {
     if (options.limitAttempts) {
       var attemptsInterval = Math.pow(options.interval, Math.log(user.get(options.attemptsField) + 1));
@@ -135,14 +153,12 @@ module.exports = function(schema, options) {
       return cb(null, false, new errors.NoSaltValueStoredError(options.errorMessages.NoSaltValueStoredError));
     }
 
-    pbkdf2(password, user.get(options.saltField), function(err, hashRaw) {
+    checkPassword(user, password, function(err, passwordValid) {
       if (err) {
         return cb(err);
       }
 
-      var hash = new Buffer(hashRaw, 'binary').toString(options.encoding);
-
-      if (scmp(hash, user.get(options.hashField))) {
+      if (err, passwordValid) {
         if (options.limitAttempts) {
           user.set(options.lastLoginField, Date.now());
           user.set(options.attemptsField, 0);
@@ -166,7 +182,23 @@ module.exports = function(schema, options) {
         }
       }
     });
+  }
 
+  schema.methods.checkPassword = function(password, cb) {
+    var self = this;
+
+    if (!self.get(options.saltField)) {
+      self.constructor.findByUsername(self.get(options.usernameField), true, function(err, user) {
+        if (err) return cb(err);
+        if (user) {
+          return checkPassword(user, password, cb);
+        } else {
+          return cb(new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError));
+        }
+      });
+    } else {
+      return checkPassword(self, password, cb);
+    }
   }
 
   schema.methods.authenticate = function(password, cb) {
