@@ -5,12 +5,12 @@ var passportLocalMongoose = require('../');
 var mongotest = require('./helpers/mongotest');
 
 describe('issues', function() {
+  this.timeout(5000); // Five seconds - mongodb access needed
+
   beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongooseissues'));
   afterEach(mongotest.disconnect());
 
   it('should support nested fields - Issue #9', function(done) {
-    this.timeout(5000); // Five seconds - mongo db access needed
-
     var UserSchema = new Schema({
       sensitiveData1: String,
       sensitiveDate2: Number,
@@ -36,8 +36,6 @@ describe('issues', function() {
   });
 
   it('should support not throw exception in case hash or salt are not stored - Issue #27', function(done) {
-    this.timeout(5000); // Five seconds - mongo db access needed
-
     var UserSchema = new Schema({
       name: String,
       age: Number
@@ -63,8 +61,6 @@ describe('issues', function() {
   });
 
   it('should support not throw exception in case hash and salt are not selected - Issue #27', function(done) {
-    this.timeout(5000); // Five seconds - mongo db access needed
-
     var UserSchema = new Schema({
       name: String,
       age: Number
@@ -89,8 +85,6 @@ describe('issues', function() {
   });
 
   it('should populate fields in findByUsername if option is given - Issue #20', function(done) {
-    this.timeout(5000); // Five seconds - mongo db access needed
-
     var LoginSchema = new Schema({date: Date, success: Boolean});
     var UserSchema = new Schema({logins: [{type: Schema.Types.ObjectId, ref: 'Login'}]});
 
@@ -128,8 +122,6 @@ describe('issues', function() {
 
   /* Since password is not directly stored with mongo/mongoose, password cannot be easily validated */
   it('should support password validation - Issue #57', function(done) {
-    this.timeout(5000); // Five seconds - mongo db access needed
-
     var UserSchema = new Schema({});
 
     var nastyPasswordValidator = function(password, cb) {
@@ -148,8 +140,6 @@ describe('issues', function() {
   });
 
   it('should not expose hash and salt fields - Issue #72', function(done) {
-    this.timeout(5000); // Five seconds - mongo db access needed
-
     var UserSchema = new Schema({});
 
     UserSchema.plugin(passportLocalMongoose, {});
@@ -170,7 +160,6 @@ describe('issues', function() {
   });
 
   describe('authentication should work with salt/hash field marked as select: false - Issue #96', function() {
-    this.timeout(5000); // Five seconds - mongo db access needed
     var UserSchema = new Schema({});
     UserSchema.plugin(passportLocalMongoose, {});
     var userName = 'user_' + Math.random();
