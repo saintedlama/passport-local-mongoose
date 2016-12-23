@@ -158,6 +158,30 @@ describe('issues', function() {
       });
     });
   });
+  
+  it('should not fail on parallel requests with reused query - Issue #124', function(done) {
+    var UserSchema = new Schema({});
+    UserSchema.plugin(passportLocalMongoose);
+
+    var User = mongoose.model('ShouldNotFailOnParallelRequestsWithReusedQuery', UserSchema);
+    
+    var query = User.find({});
+    var result = [];
+    
+    query.exec(function(err, users) {
+        assert.ifError(err);
+        
+        result.push(users);
+        if (result.length == 2) done();
+    });
+    
+    query.count().exec(function(err, count) {
+        assert.ifError(err);
+        
+        result.push(count);
+        if (result.length == 2) done();
+    });
+  });
 
   describe('authentication should work with salt/hash field marked as select: false - Issue #96', function() {
     var UserSchema = new Schema({});
