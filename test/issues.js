@@ -220,4 +220,24 @@ describe('issues', function() {
       });
     });
   });
+
+  it('should select attemptsField and lastLoginField in findByUsername if limitAttempts is true and option.selectFields is given - Issue #129', function(done) {
+    var UserSchema = new Schema({});
+    UserSchema.plugin(passportLocalMongoose, {limitAttempts: true, selectFields: 'username'});
+    var User = mongoose.model('AddFieldsToSelectFields', UserSchema);
+
+    var user = new User({username: 'hugo', department: 'DevOps'});
+    user.save(function(err) {
+      expect(err).to.not.exist;
+
+      User.findByUsername('hugo', function(err, user) {
+        expect(err).to.not.exist;
+        expect(user).to.exist;
+        expect(user.last).to.exist;
+        expect(user.attempts).to.exist;
+
+        done();
+      });
+    });
+  });
 });
