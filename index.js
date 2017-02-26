@@ -71,9 +71,12 @@ module.exports = function(schema, options) {
     schemaFields[options.attemptsField] = {type: Number, default: 0};
     schemaFields[options.lastLoginField] = {type: Date, default: Date.now};
     if (options.selectFields) {
-      [options.attemptsField, options.lastLoginField].forEach(field => {
-        options.selectFields += options.selectFields.includes(field) ? '' : ` ${field}`
-      })
+      var fieldsToAdd = [options.attemptsField, options.lastLoginField];
+      for (var i = 0; i < fieldsToAdd.length; i++ ) {
+        if (options.selectFields.indexOf(fieldsToAdd[i]) === -1) {
+          options.selectFields += ' ' + fieldsToAdd[i];
+        }
+      }
     }
   }
 
