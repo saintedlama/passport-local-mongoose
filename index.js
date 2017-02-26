@@ -70,6 +70,11 @@ module.exports = function(schema, options) {
   if (options.limitAttempts) {
     schemaFields[options.attemptsField] = {type: Number, default: 0};
     schemaFields[options.lastLoginField] = {type: Date, default: Date.now};
+    if (options.selectFields) {
+      [options.attemptsField, options.lastLoginField].forEach(field => {
+        options.selectFields += options.selectFields.includes(field) ? '' : ` ${field}`
+      })
+    }
   }
 
   schema.add(schemaFields);
