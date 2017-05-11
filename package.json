@@ -25,7 +25,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "coveralls": "^2.11.15",
-    "cross-env": "^2.0.0",
+    "cross-env": "^5.0.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "mocha-lcov-reporter": "^1.2.0",
