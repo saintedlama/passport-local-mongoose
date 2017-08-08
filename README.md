@@ -32,18 +32,17 @@ digest algorithm.
 ### Plugin Passport-Local Mongoose
 First you need to plugin Passport-Local Mongoose into your User schema
 
-    var mongoose = require('mongoose'),
-        Schema = mongoose.Schema,
-        passportLocalMongoose = require('passport-local-mongoose');
+    const mongoose = require('mongoose');
+    const Schema = mongoose.Schema;
+    const passportLocalMongoose = require('passport-local-mongoose');
     
-    var User = new Schema({});
+    const User = new Schema({});
     
     User.plugin(passportLocalMongoose);
     
     module.exports = mongoose.model('User', User);
 
-You're free to define your User how you like. Passport-Local Mongoose will add a username, hash and salt field to store
-the username, the hashed password and the salt value.
+You're free to define your User how you like. Passport-Local Mongoose will add a username, hash and salt field to store the username, the hashed password and the salt value.
 
 Additionally Passport-Local Mongoose adds some methods to your Schema. See the API Documentation section for more details.
 
@@ -55,7 +54,7 @@ Passport-Local Mongoose supports this setup by implementing a `LocalStrategy` an
 To setup Passport-Local Mongoose use this code
 
     // requires the model with Passport-Local Mongoose plugged in
-    var User = require('./models/user');
+    const User = require('./models/user');
     
     // use static authenticate method of model in LocalStrategy
     passport.use(new LocalStrategy(User.authenticate()));
@@ -70,7 +69,7 @@ Make sure that you have a mongoose connected to mongodb and you're done.
 Starting with version 0.2.1 passport-local-mongoose adds a helper method `createStrategy` as static method to your schema.
 The `createStrategy` is responsible to setup passport-local `LocalStrategy` with the correct options.
 
-    var User = require('./models/user');
+    const User = require('./models/user');
     
     // CHANGE: USE "createStrategy" INSTEAD OF "authenticate"
     passport.use(User.createStrategy());
@@ -175,7 +174,7 @@ All those errors inherit from `AuthenticationError`, if you need a more general 
 ### Static methods
 Static methods are exposed on the model constructor. For example to use createStrategy function use
 
-    var User = require('./models/user');
+    const User = require('./models/user');
     User.createStrategy();
 
 * authenticate() Generates a function that is used in Passport's LocalStrategy
