@@ -1,5 +1,6 @@
 # test related
 coverage/
+.nyc_output/
 testing
 testapp
 
