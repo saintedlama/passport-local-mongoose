@@ -1,10 +1,9 @@
 var crypto = require('crypto');
 var LocalStrategy = require('passport-local').Strategy;
-var errors = require('./lib/errors.js');
 var scmp = require('scmp');
-var semver = require('semver');
 
-var pbkdf2DigestSupport = semver.gte(process.version, '0.12.0');
+var errors = require('./lib/errors');
+var pbkdf2 = require('./lib/pbkdf2');
 
 module.exports = function(schema, options) {
   options = options || {};
@@ -41,6 +40,8 @@ module.exports = function(schema, options) {
     options.maxAttempts = options.maxAttempts || Infinity;
   }
 
+  options.upgrade;
+
   options.errorMessages = options.errorMessages || {};
   options.errorMessages.MissingPasswordError = options.errorMessages.MissingPasswordError || 'No password was given';
   options.errorMessages.AttemptTooSoonError = options.errorMessages.AttemptTooSoonError || 'Account is currently locked. Try again later';
@@ -50,14 +51,6 @@ module.exports = function(schema, options) {
   options.errorMessages.IncorrectUsernameError = options.errorMessages.IncorrectUsernameError || 'Password or username are incorrect';
   options.errorMessages.MissingUsernameError = options.errorMessages.MissingUsernameError|| 'No username was given';
   options.errorMessages.UserExistsError = options.errorMessages.UserExistsError|| 'A user with the given username is already registered';
-
-  var pbkdf2 = function(password, salt, callback) {
-    if (pbkdf2DigestSupport) {
-      crypto.pbkdf2(password, salt, options.iterations, options.keylen, options.digestAlgorithm, callback);
-    } else {
-      crypto.pbkdf2(password, salt, options.iterations, options.keylen, callback);
-    }
-  };
 
   var schemaFields = {};
 
@@ -101,7 +94,7 @@ module.exports = function(schema, options) {
 
         var salt = buf.toString(options.encoding);
 
-        pbkdf2(password, salt, function(pbkdf2Err, hashRaw) {
+        pbkdf2(password, salt, options, function(pbkdf2Err, hashRaw) {
           if (pbkdf2Err) {
             return cb(pbkdf2Err);
           }
@@ -135,7 +128,7 @@ module.exports = function(schema, options) {
       return cb(null, false, new errors.NoSaltValueStoredError(options.errorMessages.NoSaltValueStoredError));
     }
 
-    pbkdf2(password, user.get(options.saltField), function(err, hashBuffer) {
+    pbkdf2(password, user.get(options.saltField), options, function(err, hashBuffer) {
       if (err) {
         return cb(err);
       }
