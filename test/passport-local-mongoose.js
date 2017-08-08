@@ -173,6 +173,82 @@ describe('passportLocalMongoose', function() {
       });
     });
   });
+  
+  describe('#changePassword()', function() {
+    it('should change password', function(done) {
+      this.timeout(5000); // Five seconds - heavy crypto in background
+      
+      var user = new DefaultUser();
+
+      user.setPassword('password1', function(err) {
+        assert.ifError(err);
+        
+        user.changePassword('password1', 'password2', function(err, user) {
+          assert.ifError(err);
+          assert.ok(user);
+          
+          user.authenticate('password2', function(err, result, data) {
+            assert.ifError(err);
+            assert.ok(result);
+            
+            done();
+          });
+        });
+      });
+    });
+    
+    it('should fail on wrong password', function(done) {
+      this.timeout(5000); // Five seconds - heavy crypto in background
+        
+      var user = new DefaultUser();
+
+      user.setPassword('password1', function(err) {
+        assert.ifError(err);
+        
+        user.changePassword('password2', 'password2', function(err, user) {
+          assert.ok(err);
+          done();
+        })
+      });
+    });
+    
+    it('should not fail when passwords are the same', function(done) {
+      this.timeout(5000); // Five seconds - heavy crypto in background
+      
+      var user = new DefaultUser();
+
+      user.setPassword('password1', function(err) {
+        assert.ifError(err);
+        
+        user.changePassword('password1', 'password1', function(err, user) {
+          assert.ifError(err);
+          assert.ok(user);
+          
+          done();
+        });
+      });
+    });
+    
+    it('should change password when user model doesnt include salt/hash fields', function(done) {
+      this.timeout(5000); // Five seconds - heavy crypto in background
+      
+      var user = new DefaultUser();
+
+      user.setPassword('password1', function(err) {
+        assert.ifError(err);
+        
+        delete user.salt;
+        delete user.hash;
+        
+        user.changePassword('password1', 'password2', function(err, user) {
+          assert.ifError(err);
+          assert.ok(user);
+          
+          done();
+        });
+      });
+    });
+  });
 
   describe('#authenticate()', function() {
     it('should yield false in case user cannot be authenticated', function(done) {

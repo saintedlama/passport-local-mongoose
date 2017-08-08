@@ -107,6 +107,50 @@ module.exports = function(schema, options) {
       });
     });
   };
+  
+  function changePassword(user, oldPassword, newPassword, cb) {
+    if (!oldPassword || !newPassword) {
+      return cb(new errors.MissingPasswordError(options.errorMessages.MissingPasswordError));
+    }
+    
+    if (!user.get(options.saltField)) {
+      return cb(new errors.NoSaltValueStoredError(options.errorMessages.NoSaltValueStoredError));
+    }
+    
+    pbkdf2(oldPassword, user.get(options.saltField), function(err, hashRaw) {
+      if (err) {
+        return cb(err);
+      }
+
+      var hash = new Buffer(hashRaw, 'binary').toString(options.encoding);
+
+      if (scmp(hash, user.get(options.hashField))) {
+        if (oldPassword === newPassword) {
+            return cb(null, user);
+        }
+        user.setPassword(newPassword, cb);
+      } else {
+        return cb(new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError));
+      }
+    });
+  }
+  
+  schema.methods.changePassword = function(oldPassword, newPassword, cb) {
+    var self = this;
+    
+    if (!self.get(options.saltField)) {
+      self.constructor.findByUsername(self.get(options.usernameField), true, function(err, user) {
+        if (err) return cb(err);
+        if (user) {
+          return changePassword(user, oldPassword, newPassword, cb);
+        } else {
+          return cb(new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError));
+        }
+      });
+    } else {
+      return changePassword(self, oldPassword, newPassword, cb);
+    }
+  };
 
   function authenticate(user, password, cb) {
     if (options.limitAttempts) {
@@ -157,7 +201,6 @@ module.exports = function(schema, options) {
         }
       }
     });
-
   }
 
   schema.methods.authenticate = function(password, cb) {
