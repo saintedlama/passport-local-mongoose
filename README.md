@@ -152,6 +152,10 @@ For a complete example implementing a registration, login and logout see the
 #### setPassword(password, cb) 
 asynchronous method to set a user's password hash and salt
 
+#### changePassword(oldPassword, newPassword, cb)
+asynchronous method to change a user's password hash and salt. If oldPassword does
+not match the user's old password an `IncorrectPasswordError` is passed to cb.
+
 #### authenticate(password, cb)
 asynchronous method to authenticate a user instance
 

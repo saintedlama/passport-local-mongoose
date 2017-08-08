@@ -137,6 +137,8 @@ describe('passportLocalMongoose', function() {
   });
 
   describe('#setPassword()', function() {
+    this.timeout(5000); // Five seconds - heavy crypto in background
+
     it('should set yield an error if password is undefined', function(done) {
       var user = new DefaultUser();
 
@@ -147,8 +149,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should set salt and hash', function(done) {
-      this.timeout(5000); // Five seconds - heavy crypto in background
-
       var user = new DefaultUser();
 
       user.setPassword('password', function(err) {
@@ -161,8 +161,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should authenticate user with arguments supplied to setPassword', function(done) {
-      this.timeout(5000); // Five seconds - heavy crypto in background
-
       var user = new DefaultUser();
 
       setPasswordAndAuthenticate(user, 'password', 'password', function(err, result) {
@@ -174,10 +172,88 @@ describe('passportLocalMongoose', function() {
     });
   });
 
-  describe('#authenticate()', function() {
-    it('should yield false in case user cannot be authenticated', function(done) {
-      this.timeout(5000); // Five seconds - heavy crypto in background
+  describe('#changePassword()', function() {
+    this.timeout(5000); // Five seconds - heavy crypto in background
 
+    beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
+    afterEach(mongotest.disconnect());
+
+    it('should change password', function(done) {
+      var user = new DefaultUser();
+
+      user.setPassword('password1', function(err) {
+        if (err) { return done(err); }
+
+        user.changePassword('password1', 'password2', function(err, user) {
+          if (err) { return done(err); }
+
+          expect(user).to.exist;
+
+          user.authenticate('password2', function(err, result) {
+            if (err) { return done(err); }
+
+            expect(result).to.exist;
+
+            done();
+          });
+        });
+      });
+    });
+
+    it('should fail on wrong password', function(done) {
+      var user = new DefaultUser();
+
+      user.setPassword('password1', function(err) {
+        if (err) { return done(err); }
+
+        user.changePassword('password2', 'password2', function(err) {
+          expect(err).to.exist;
+
+          done();
+        });
+      });
+    });
+
+    it('should not fail when passwords are the same', function(done) {
+      var user = new DefaultUser();
+
+      user.setPassword('password1', function(err) {
+        if (err) { return done(err); }
+
+        user.changePassword('password1', 'password1', function(err, user) {
+          if (err) { return done(err); }
+
+          expect(user).to.exist;
+
+          done();
+        });
+      });
+    });
+
+    it('should change password when user model doesnt include salt/hash fields', function(done) {
+      var user = new DefaultUser();
+
+      user.setPassword('password1', function(err) {
+        if (err) { return done(err); }
+
+        delete user.salt;
+        delete user.hash;
+
+        user.changePassword('password1', 'password2', function(err, user) {
+          if (err) { return done(err); }
+
+          expect(user).to.exist;
+
+          done();
+        });
+      });
+    });
+  });
+
+  describe('#authenticate()', function() {
+    this.timeout(5000); // Five seconds - heavy crypto in background
+
+    it('should yield false in case user cannot be authenticated', function(done) {
       var user = new DefaultUser();
 
       setPasswordAndAuthenticate(user, 'password', 'nopassword', function(err, result) {
@@ -189,8 +265,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should supply a message when authentication fails', function(done) {
-      this.timeout(5000); // Five seconds - heavy crypto in background
-
       var user = new DefaultUser();
 
       setPasswordAndAuthenticate(user, 'password', 'nopassword', function(err, result, options) {
@@ -203,12 +277,12 @@ describe('passportLocalMongoose', function() {
   });
 
   describe('static #authenticate()', function() {
+    this.timeout(5000); // Five seconds - mongo db access needed
+
     beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
     afterEach(mongotest.disconnect());
 
     it('should yield false with message option for authenticate', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       DefaultUser.authenticate()('user', 'password', function(err, result, options) {
         expect(err).to.not.exist;
         expect(result).to.equal(false);
@@ -219,8 +293,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should authenticate existing user with matching password', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var user = new DefaultUser({username: 'user'});
       user.setPassword('password', function(err) {
         expect(err).to.not.exist;
@@ -243,14 +315,12 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should authenticate existing user with case insensitive username with matching password', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema();
       UserSchema.plugin(passportLocalMongoose, {usernameLowerCase: true});
       var User = mongoose.model('AuthenticateWithCaseInsensitiveUsername', UserSchema);
 
       var username = 'userName';
-      User.register({username: username}, 'password', function(err, user) {
+      User.register({username: username}, 'password', function(err) {
         expect(err).to.not.exist;
 
         User.authenticate()('username', 'password', function(err, result) {
@@ -265,8 +335,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should authenticate existing user with matching password with field overrides', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema();
       UserSchema.plugin(passportLocalMongoose, {
         usernameField: 'email',
@@ -293,8 +361,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should not authenticate existing user with non matching password', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var user = new DefaultUser({username: 'user'});
       user.setPassword('password', function(err) {
         expect(err).to.not.exist;
@@ -314,8 +380,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should lock authenticate after too many login attempts', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {limitAttempts: true, interval: 20000}); // High initial value for test
 
@@ -355,8 +419,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should completely lock account after too many failed attempts', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {
         limitAttempts: true,
@@ -452,6 +514,8 @@ describe('passportLocalMongoose', function() {
   });
 
   describe('static #deserializeUser()', function() {
+    this.timeout(5000); // Five seconds - mongo db access needed
+
     beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
     afterEach(mongotest.disconnect());
 
@@ -460,8 +524,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should deserialize users by retrieving users from mongodb', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       DefaultUser.register({username: 'user'}, 'password', function(err, user) {
         expect(err).to.not.exist;
 
@@ -475,8 +537,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should deserialize users by retrieving users from mongodb with username override', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema();
       UserSchema.plugin(passportLocalMongoose, {usernameField: 'email'});
       var User = mongoose.model('DeserializeUserWithOverride', UserSchema);
@@ -623,6 +683,8 @@ describe('passportLocalMongoose', function() {
   });
 
   describe('static #register()', function() {
+    this.timeout(5000); // Five seconds - mongo db access needed
+
     beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
     afterEach(mongotest.disconnect());
 
@@ -635,8 +697,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should register user', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {});
       var User = mongoose.model('RegisterUser', UserSchema);
@@ -654,8 +714,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should check for duplicate user name', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {});
       var User = mongoose.model('RegisterDuplicateUser', UserSchema);
@@ -671,8 +729,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should authenticate registered user', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {iterations: 1}); // 1 iteration - safes time in tests
       var User = mongoose.model('RegisterAndAuthenticateUser', UserSchema);
@@ -691,8 +747,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should not authenticate registered user with wrong password', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {iterations: 1}); // 1 iteration - safes time in tests
       var User = mongoose.model('RegisterAndNotAuthenticateUser', UserSchema);
@@ -711,8 +765,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('it should add username existing user without username', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {});
       var User = mongoose.model('RegisterExistingUser', UserSchema);
@@ -737,8 +789,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should result in AuthenticationError error in case no username was given', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {});
       var User = mongoose.model('RegisterUserWithoutUsername', UserSchema);
@@ -750,8 +800,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should result in AuthenticationError error in case no password was given', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {});
       var User = mongoose.model('RegisterUserWithoutPassword', UserSchema);

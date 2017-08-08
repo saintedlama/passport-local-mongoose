@@ -45,8 +45,8 @@ module.exports = function(schema, options) {
   options.errorMessages.AttemptTooSoonError = options.errorMessages.AttemptTooSoonError || 'Account is currently locked. Try again later';
   options.errorMessages.TooManyAttemptsError = options.errorMessages.TooManyAttemptsError || 'Account locked due to too many failed login attempts';
   options.errorMessages.NoSaltValueStoredError = options.errorMessages.NoSaltValueStoredError || 'Authentication not possible. No salt value stored';
-  options.errorMessages.IncorrectPasswordError = options.errorMessages.IncorrectPasswordError || 'Password or username are incorrect';
-  options.errorMessages.IncorrectUsernameError = options.errorMessages.IncorrectUsernameError || 'Password or username are incorrect';
+  options.errorMessages.IncorrectPasswordError = options.errorMessages.IncorrectPasswordError || 'Password or username is incorrect';
+  options.errorMessages.IncorrectUsernameError = options.errorMessages.IncorrectUsernameError || 'Password or username is incorrect';
   options.errorMessages.MissingUsernameError = options.errorMessages.MissingUsernameError|| 'No username was given';
   options.errorMessages.UserExistsError = options.errorMessages.UserExistsError|| 'A user with the given username is already registered';
 
@@ -65,7 +65,7 @@ module.exports = function(schema, options) {
 
   schema.add(schemaFields);
 
-  schema.pre('save', function (next) {
+  schema.pre('save', function(next) {
     if (options.usernameLowerCase && this[options.usernameField]) {
       this[options.usernameField] = this[options.usernameField].toLowerCase();
     }
@@ -99,6 +99,32 @@ module.exports = function(schema, options) {
           self.set(options.saltField, salt);
 
           cb(null, self);
+        });
+      });
+    });
+  };
+
+  schema.methods.changePassword = function(oldPassword, newPassword, cb) {
+    if (!oldPassword || !newPassword) {
+      return cb(new errors.MissingPasswordError(options.errorMessages.MissingPasswordError));
+    }
+
+    var self = this;
+
+    this.authenticate(oldPassword, function(err, authenticated) {
+      if (err) { return cb(err); }
+
+      if (!authenticated) {
+        return cb(new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError));
+      }
+
+      self.setPassword(newPassword, function(setPasswordErr, user) {
+        if (setPasswordErr) { return cb(setPasswordErr); }
+
+        self.save(function(saveErr) {
+          if (saveErr) { return cb(saveErr); }
+
+          cb(null, user);
         });
       });
     });
@@ -179,14 +205,10 @@ module.exports = function(schema, options) {
       }
 
       user.setPassword(password, function(setPasswordErr, user) {
-        if (setPasswordErr) {
-          return cb(setPasswordErr);
-        }
+        if (setPasswordErr) { return cb(setPasswordErr); }
 
         user.save(function(saveErr) {
-          if (saveErr) {
-            return cb(saveErr);
-          }
+          if (saveErr) { return cb(saveErr); }
 
           cb(null, user);
         });
