@@ -12,14 +12,18 @@ passport, passport-local and passport-local-mongoose for user authentication in 
 
 ## Installation
 
-    $ npm install passport-local-mongoose
+```bash
+$ npm install passport-local-mongoose
+```
 
 Passport-Local Mongoose does not require `passport`, `passport-local` or `mongoose` dependencies directly but expects you
 to have these dependencies installed.
 
 In case you need to install the whole set of dependencies
 
-    $ npm install passport passport-local mongoose passport-local-mongoose --save
+```bash
+$ npm install passport passport-local mongoose passport-local-mongoose --save
+```
 
 ### Updating from 1.x to 2.x
 The default digest algorithm was changed due to security implications from **sha1** to **sha256**. If you decide
@@ -32,15 +36,17 @@ digest algorithm.
 ### Plugin Passport-Local Mongoose
 First you need to plugin Passport-Local Mongoose into your User schema
 
-    const mongoose = require('mongoose');
-    const Schema = mongoose.Schema;
-    const passportLocalMongoose = require('passport-local-mongoose');
-    
-    const User = new Schema({});
-    
-    User.plugin(passportLocalMongoose);
-    
-    module.exports = mongoose.model('User', User);
+```javascript
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const passportLocalMongoose = require('passport-local-mongoose');
+
+const User = new Schema({});
+
+User.plugin(passportLocalMongoose);
+
+module.exports = mongoose.model('User', User);
+```
 
 You're free to define your User how you like. Passport-Local Mongoose will add a username, hash and salt field to store the username, the hashed password and the salt value.
 
@@ -53,15 +59,17 @@ Passport-Local Mongoose supports this setup by implementing a `LocalStrategy` an
 
 To setup Passport-Local Mongoose use this code
 
-    // requires the model with Passport-Local Mongoose plugged in
-    const User = require('./models/user');
-    
-    // use static authenticate method of model in LocalStrategy
-    passport.use(new LocalStrategy(User.authenticate()));
-    
-    // use static serialize and deserialize of model for passport session support
-    passport.serializeUser(User.serializeUser());
-    passport.deserializeUser(User.deserializeUser());
+```javascript
+// requires the model with Passport-Local Mongoose plugged in
+const User = require('./models/user');
+
+// use static authenticate method of model in LocalStrategy
+passport.use(new LocalStrategy(User.authenticate()));
+
+// use static serialize and deserialize of model for passport session support
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+```
 
 Make sure that you have a mongoose connected to mongodb and you're done.
 
@@ -69,13 +77,15 @@ Make sure that you have a mongoose connected to mongodb and you're done.
 Starting with version 0.2.1 passport-local-mongoose adds a helper method `createStrategy` as static method to your schema.
 The `createStrategy` is responsible to setup passport-local `LocalStrategy` with the correct options.
 
-    const User = require('./models/user');
-    
-    // CHANGE: USE "createStrategy" INSTEAD OF "authenticate"
-    passport.use(User.createStrategy());
-    
-    passport.serializeUser(User.serializeUser());
-    passport.deserializeUser(User.deserializeUser());
+```javascript
+const User = require('./models/user');
+
+// CHANGE: USE "createStrategy" INSTEAD OF "authenticate"
+passport.use(User.createStrategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+```
 
 The reason for this functionality is that when using the `usernameField` option to specify an alternative usernameField name, 
 for example "email" passport-local would still expect your frontend login form to contain an input field with name "username"
@@ -85,7 +95,9 @@ instead of email. This can be configured for passport-local but this is double t
 When plugging in Passport-Local Mongoose plugin additional options can be provided to configure
 the hashing algorithm.
 
-    User.plugin(passportLocalMongoose, options);
+```javascript
+User.plugin(passportLocalMongoose, options);
+```
 
 __Main Options__
 
@@ -174,8 +186,10 @@ All those errors inherit from `AuthenticationError`, if you need a more general 
 ### Static methods
 Static methods are exposed on the model constructor. For example to use createStrategy function use
 
-    const User = require('./models/user');
-    User.createStrategy();
+```javascript
+const User = require('./models/user');
+User.createStrategy();
+```
 
 * authenticate() Generates a function that is used in Passport's LocalStrategy
 * serializeUser() Generates a function that is used by Passport to serialize users into the session
