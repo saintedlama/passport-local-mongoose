@@ -114,7 +114,11 @@ describe('passportLocalMongoose', function() {
       var UserSchema = new Schema({username: usernameField});
       UserSchema.plugin(passportLocalMongoose);
 
-      expect(UserSchema.path('username').options).to.deep.equal(usernameField);
+      var usernameFieldOptions = UserSchema.path('username').options;
+
+      expect(usernameFieldOptions.type).to.deep.equal(usernameField.type);
+      expect(usernameFieldOptions.required).to.deep.equal(usernameField.required);
+      expect(usernameFieldOptions.unique).to.deep.equal(usernameField.unique);
     });
 
     it('should add "username" field to as unique model per default', function() {
