@@ -211,8 +211,8 @@ module.exports = function(schema, options) {
           if (saveErr) { return cb(saveErr); }
 
           // hide hashField & saltField by default
-          user[options.hashField] = undefined;
-          user[options.saltField] = undefined;
+          user[options.hashField] = null;
+          user[options.saltField] = null;
 
           cb(null, user);
         });
