@@ -210,6 +210,10 @@ module.exports = function(schema, options) {
         user.save(function(saveErr) {
           if (saveErr) { return cb(saveErr); }
 
+          // hide hashField & saltField by default
+          user[options.hashField] = null;
+          user[options.saltField] = null;
+
           cb(null, user);
         });
       });
