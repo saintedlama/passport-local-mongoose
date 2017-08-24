@@ -9,16 +9,6 @@ var DefaultUserSchema = new Schema();
 DefaultUserSchema.plugin(passportLocalMongoose);
 var DefaultUser = mongoose.model('DefaultUser', DefaultUserSchema);
 
-var setPasswordAndAuthenticate = function(user, passwordToSet, passwordToAuthenticate, cb) {
-  user.setPassword(passwordToSet, function(err) {
-    if (err) {
-      return cb(err);
-    }
-
-    user.authenticate(passwordToAuthenticate, cb);
-  });
-};
-
 describe('passportLocalMongoose', function() {
   it('should expose errors', function() {
     expect(passportLocalMongoose.errors).to.exist;
@@ -822,3 +812,13 @@ describe('passportLocalMongoose', function() {
     });
   });
 });
+
+function setPasswordAndAuthenticate(user, passwordToSet, passwordToAuthenticate, cb) {
+  user.setPassword(passwordToSet, function(err) {
+    if (err) {
+      return cb(err);
+    }
+
+    user.authenticate(passwordToAuthenticate, cb);
+  });
+};
