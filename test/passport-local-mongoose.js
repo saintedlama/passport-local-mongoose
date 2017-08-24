@@ -295,8 +295,10 @@ describe('passportLocalMongoose', function() {
 
             expect(result instanceof DefaultUser).to.exist;
             expect(result.username).to.equal(user.username);
-            expect(result.salt).to.equal(user.salt);
-            expect(result.hash).to.equal(user.hash);
+
+            // Salt and hash should not be loaded when loading a user with authenticate
+            expect(result.salt).to.not.exist;
+            expect(result.hash).to.not.exist;
 
             done();
           });
