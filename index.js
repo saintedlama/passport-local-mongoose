@@ -40,6 +40,8 @@ module.exports = function(schema, options) {
     options.maxAttempts = options.maxAttempts || Infinity;
   }
 
+  options.findByUsername = options.findByUsername || function(model, queryParameters) { return model.findOne(queryParameters); }
+
   options.errorMessages = options.errorMessages || {};
   options.errorMessages.MissingPasswordError = options.errorMessages.MissingPasswordError || 'No password was given';
   options.errorMessages.AttemptTooSoonError = options.errorMessages.AttemptTooSoonError || 'Account is currently locked. Try again later';
@@ -235,7 +237,7 @@ module.exports = function(schema, options) {
       queryOrParameters.push(parameter);
     }
 
-    var query = this.findOne({$or: queryOrParameters});
+    var query = options.findByUsername(this, { $or: queryOrParameters });
 
     if (selectHashSaltFields) {
       query.select('+' + options.hashField + " +" + options.saltField);

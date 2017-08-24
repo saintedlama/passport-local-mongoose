@@ -121,6 +121,7 @@ field to hold the username for example "email".
 * maxAttempts: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
 * passwordValidator: specifies your custom validation function for the password in the form 'function(password,cb)'. Default: validates non-empty passwords.
 * usernameQueryFields: specifies alternative fields of the model for identifying a user (e.g. email).
+* findByUsername: Specifies a query function that is executed with query parameters to restrict the query with extra query parameters. For example query only users with field "active" set to `true`. Default: `function(model, queryParameters) { return model.findOne(queryParameters); }`. See the examples section for a use case.
 
 *Attention!* Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
 
@@ -201,6 +202,54 @@ User.createStrategy();
 * register(user, password, cb) Convenience method to register a new user instance with a given password. Checks if username is unique. See [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
 * findByUsername() Convenience method to find a user instance by it's unique username.
 * createStrategy() Creates a configured passport-local `LocalStrategy` instance that can be used in passport.
+
+## Examples
+
+### Allow only "active" users to authenticate
+
+First we define a schema with an additional field `active` of type Boolean. 
+
+```javascript
+var UserSchema = new Schema({
+  active: Boolean
+});
+```
+
+When plugging in Passport-Local Mongoose we set `usernameUnique` to avoid creating a unique mongodb index on field `username`. To avoid
+non active users to be queried by mongodb we can specify the option `findByUsername` that allows us to restrict a query. In our case
+we want to restrict the query to only query users with field `active` set to `true`. The `findByUsername` MUST return a Mongoose query.
+
+```javascript
+UserSchema.plugin(passportLocalMongoose, {
+  // Needed to set usernameUnique to true to avoid a mongodb index on the username column!
+  usernameUnique: false,
+  
+  findByUsername: function(model, queryParameters) {
+    // Add additional query parameter - AND condition - active: true
+    queryParameters.active = true;
+    return model.findOne(queryParameters);
+  }
+});
+```
+
+To test the implementation we can simply create (register) a user with field `active` set to `false` and try to authenticate this user
+in a second step:
+
+```javascript
+var User = mongoose.model('Users', UserSchema);
+
+User.register({username:'username', active: false}, 'password', function(err, user) {
+  if (err) { ... }
+
+  var authenticate = User.authenticate();
+  authenticate('username', 'password', function(err, result) {
+    if (err) { ... }
+
+    // Value 'result' is set to false. The user could not be authenticated since the user is not active
+    
+  });
+});
+```
 
 ## License
 Passport-Local Mongoose is licenses under the [MIT license](http://opensource.org/licenses/MIT).

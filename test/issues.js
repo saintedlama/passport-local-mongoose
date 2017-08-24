@@ -220,4 +220,72 @@ describe('issues', function() {
       });
     });
   });
+
+  it('should support additional query restrictions in findByUsername - Issue #227', function(done) {
+    var UserSchema = new Schema({
+      active: Boolean
+    });
+
+    UserSchema.plugin(passportLocalMongoose, {
+      // Needed to set usernameUnique to true to avoid a mongodb index on the username column!
+      usernameUnique: false,
+
+      findByUsername: function(model, queryParameters) {
+        // Add additional query parameter - AND condition - active: true
+        queryParameters.active = true;
+        return model.findOne(queryParameters);
+      }
+    });
+
+    var User = mongoose.model('ShouldSupportAdditionalQueryRestrictions', UserSchema);
+
+    User.register({username:'username', active: false}, 'password', function(err, user) {
+      if (err) { return done(err); }
+
+      var authenticate = User.authenticate();
+      authenticate('username', 'password', function(err, result) {
+        if (err) { return done(err); }
+
+        // Expect that non active users must not authenticate successfully!
+        expect(result).to.be.false;
+        done();
+      });
+    });
+  });
+
+  it('should allow already registered but not active usernames to be taken again - Issue #227', function(done) {
+    var UserSchema = new Schema({
+      active: Boolean
+    });
+
+    UserSchema.plugin(passportLocalMongoose, {
+      // Needed to set usernameUnique to true to avoid a mongodb index on the username column!
+      usernameUnique: false,
+
+      findByUsername: function(model, queryParameters) {
+        // Add additional query parameter - AND condition - active: true
+        queryParameters.active = true;
+        return model.findOne(queryParameters);
+      }
+    });
+
+    var User = mongoose.model('ShouldAllowRegisteredNonActiveUsernamesInRegister', UserSchema);
+
+    User.register({username:'username', active: false }, 'password', function(err, user) {
+      if (err) { return done(err); }
+
+      User.register({username:'username', active: true}, 'password', function(err, user) {
+        if (err) { return done(err); }
+
+        var authenticate = User.authenticate();
+        authenticate('username', 'password', function(err, user) {
+          if (err) { return done(err); }
+
+          // Expect that active users can authenticate!
+          expect(user).to.exist;
+          done();
+        });
+      });
+    });
+  });
 });
