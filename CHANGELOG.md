@@ -1,3 +1,11 @@
+4.4.0 / 2017-10-25
+==================
+
+  * 4.4.0
+  * Merge pull request [#233](https://github.com/saintedlama/passport-local-mongoose/issues/233) from 4umfreak/master
+    Issue [#79](https://github.com/saintedlama/passport-local-mongoose/issues/79) and Bug [#58](https://github.com/saintedlama/passport-local-mongoose/issues/58), handle save() asynchronously
+  * Update changelog
+
 4.3.0 / 2017-10-25
 ==================
 
@@ -5,6 +13,8 @@
   * Merge pull request [#234](https://github.com/saintedlama/passport-local-mongoose/issues/234) from MeestorHok/master
     Fixed vulnerable dependency
   * Fixed vulnerable dependency
+  * fixed up code tabbing style differences
+  * added code and tests to handle mongoose errors and concurrency gracefully.
 
 4.2.1 / 2017-08-26
 ==================
@@ -152,8 +162,3 @@
 ==================
 
   * 1.2.0
-  * Manually revert commit b1fba9ab277765cad8fd32bb56f08648684706aa
-  * Add test for Issue [#96](https://github.com/saintedlama/passport-local-mongoose/issues/96)
-  * Fix package.json syntax
-  * Get rid of gulp
-  * Add git push and npm publish commands
