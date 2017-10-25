@@ -10,6 +10,8 @@ DefaultUserSchema.plugin(passportLocalMongoose);
 var DefaultUser = mongoose.model('DefaultUser', DefaultUserSchema);
 
 describe('passportLocalMongoose', function() {
+  this.timeout(10000); // Ten seconds - mongo db access needed
+
   it('should expose errors', function() {
     expect(passportLocalMongoose.errors).to.exist;
   });
@@ -127,8 +129,6 @@ describe('passportLocalMongoose', function() {
   });
 
   describe('#setPassword()', function() {
-    this.timeout(5000); // Five seconds - heavy crypto in background
-
     it('should set yield an error if password is undefined', function(done) {
       var user = new DefaultUser();
 
@@ -163,8 +163,6 @@ describe('passportLocalMongoose', function() {
   });
 
   describe('#changePassword()', function() {
-    this.timeout(5000); // Five seconds - heavy crypto in background
-
     beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
     afterEach(mongotest.disconnect());
 
@@ -245,8 +243,6 @@ describe('passportLocalMongoose', function() {
     beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
     afterEach(mongotest.disconnect());
 
-    this.timeout(5000); // Five seconds - heavy crypto in background
-
     it('should yield false in case user cannot be authenticated', function(done) {
       var user = new DefaultUser();
 
@@ -270,8 +266,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should supply message when limiting attempts and authenticating too soon', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {
         limitAttempts: true,
@@ -301,8 +295,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should get an error updating when limiting attempts and authenticating too soon', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema({}, {saveErrorIfNotFound: true});
       UserSchema.plugin(passportLocalMongoose, {
         limitAttempts: true,
@@ -333,8 +325,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should get an error updating the user on password match when limiting attempts', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema({}, {saveErrorIfNotFound: true});
       UserSchema.plugin(passportLocalMongoose, {
         limitAttempts: true
@@ -362,7 +352,7 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should update the user on password match while limiting attempts', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
+
 
       var UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {
@@ -391,8 +381,6 @@ describe('passportLocalMongoose', function() {
     });
 
     it('should fail to update the user on password mismatch while limiting attempts', function(done) {
-      this.timeout(5000); // Five seconds - mongo db access needed
-
       var UserSchema = new Schema({}, {saveErrorIfNotFound: true});
       UserSchema.plugin(passportLocalMongoose, {
         limitAttempts: true,
@@ -424,8 +412,6 @@ describe('passportLocalMongoose', function() {
   });
 
   describe('static #authenticate()', function() {
-    this.timeout(5000); // Five seconds - mongo db access needed
-
     beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
     afterEach(mongotest.disconnect());
 
@@ -662,8 +648,6 @@ describe('passportLocalMongoose', function() {
   });
 
   describe('static #deserializeUser()', function() {
-    this.timeout(5000); // Five seconds - mongo db access needed
-
     beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
     afterEach(mongotest.disconnect());
 
@@ -831,8 +815,6 @@ describe('passportLocalMongoose', function() {
   });
 
   describe('static #register()', function() {
-    this.timeout(5000); // Five seconds - mongo db access needed
-
     beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
     afterEach(mongotest.disconnect());
 

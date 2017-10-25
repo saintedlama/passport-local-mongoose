@@ -5,12 +5,12 @@ var passportLocalMongoose = require('../');
 var mongotest = require('./helpers/mongotest');
 
 describe('alternative query field', function() {
+  this.timeout(10000); // Ten seconds - mongo db access needed
+
   beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongooseissues'));
   afterEach(mongotest.disconnect());
 
   it('should find an existing user by alternative query field', function(done) {
-    this.timeout(5000); // Five seconds - mongo db access needed
-
     var UserSchema = new Schema({
       email: String
     });
@@ -33,8 +33,6 @@ describe('alternative query field', function() {
   });
 
   it('should authenticate an existing user by alternative query field', function(done) {
-    this.timeout(5000); // Five seconds - mongo db access needed
-
     var UserSchema = new Schema({
       email: String
     });
@@ -57,8 +55,6 @@ describe('alternative query field', function() {
   });
 
   it('should authenticate an existing user by default username field', function(done) {
-    this.timeout(5000); // Five seconds - mongo db access needed
-
     var UserSchema = new Schema({
       email: String
     });
@@ -81,8 +77,6 @@ describe('alternative query field', function() {
   });
 
   it('should not authenticate an existing user by unconfigured alternative query field', function(done) {
-    this.timeout(5000); // Five seconds - mongo db access needed
-
     var UserSchema = new Schema({
       email: String
     });

@@ -5,7 +5,7 @@ var passportLocalMongoose = require('../');
 var mongotest = require('./helpers/mongotest');
 
 describe('issues', function() {
-  this.timeout(5000); // Five seconds - mongodb access needed
+  this.timeout(10000); // Ten seconds - mongodb access needed
 
   beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongooseissues'));
   afterEach(mongotest.disconnect());
