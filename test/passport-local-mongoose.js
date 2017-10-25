@@ -241,6 +241,10 @@ describe('passportLocalMongoose', function() {
   });
 
   describe('#authenticate()', function() {
+
+    beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongoosetests'));
+    afterEach(mongotest.disconnect());
+
     this.timeout(5000); // Five seconds - heavy crypto in background
 
     it('should yield false in case user cannot be authenticated', function(done) {
@@ -264,6 +268,159 @@ describe('passportLocalMongoose', function() {
         done();
       });
     });
+
+    it('should supply message when limiting attempts and authenticating too soon', function(done) {
+      this.timeout(5000); // Five seconds - mongo db access needed
+
+      var UserSchema = new Schema({});
+      UserSchema.plugin(passportLocalMongoose, {
+        limitAttempts: true,
+        interval: 20000
+      });
+      var User = mongoose.model('LimitAttemptsTooSoonUser', UserSchema);
+
+      var user = new User({
+        username: 'mark',
+        attempts: 1,
+        last: Date.now()
+      });
+      user.setPassword('password', function(err) {
+        expect(err).to.not.exist;
+
+        user.save(function(err) {
+          expect(err).to.not.exist;
+
+          user.authenticate('password', function(err, user, message) {
+            expect(err).to.not.exist;
+            expect(user).to.be.false;
+            expect(message).to.be.instanceof(errors.AttemptTooSoonError);
+            done();
+          });
+        });
+      });
+    });
+
+    it('should get an error updating when limiting attempts and authenticating too soon', function(done) {
+      this.timeout(5000); // Five seconds - mongo db access needed
+
+      var UserSchema = new Schema({}, {saveErrorIfNotFound: true});
+      UserSchema.plugin(passportLocalMongoose, {
+        limitAttempts: true,
+        interval: 20000
+      });
+      var User = mongoose.model('LimitAttemptsTooSoonUpdateWithError', UserSchema);
+
+      var user = new User({
+        username: 'jimmy',
+        attempts: 1,
+        last: Date.now()
+      });
+      user.setPassword('password', function(err) {
+        expect(err).to.not.exist;
+
+        user.save(function(err) {
+          expect(err).to.not.exist;
+
+          user._id = id = mongoose.Types.ObjectId();
+          user.authenticate('password', function(err, user, message) {
+            expect(err).to.exist;
+            expect(user).to.not.exist;
+            expect(message).to.not.exist;
+            done();
+          });
+        });
+      });
+    });
+
+    it('should get an error updating the user on password match when limiting attempts', function(done) {
+      this.timeout(5000); // Five seconds - mongo db access needed
+
+      var UserSchema = new Schema({}, {saveErrorIfNotFound: true});
+      UserSchema.plugin(passportLocalMongoose, {
+        limitAttempts: true
+      });
+      var User = mongoose.model('LimitAttemptsUpdateWithError', UserSchema);
+
+      var user = new User({
+        username: 'jane'
+      });
+      user.setPassword('password', function(err) {
+        expect(err).to.not.exist;
+
+        user.save(function(err) {
+          expect(err).to.not.exist;
+
+          user._id = id = mongoose.Types.ObjectId();
+          user.authenticate('password', function(err, user, message) {
+            expect(err).to.exist;
+            expect(user).to.not.exist;
+            expect(message).to.not.exist;
+            done();
+          });
+        });
+      });
+    });
+
+    it('should update the user on password match while limiting attempts', function(done) {
+      this.timeout(5000); // Five seconds - mongo db access needed
+
+      var UserSchema = new Schema({});
+      UserSchema.plugin(passportLocalMongoose, {
+        limitAttempts: true
+      });
+      var User = mongoose.model('LimitAttemptsUpdateWithoutError', UserSchema);
+
+      var user = new User({
+        username: 'walter'
+      });
+      user.setPassword('password', function(err) {
+        expect(err).to.not.exist;
+
+        user.save(function(err) {
+          expect(err).to.not.exist;
+
+          user.authenticate('password', function(err, result, message) {
+            expect(err).to.not.exist;
+            expect(result).to.exist;
+            expect(result.username).to.equal(user.username);
+            expect(message).to.not.exist;
+            done();
+          });
+        });
+      });
+    });
+
+    it('should fail to update the user on password mismatch while limiting attempts', function(done) {
+      this.timeout(5000); // Five seconds - mongo db access needed
+
+      var UserSchema = new Schema({}, {saveErrorIfNotFound: true});
+      UserSchema.plugin(passportLocalMongoose, {
+        limitAttempts: true,
+        interval: 20000
+      });
+      var User = mongoose.model('LimitAttemptsMismatchWithAnError', UserSchema);
+
+      var user = new User({
+        username: 'wendy'
+      });
+      user.setPassword('password', function(err) {
+        expect(err).to.not.exist;
+
+        user.save(function(err) {
+          expect(err).to.not.exist;
+
+          user.hash = 'deadbeef'; // force an error on scmp with different length hex.
+          user._id = id = mongoose.Types.ObjectId(); // force the save to fail
+          user.authenticate('password', function(err, user, message) {
+            expect(err).to.exist;
+            expect(user).to.not.exist;
+            expect(message).to.not.exist;
+            done();
+          });
+        });
+      });
+    });
+
   });
 
   describe('static #authenticate()', function() {
