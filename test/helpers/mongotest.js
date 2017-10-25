@@ -1,6 +1,6 @@
-var assert = require('assert');
-var mongoose = require('mongoose');
-var debug = require('debug')('passport:local:mongoose');
+const assert = require('assert');
+const mongoose = require('mongoose');
+const debug = require('debug')('passport:local:mongoose');
 
 module.exports = {
   prepareDb: function(connectionString, options) {
@@ -21,7 +21,7 @@ module.exports = {
         mongoose.connection.db.collections(function(err, collections) {
           assert.ifError(err);
 
-          var collectionsToDrop = collections
+          const collectionsToDrop = collections
             .filter(function(col) { return col.collectionName.indexOf('system.') != 0; })
             .map(function(col) { return col.collectionName; });
 

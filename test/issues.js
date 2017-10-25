@@ -1,8 +1,8 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var expect = require('chai').expect;
-var passportLocalMongoose = require('../');
-var mongotest = require('./helpers/mongotest');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const expect = require('chai').expect;
+const passportLocalMongoose = require('../');
+const mongotest = require('./helpers/mongotest');
 
 describe('issues', function() {
   this.timeout(10000); // Ten seconds - mongodb access needed
@@ -11,7 +11,7 @@ describe('issues', function() {
   afterEach(mongotest.disconnect());
 
   it('should support nested fields - Issue #9', function(done) {
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       sensitiveData1: String,
       sensitiveDate2: Number,
       account: {
@@ -21,7 +21,7 @@ describe('issues', function() {
     });
 
     UserSchema.plugin(passportLocalMongoose, {usernameField: 'account.email'});
-    var User = mongoose.model('ShouldSupportNestedFields_Issue_9', UserSchema);
+    const User = mongoose.model('ShouldSupportNestedFields_Issue_9', UserSchema);
 
     User.register({account: {email: 'nestedemail'}}, 'password', function(err, user) {
       expect(err).to.not.exist;
@@ -36,13 +36,13 @@ describe('issues', function() {
   });
 
   it('should support not throw exception in case hash or salt are not stored - Issue #27', function(done) {
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       name: String,
       age: Number
     });
 
     UserSchema.plugin(passportLocalMongoose);
-    var User = mongoose.model('ShouldNotThrowIfPasswordOrSaltAreNotStored_Issue_27', UserSchema);
+    const User = mongoose.model('ShouldNotThrowIfPasswordOrSaltAreNotStored_Issue_27', UserSchema);
 
     User.create({username: 'hugo', name: 'Hugo Wiener', age: 143}, function(err, user) {
       expect(err).to.not.exist;
@@ -61,19 +61,19 @@ describe('issues', function() {
   });
 
   it('should support not throw exception in case hash and salt are not selected - Issue #27', function(done) {
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       name: String,
       age: Number
     });
 
     UserSchema.plugin(passportLocalMongoose, {selectFields: 'name'});
-    var User = mongoose.model('ShouldNotThrowIfPasswordAndSaltAreNotSelected_Issue_27', UserSchema);
+    const User = mongoose.model('ShouldNotThrowIfPasswordAndSaltAreNotSelected_Issue_27', UserSchema);
 
     User.register(new User({username: 'hugo'}), 'password', function(err, user) {
       expect(err).to.not.exist;
       expect(user).to.exist;
 
-      var authenticate = User.authenticate();
+      const authenticate = User.authenticate();
 
       authenticate('hugo', 'password', function(err, result) {
         expect(err).to.not.exist;
@@ -85,21 +85,21 @@ describe('issues', function() {
   });
 
   it('should populate fields in findByUsername if option is given - Issue #20', function(done) {
-    var LoginSchema = new Schema({date: Date, success: Boolean});
-    var UserSchema = new Schema({logins: [{type: Schema.Types.ObjectId, ref: 'Login'}]});
+    const LoginSchema = new Schema({date: Date, success: Boolean});
+    const UserSchema = new Schema({logins: [{type: Schema.Types.ObjectId, ref: 'Login'}]});
 
     UserSchema.plugin(passportLocalMongoose, {populateFields: 'logins'});
-    var User = mongoose.model('ShouldPopulateFields_Issue_20', UserSchema);
-    var Login = mongoose.model('Login', LoginSchema);
+    const User = mongoose.model('ShouldPopulateFields_Issue_20', UserSchema);
+    const Login = mongoose.model('Login', LoginSchema);
 
-    var loginDate = new Date();
-    var loginSuccess = true;
+    const loginDate = new Date();
+    const loginSuccess = true;
 
     Login.create({date: loginDate, success: loginSuccess}, function(err, login) {
       expect(err).to.not.exist;
       expect(login).to.exist;
 
-      var logins = [];
+      const logins = [];
       logins.push(login._id);
 
       User.register(new User({username: 'hugo', logins: logins}), 'password', function(err, user) {
@@ -122,28 +122,28 @@ describe('issues', function() {
 
   /* Since password is not directly stored with mongo/mongoose, password cannot be easily validated */
   it('should support password validation - Issue #57', function(done) {
-    var UserSchema = new Schema({});
+    const UserSchema = new Schema({});
 
-    var nastyPasswordValidator = function(password, cb) {
+    const nastyPasswordValidator = function(password, cb) {
       cb("My nasty error");
     };
 
     UserSchema.plugin(passportLocalMongoose, {
       passwordValidator: nastyPasswordValidator
     });
-    var User = mongoose.model('ShouldSupportPasswordValidation_Issue_57', UserSchema);
+    const User = mongoose.model('ShouldSupportPasswordValidation_Issue_57', UserSchema);
 
-    User.register({username: "nicolascage"}, 'password', function(err, user) {
+    User.register({username: "nicolascage"}, 'password', function(err) {
       expect(err).to.equal("My nasty error");
       done();
     });
   });
 
   it('should not expose hash and salt fields - Issue #72', function(done) {
-    var UserSchema = new Schema({});
+    const UserSchema = new Schema({});
 
     UserSchema.plugin(passportLocalMongoose, {});
-    var User = mongoose.model('ShouldNotExposeHashAndSaltFields_Issue_72', UserSchema);
+    const User = mongoose.model('ShouldNotExposeHashAndSaltFields_Issue_72', UserSchema);
 
     User.register({username: "nicolascage"}, 'password', function(err, user) {
       expect(err).to.not.exist;
@@ -160,10 +160,10 @@ describe('issues', function() {
   });
 
   describe('authentication should work with salt/hash field marked as select: false - Issue #96', function() {
-    var UserSchema = new Schema({});
+    const UserSchema = new Schema({});
     UserSchema.plugin(passportLocalMongoose, {});
-    var userName = 'user_' + Math.random();
-    var User = mongoose.model('ShouldAuthenticateWithSaltAndHashNotExposed_Issue_96', UserSchema);
+    const userName = 'user_' + Math.random();
+    const User = mongoose.model('ShouldAuthenticateWithSaltAndHashNotExposed_Issue_96', UserSchema);
     beforeEach(function(done) {
       User.register({username: userName}, 'password', function(err, user) {
         expect(err).to.not.exist;
@@ -198,10 +198,10 @@ describe('issues', function() {
 
   describe('backward compatible #authenticate()', function() {
     it('should authenticate a user created in a 3.x version - issue #115', function(done) {
-      var UserSchema = new Schema();
+      const UserSchema = new Schema();
       // Backward compatible digest is used: sha1 because pre node.js 0.12 this was the only supported digest algorithm!
       UserSchema.plugin(passportLocalMongoose, {usernameLowerCase: true, digestAlgorithm: 'sha1' });
-      var User = mongoose.model('AuthenticateBackwardCompatible', UserSchema);
+      const User = mongoose.model('AuthenticateBackwardCompatible', UserSchema);
 
       // 3.0 generated hash and salt of 'username', 'password'
       User.create({
@@ -222,7 +222,7 @@ describe('issues', function() {
   });
 
   it('should support additional query restrictions in findByUsername - Issue #227', function(done) {
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       active: Boolean
     });
 
@@ -237,12 +237,12 @@ describe('issues', function() {
       }
     });
 
-    var User = mongoose.model('ShouldSupportAdditionalQueryRestrictions', UserSchema);
+    const User = mongoose.model('ShouldSupportAdditionalQueryRestrictions', UserSchema);
 
-    User.register({username:'username', active: false}, 'password', function(err, user) {
+    User.register({username:'username', active: false}, 'password', function(err) {
       if (err) { return done(err); }
 
-      var authenticate = User.authenticate();
+      const authenticate = User.authenticate();
       authenticate('username', 'password', function(err, result) {
         if (err) { return done(err); }
 
@@ -254,7 +254,7 @@ describe('issues', function() {
   });
 
   it('should allow already registered but not active usernames to be taken again - Issue #227', function(done) {
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       active: Boolean
     });
 
@@ -269,15 +269,15 @@ describe('issues', function() {
       }
     });
 
-    var User = mongoose.model('ShouldAllowRegisteredNonActiveUsernamesInRegister', UserSchema);
+    const User = mongoose.model('ShouldAllowRegisteredNonActiveUsernamesInRegister', UserSchema);
 
-    User.register({username:'username', active: false }, 'password', function(err, user) {
+    User.register({username:'username', active: false }, 'password', function(err) {
       if (err) { return done(err); }
 
-      User.register({username:'username', active: true}, 'password', function(err, user) {
+      User.register({username:'username', active: true}, 'password', function(err) {
         if (err) { return done(err); }
 
-        var authenticate = User.authenticate();
+        const authenticate = User.authenticate();
         authenticate('username', 'password', function(err, user) {
           if (err) { return done(err); }
 

@@ -1,8 +1,8 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var expect = require('chai').expect;
-var passportLocalMongoose = require('../');
-var mongotest = require('./helpers/mongotest');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const expect = require('chai').expect;
+const passportLocalMongoose = require('../');
+const mongotest = require('./helpers/mongotest');
 
 describe('alternative query field', function() {
   this.timeout(10000); // Ten seconds - mongo db access needed
@@ -11,14 +11,14 @@ describe('alternative query field', function() {
   afterEach(mongotest.disconnect());
 
   it('should find an existing user by alternative query field', function(done) {
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       email: String
     });
     UserSchema.plugin(passportLocalMongoose, {iterations: 1, usernameQueryFields: ['email']}); // 1 iteration - safes time in tests
-    var User = mongoose.model('FindAlternativeQueryField', UserSchema);
+    const User = mongoose.model('FindAlternativeQueryField', UserSchema);
 
-    var email = 'hugo@test.org';
-    var user = new User({username: 'hugo', email: email});
+    const email = 'hugo@test.org';
+    const user = new User({username: 'hugo', email: email});
     user.save(function(err) {
       expect(err).to.not.exist;
 
@@ -33,14 +33,14 @@ describe('alternative query field', function() {
   });
 
   it('should authenticate an existing user by alternative query field', function(done) {
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       email: String
     });
     UserSchema.plugin(passportLocalMongoose, {iterations: 1, usernameQueryFields: ['email']}); // 1 iteration - safes time in tests
-    var User = mongoose.model('AuthenticateAlternativeQueryField', UserSchema);
+    const User = mongoose.model('AuthenticateAlternativeQueryField', UserSchema);
 
-    var email = 'hugo@test.org';
-    var user = new User({username: 'hugo', email: email});
+    const email = 'hugo@test.org';
+    const user = new User({username: 'hugo', email: email});
     User.register(user, 'password', function(err) {
       expect(err).to.not.exist;
 
@@ -55,14 +55,14 @@ describe('alternative query field', function() {
   });
 
   it('should authenticate an existing user by default username field', function(done) {
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       email: String
     });
     UserSchema.plugin(passportLocalMongoose, {iterations: 1, usernameQueryFields: ['email']}); // 1 iteration - safes time in tests
-    var User = mongoose.model('AuthenticateDefaultField', UserSchema);
+    const User = mongoose.model('AuthenticateDefaultField', UserSchema);
 
-    var email = 'hugo@test.org';
-    var user = new User({username: 'hugo', email: email});
+    const email = 'hugo@test.org';
+    const user = new User({username: 'hugo', email: email});
     User.register(user, 'password', function(err) {
       expect(err).to.not.exist;
 
@@ -77,14 +77,14 @@ describe('alternative query field', function() {
   });
 
   it('should not authenticate an existing user by unconfigured alternative query field', function(done) {
-    var UserSchema = new Schema({
+    const UserSchema = new Schema({
       email: String
     });
     UserSchema.plugin(passportLocalMongoose, {iterations: 1, usernameQueryFields: []}); // 1 iteration - safes time in tests
-    var User = mongoose.model('NotAuthenticateUnconfiguredAlternativeQueryField', UserSchema);
+    const User = mongoose.model('NotAuthenticateUnconfiguredAlternativeQueryField', UserSchema);
 
-    var email = 'hugo@test.org';
-    var user = new User({username: 'hugo', email: email});
+    const email = 'hugo@test.org';
+    const user = new User({username: 'hugo', email: email});
     User.register(user, 'password', function(err) {
       expect(err).to.not.exist;
 

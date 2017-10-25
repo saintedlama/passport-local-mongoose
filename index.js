@@ -1,9 +1,9 @@
-var crypto = require('crypto');
-var LocalStrategy = require('passport-local').Strategy;
+const crypto = require('crypto');
+const LocalStrategy = require('passport-local').Strategy;
 
-var pbkdf2 = require('./lib/pbkdf2');
-var errors = require('./lib/errors');
-var authenticate = require('./lib/authenticate');
+const pbkdf2 = require('./lib/pbkdf2');
+const errors = require('./lib/errors');
+const authenticate = require('./lib/authenticate');
 
 module.exports = function(schema, options) {
   options = options || {};
@@ -52,7 +52,7 @@ module.exports = function(schema, options) {
   options.errorMessages.MissingUsernameError = options.errorMessages.MissingUsernameError|| 'No username was given';
   options.errorMessages.UserExistsError = options.errorMessages.UserExistsError|| 'A user with the given username is already registered';
 
-  var schemaFields = {};
+  const schemaFields = {};
 
   if (!schema.path(options.usernameField)) {
     schemaFields[options.usernameField] = {type: String, unique: options.usernameUnique};
@@ -80,27 +80,25 @@ module.exports = function(schema, options) {
       return cb(new errors.MissingPasswordError(options.errorMessages.MissingPasswordError));
     }
 
-    var self = this;
-
-    options.passwordValidator(password, function(err) {
+    options.passwordValidator(password, (err) => {
       if (err) { return cb(err); }
 
-      crypto.randomBytes(options.saltlen, function(randomBytesErr, buf) {
+      crypto.randomBytes(options.saltlen, (randomBytesErr, buf) => {
         if (randomBytesErr) {
           return cb(randomBytesErr);
         }
 
-        var salt = buf.toString(options.encoding);
+        const salt = buf.toString(options.encoding);
 
-        pbkdf2(password, salt, options, function(pbkdf2Err, hashRaw) {
+        pbkdf2(password, salt, options, (pbkdf2Err, hashRaw) => {
           if (pbkdf2Err) {
             return cb(pbkdf2Err);
           }
 
-          self.set(options.hashField, new Buffer(hashRaw, 'binary').toString(options.encoding));
-          self.set(options.saltField, salt);
+          this.set(options.hashField, new Buffer(hashRaw, 'binary').toString(options.encoding));
+          this.set(options.saltField, salt);
 
-          cb(null, self);
+          cb(null, this);
         });
       });
     });
@@ -111,19 +109,17 @@ module.exports = function(schema, options) {
       return cb(new errors.MissingPasswordError(options.errorMessages.MissingPasswordError));
     }
 
-    var self = this;
-
-    this.authenticate(oldPassword, function(err, authenticated) {
+    this.authenticate(oldPassword, (err, authenticated) => {
       if (err) { return cb(err); }
 
       if (!authenticated) {
         return cb(new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError));
       }
 
-      self.setPassword(newPassword, function(setPasswordErr, user) {
+      this.setPassword(newPassword, (setPasswordErr, user) => {
         if (setPasswordErr) { return cb(setPasswordErr); }
 
-        self.save(function(saveErr) {
+        this.save(function(saveErr) {
           if (saveErr) { return cb(saveErr); }
 
           cb(null, user);
@@ -133,11 +129,9 @@ module.exports = function(schema, options) {
   };
 
   schema.methods.authenticate = function(password, cb) {
-    var self = this;
-
     // With hash/salt marked as "select: false" - load model including the salt/hash fields form db and authenticate
-    if (!self.get(options.saltField)) {
-      self.constructor.findByUsername(self.get(options.usernameField), true, function(err, user) {
+    if (!this.get(options.saltField)) {
+      this.constructor.findByUsername(this.get(options.usernameField), true, (err, user) => {
         if (err) { return cb(err); }
 
         if (user) {
@@ -147,7 +141,7 @@ module.exports = function(schema, options) {
         }
       });
     } else {
-      return authenticate(self, password, options, cb);
+      return authenticate(this, password, options, cb);
     }
   };
 
@@ -159,10 +153,8 @@ module.exports = function(schema, options) {
   }
 
   schema.statics.authenticate = function() {
-    var self = this;
-
-    return function(username, password, cb) {
-      self.findByUsername(username, true, function(err, user) {
+    return (username, password, cb) => {
+      this.findByUsername(username, true, (err, user) => {
         if (err) { return cb(err); }
 
         if (user) {
@@ -181,10 +173,8 @@ module.exports = function(schema, options) {
   };
 
   schema.statics.deserializeUser = function() {
-    var self = this;
-
-    return function(username, cb) {
-      self.findByUsername(username, cb);
+    return (username, cb) => {
+      this.findByUsername(username, cb);
     };
   };
 
@@ -198,7 +188,7 @@ module.exports = function(schema, options) {
       return cb(new errors.MissingUsernameError(options.errorMessages.MissingUsernameError));
     }
 
-    var self = this;
+    const self = this;
     self.findByUsername(user.get(options.usernameField), function(err, existingUser) {
       if (err) { return cb(err); }
 
@@ -230,14 +220,14 @@ module.exports = function(schema, options) {
     }
 
     // Add each username query field
-    var queryOrParameters = [];
-    for (var i = 0; i < options.usernameQueryFields.length; i++) {
-      var parameter = {};
+    const queryOrParameters = [];
+    for (let i = 0; i < options.usernameQueryFields.length; i++) {
+      const parameter = {};
       parameter[options.usernameQueryFields[i]] = username;
       queryOrParameters.push(parameter);
     }
 
-    var query = options.findByUsername(this, { $or: queryOrParameters });
+    const query = options.findByUsername(this, { $or: queryOrParameters });
 
     if (selectHashSaltFields) {
       query.select('+' + options.hashField + " +" + options.saltField);

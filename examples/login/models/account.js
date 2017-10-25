@@ -1,8 +1,8 @@
-var mongoose = require('mongoose'),
+let mongoose = require('mongoose'),
   Schema = mongoose.Schema,
   passportLocalMongoose = require('passport-local-mongoose');
 
-var Account = new Schema({
+const Account = new Schema({
   nickname: String,
   birthdate: Date
 });

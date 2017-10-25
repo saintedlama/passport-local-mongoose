@@ -30,9 +30,9 @@
 
     $.support.transition = (function () {
 
-      var transitionEnd = (function () {
+      const transitionEnd = (function () {
 
-        var el = document.createElement('bootstrap')
+        let el = document.createElement('bootstrap')
           , transEndEventNames = {
                'WebkitTransition' : 'webkitTransitionEnd'
             ,  'MozTransition'    : 'transitionend'
@@ -85,13 +85,13 @@
  /* ALERT CLASS DEFINITION
   * ====================== */
 
-  var dismiss = '[data-dismiss="alert"]'
+  let dismiss = '[data-dismiss="alert"]'
     , Alert = function (el) {
         $(el).on('click', dismiss, this.close)
       }
 
   Alert.prototype.close = function (e) {
-    var $this = $(this)
+    let $this = $(this)
       , selector = $this.attr('data-target')
       , $parent
 
@@ -129,7 +129,7 @@
 
   $.fn.alert = function (option) {
     return this.each(function () {
-      var $this = $(this)
+      let $this = $(this)
         , data = $this.data('alert')
       if (!data) $this.data('alert', (data = new Alert(this)))
       if (typeof option == 'string') data[option].call($this)
@@ -174,13 +174,13 @@
  /* BUTTON PUBLIC CLASS DEFINITION
   * ============================== */
 
-  var Button = function (element, options) {
+  const Button = function (element, options) {
     this.$element = $(element)
     this.options = $.extend({}, $.fn.button.defaults, options)
   }
 
   Button.prototype.setState = function (state) {
-    var d = 'disabled'
+    let d = 'disabled'
       , $el = this.$element
       , data = $el.data()
       , val = $el.is('input') ? 'val' : 'html'
@@ -199,7 +199,7 @@
   }
 
   Button.prototype.toggle = function () {
-    var $parent = this.$element.closest('[data-toggle="buttons-radio"]')
+    const $parent = this.$element.closest('[data-toggle="buttons-radio"]')
 
     $parent && $parent
       .find('.active')
@@ -214,7 +214,7 @@
 
   $.fn.button = function (option) {
     return this.each(function () {
-      var $this = $(this)
+      let $this = $(this)
         , data = $this.data('button')
         , options = typeof option == 'object' && option
       if (!data) $this.data('button', (data = new Button(this, options)))
@@ -235,7 +235,7 @@
 
   $(function () {
     $('body').on('click.button.data-api', '[data-toggle^=button]', function ( e ) {
-      var $btn = $(e.target)
+      let $btn = $(e.target)
       if (!$btn.hasClass('btn')) $btn = $btn.closest('.btn')
       $btn.button('toggle')
     })
@@ -269,7 +269,7 @@
  /* CAROUSEL CLASS DEFINITION
   * ========================= */
 
-  var Carousel = function (element, options) {
+  const Carousel = function (element, options) {
     this.$element = $(element)
     this.options = options
     this.options.slide && this.slide(this.options.slide)
@@ -289,7 +289,7 @@
     }
 
   , to: function (pos) {
-      var $active = this.$element.find('.item.active')
+      let $active = this.$element.find('.item.active')
         , children = $active.parent().children()
         , activePos = children.index($active)
         , that = this
@@ -331,7 +331,7 @@
     }
 
   , slide: function (type, next) {
-      var $active = this.$element.find('.item.active')
+      let $active = this.$element.find('.item.active')
         , $next = next || $active[type]()
         , isCycling = this.interval
         , direction = type == 'next' ? 'left' : 'right'
@@ -384,7 +384,7 @@
 
   $.fn.carousel = function (option) {
     return this.each(function () {
-      var $this = $(this)
+      let $this = $(this)
         , data = $this.data('carousel')
         , options = $.extend({}, $.fn.carousel.defaults, typeof option == 'object' && option)
         , action = typeof option == 'string' ? option : options.slide
@@ -408,7 +408,7 @@
 
   $(function () {
     $('body').on('click.carousel.data-api', '[data-slide]', function ( e ) {
-      var $this = $(this), href
+      let $this = $(this), href
         , $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) //strip for ie7
         , options = !$target.data('modal') && $.extend({}, $target.data(), $this.data())
       $target.carousel(options)
@@ -444,7 +444,7 @@
  /* COLLAPSE PUBLIC CLASS DEFINITION
   * ================================ */
 
-  var Collapse = function (element, options) {
+  const Collapse = function (element, options) {
     this.$element = $(element)
     this.options = $.extend({}, $.fn.collapse.defaults, options)
 
@@ -460,12 +460,12 @@
     constructor: Collapse
 
   , dimension: function () {
-      var hasWidth = this.$element.hasClass('width')
+      const hasWidth = this.$element.hasClass('width')
       return hasWidth ? 'width' : 'height'
     }
 
   , show: function () {
-      var dimension
+      let dimension
         , scroll
         , actives
         , hasData
@@ -489,7 +489,7 @@
     }
 
   , hide: function () {
-      var dimension
+      let dimension
       if (this.transitioning) return
       dimension = this.dimension()
       this.reset(this.$element[dimension]())
@@ -498,7 +498,7 @@
     }
 
   , reset: function (size) {
-      var dimension = this.dimension()
+      const dimension = this.dimension()
 
       this.$element
         .removeClass('collapse')
@@ -511,7 +511,7 @@
     }
 
   , transition: function (method, startEvent, completeEvent) {
-      var that = this
+      let that = this
         , complete = function () {
             if (startEvent.type == 'show') that.reset()
             that.transitioning = 0
@@ -543,7 +543,7 @@
 
   $.fn.collapse = function (option) {
     return this.each(function () {
-      var $this = $(this)
+      let $this = $(this)
         , data = $this.data('collapse')
         , options = typeof option == 'object' && option
       if (!data) $this.data('collapse', (data = new Collapse(this, options)))
@@ -563,7 +563,7 @@
 
   $(function () {
     $('body').on('click.collapse.data-api', '[data-toggle=collapse]', function (e) {
-      var $this = $(this), href
+      let $this = $(this), href
         , target = $this.attr('data-target')
           || e.preventDefault()
           || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '') //strip for ie7
@@ -601,9 +601,9 @@
  /* DROPDOWN CLASS DEFINITION
   * ========================= */
 
-  var toggle = '[data-toggle=dropdown]'
+  let toggle = '[data-toggle=dropdown]'
     , Dropdown = function (element) {
-        var $el = $(element).on('click.dropdown.data-api', this.toggle)
+        const $el = $(element).on('click.dropdown.data-api', this.toggle)
         $('html').on('click.dropdown.data-api', function () {
           $el.parent().removeClass('open')
         })
@@ -614,7 +614,7 @@
     constructor: Dropdown
 
   , toggle: function (e) {
-      var $this = $(this)
+      let $this = $(this)
         , $parent
         , isActive
 
@@ -635,7 +635,7 @@
     }
 
   , keydown: function (e) {
-      var $this
+      let $this
         , $items
         , $active
         , $parent
@@ -680,7 +680,7 @@
   }
 
   function getParent($this) {
-    var selector = $this.attr('data-target')
+    let selector = $this.attr('data-target')
       , $parent
 
     if (!selector) {
@@ -700,7 +700,7 @@
 
   $.fn.dropdown = function (option) {
     return this.each(function () {
-      var $this = $(this)
+      let $this = $(this)
         , data = $this.data('dropdown')
       if (!data) $this.data('dropdown', (data = new Dropdown(this)))
       if (typeof option == 'string') data[option].call($this)
@@ -750,7 +750,7 @@
  /* MODAL CLASS DEFINITION
   * ====================== */
 
-  var Modal = function (element, options) {
+  const Modal = function (element, options) {
     this.options = options
     this.$element = $(element)
       .delegate('[data-dismiss="modal"]', 'click.dismiss.modal', $.proxy(this.hide, this))
@@ -766,7 +766,7 @@
       }
 
     , show: function () {
-        var that = this
+        let that = this
           , e = $.Event('show')
 
         this.$element.trigger(e)
@@ -780,7 +780,7 @@
         this.escape()
 
         this.backdrop(function () {
-          var transition = $.support.transition && that.$element.hasClass('fade')
+          const transition = $.support.transition && that.$element.hasClass('fade')
 
           if (!that.$element.parent().length) {
             that.$element.appendTo(document.body) //don't move modals dom position
@@ -810,7 +810,7 @@
     , hide: function (e) {
         e && e.preventDefault()
 
-        var that = this
+        const that = this
 
         e = $.Event('hide')
 
@@ -836,7 +836,7 @@
       }
 
     , enforceFocus: function () {
-        var that = this
+        const that = this
         $(document).on('focusin.modal', function (e) {
           if (that.$element[0] !== e.target && !that.$element.has(e.target).length) {
             that.$element.focus()
@@ -845,7 +845,7 @@
       }
 
     , escape: function () {
-        var that = this
+        const that = this
         if (this.isShown && this.options.keyboard) {
           this.$element.on('keyup.dismiss.modal', function ( e ) {
             e.which == 27 && that.hide()
@@ -856,7 +856,7 @@
       }
 
     , hideWithTransition: function () {
-        var that = this
+        let that = this
           , timeout = setTimeout(function () {
               that.$element.off($.support.transition.end)
               that.hideModal()
@@ -882,11 +882,11 @@
       }
 
     , backdrop: function (callback) {
-        var that = this
+        let that = this
           , animate = this.$element.hasClass('fade') ? 'fade' : ''
 
         if (this.isShown && this.options.backdrop) {
-          var doAnimate = $.support.transition && animate
+          const doAnimate = $.support.transition && animate
 
           this.$backdrop = $('<div class="modal-backdrop ' + animate + '" />')
             .appendTo(document.body)
@@ -922,7 +922,7 @@
 
   $.fn.modal = function (option) {
     return this.each(function () {
-      var $this = $(this)
+      let $this = $(this)
         , data = $this.data('modal')
         , options = $.extend({}, $.fn.modal.defaults, $this.data(), typeof option == 'object' && option)
       if (!data) $this.data('modal', (data = new Modal(this, options)))
@@ -945,7 +945,7 @@
 
   $(function () {
     $('body').on('click.modal.data-api', '[data-toggle="modal"]', function ( e ) {
-      var $this = $(this)
+      let $this = $(this)
         , href = $this.attr('href')
         , $target = $($this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))) //strip for ie7
         , option = $target.data('modal') ? 'toggle' : $.extend({ remote: !/#/.test(href) && href }, $target.data(), $this.data())
@@ -989,7 +989,7 @@
  /* TOOLTIP PUBLIC CLASS DEFINITION
   * =============================== */
 
-  var Tooltip = function (element, options) {
+  const Tooltip = function (element, options) {
     this.init('tooltip', element, options)
   }
 
@@ -998,7 +998,7 @@
     constructor: Tooltip
 
   , init: function (type, element, options) {
-      var eventIn
+      let eventIn
         , eventOut
 
       this.type = type
@@ -1034,7 +1034,7 @@
     }
 
   , enter: function (e) {
-      var self = $(e.currentTarget)[this.type](this._options).data(this.type)
+      const self = $(e.currentTarget)[this.type](this._options).data(this.type)
 
       if (!self.options.delay || !self.options.delay.show) return self.show()
 
@@ -1046,7 +1046,7 @@
     }
 
   , leave: function (e) {
-      var self = $(e.currentTarget)[this.type](this._options).data(this.type)
+      const self = $(e.currentTarget)[this.type](this._options).data(this.type)
 
       if (this.timeout) clearTimeout(this.timeout)
       if (!self.options.delay || !self.options.delay.hide) return self.hide()
@@ -1058,7 +1058,7 @@
     }
 
   , show: function () {
-      var $tip
+      let $tip
         , inside
         , pos
         , actualWidth
@@ -1113,7 +1113,7 @@
     }
 
   , setContent: function () {
-      var $tip = this.tip()
+      let $tip = this.tip()
         , title = this.getTitle()
 
       $tip.find('.tooltip-inner')[this.options.html ? 'html' : 'text'](title)
@@ -1121,13 +1121,13 @@
     }
 
   , hide: function () {
-      var that = this
+      let that = this
         , $tip = this.tip()
 
       $tip.removeClass('in')
 
       function removeWithAnimation() {
-        var timeout = setTimeout(function () {
+        const timeout = setTimeout(function () {
           $tip.off($.support.transition.end).remove()
         }, 500)
 
@@ -1145,7 +1145,7 @@
     }
 
   , fixTitle: function () {
-      var $e = this.$element
+      const $e = this.$element
       if ($e.attr('title') || typeof($e.attr('data-original-title')) != 'string') {
         $e.attr('data-original-title', $e.attr('title') || '').removeAttr('title')
       }
@@ -1163,7 +1163,7 @@
     }
 
   , getTitle: function () {
-      var title
+      let title
         , $e = this.$element
         , o = this.options
 
@@ -1213,7 +1213,7 @@
 
   $.fn.tooltip = function ( option ) {
     return this.each(function () {
-      var $this = $(this)
+      let $this = $(this)
         , data = $this.data('tooltip')
         , options = typeof option == 'object' && option
       if (!data) $this.data('tooltip', (data = new Tooltip(this, options)))
@@ -1263,7 +1263,7 @@
  /* POPOVER PUBLIC CLASS DEFINITION
   * =============================== */
 
-  var Popover = function (element, options) {
+  const Popover = function (element, options) {
     this.init('popover', element, options)
   }
 
@@ -1276,7 +1276,7 @@
     constructor: Popover
 
   , setContent: function () {
-      var $tip = this.tip()
+      let $tip = this.tip()
         , title = this.getTitle()
         , content = this.getContent()
 
@@ -1291,7 +1291,7 @@
     }
 
   , getContent: function () {
-      var content
+      let content
         , $e = this.$element
         , o = this.options
 
@@ -1320,7 +1320,7 @@
 
   $.fn.popover = function (option) {
     return this.each(function () {
-      var $this = $(this)
+      let $this = $(this)
         , data = $this.data('popover')
         , options = typeof option == 'object' && option
       if (!data) $this.data('popover', (data = new Popover(this, options)))
@@ -1366,7 +1366,7 @@
   * ========================== */
 
   function ScrollSpy(element, options) {
-    var process = $.proxy(this.process, this)
+    let process = $.proxy(this.process, this)
       , $element = $(element).is('body') ? $(window) : $(element)
       , href
     this.options = $.extend({}, $.fn.scrollspy.defaults, options)
@@ -1384,7 +1384,7 @@
       constructor: ScrollSpy
 
     , refresh: function () {
-        var self = this
+        let self = this
           , $targets
 
         this.offsets = $([])
@@ -1393,7 +1393,7 @@
         $targets = this.$body
           .find(this.selector)
           .map(function () {
-            var $el = $(this)
+            let $el = $(this)
               , href = $el.data('target') || $el.attr('href')
               , $href = /^#\w/.test(href) && $(href)
             return ( $href
@@ -1408,7 +1408,7 @@
       }
 
     , process: function () {
-        var scrollTop = this.$scrollElement.scrollTop() + this.options.offset
+        let scrollTop = this.$scrollElement.scrollTop() + this.options.offset
           , scrollHeight = this.$scrollElement[0].scrollHeight || this.$body[0].scrollHeight
           , maxScroll = scrollHeight - this.$scrollElement.height()
           , offsets = this.offsets
@@ -1430,7 +1430,7 @@
       }
 
     , activate: function (target) {
-        var active
+        let active
           , selector
 
         this.activeTarget = target
@@ -1462,7 +1462,7 @@
 
   $.fn.scrollspy = function (option) {
     return this.each(function () {
-      var $this = $(this)
+      let $this = $(this)
         , data = $this.data('scrollspy')
         , options = typeof option == 'object' && option
       if (!data) $this.data('scrollspy', (data = new ScrollSpy(this, options)))
@@ -1482,7 +1482,7 @@
 
   $(window).on('load', function () {
     $('[data-spy="scroll"]').each(function () {
-      var $spy = $(this)
+      const $spy = $(this)
       $spy.scrollspy($spy.data())
     })
   })
@@ -1515,7 +1515,7 @@
  /* TAB CLASS DEFINITION
   * ==================== */
 
-  var Tab = function (element) {
+  const Tab = function (element) {
     this.element = $(element)
   }
 
@@ -1524,7 +1524,7 @@
     constructor: Tab
 
   , show: function () {
-      var $this = this.element
+      let $this = this.element
         , $ul = $this.closest('ul:not(.dropdown-menu)')
         , selector = $this.attr('data-target')
         , previous
@@ -1560,7 +1560,7 @@
     }
 
   , activate: function ( element, container, callback) {
-      var $active = container.find('> .active')
+      let $active = container.find('> .active')
         , transition = callback
             && $.support.transition
             && $active.hasClass('fade')
@@ -1601,7 +1601,7 @@
 
   $.fn.tab = function ( option ) {
     return this.each(function () {
-      var $this = $(this)
+      let $this = $(this)
         , data = $this.data('tab')
       if (!data) $this.data('tab', (data = new Tab(this)))
       if (typeof option == 'string') data[option]()
@@ -1649,7 +1649,7 @@
  /* TYPEAHEAD PUBLIC CLASS DEFINITION
   * ================================= */
 
-  var Typeahead = function (element, options) {
+  const Typeahead = function (element, options) {
     this.$element = $(element)
     this.options = $.extend({}, $.fn.typeahead.defaults, options)
     this.matcher = this.options.matcher || this.matcher
@@ -1667,7 +1667,7 @@
     constructor: Typeahead
 
   , select: function () {
-      var val = this.$menu.find('.active').attr('data-value')
+      const val = this.$menu.find('.active').attr('data-value')
       this.$element
         .val(this.updater(val))
         .change()
@@ -1679,7 +1679,7 @@
     }
 
   , show: function () {
-      var pos = $.extend({}, this.$element.offset(), {
+      const pos = $.extend({}, this.$element.offset(), {
         height: this.$element[0].offsetHeight
       })
 
@@ -1700,7 +1700,7 @@
     }
 
   , lookup: function (event) {
-      var items
+      let items
 
       this.query = this.$element.val()
 
@@ -1714,7 +1714,7 @@
     }
 
   , process: function (items) {
-      var that = this
+      const that = this
 
       items = $.grep(items, function (item) {
         return that.matcher(item)
@@ -1734,7 +1734,7 @@
     }
 
   , sorter: function (items) {
-      var beginswith = []
+      let beginswith = []
         , caseSensitive = []
         , caseInsensitive = []
         , item
@@ -1749,14 +1749,14 @@
     }
 
   , highlighter: function (item) {
-      var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
+      const query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
       return item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
         return '<strong>' + match + '</strong>'
       })
     }
 
   , render: function (items) {
-      var that = this
+      const that = this
 
       items = $(items).map(function (i, item) {
         i = $(that.options.item).attr('data-value', item)
@@ -1770,7 +1770,7 @@
     }
 
   , next: function (event) {
-      var active = this.$menu.find('.active').removeClass('active')
+      let active = this.$menu.find('.active').removeClass('active')
         , next = active.next()
 
       if (!next.length) {
@@ -1781,7 +1781,7 @@
     }
 
   , prev: function (event) {
-      var active = this.$menu.find('.active').removeClass('active')
+      let active = this.$menu.find('.active').removeClass('active')
         , prev = active.prev()
 
       if (!prev.length) {
@@ -1866,7 +1866,7 @@
   }
 
   , blur: function (e) {
-      var that = this
+      const that = this
       setTimeout(function () { that.hide() }, 150)
     }
 
@@ -1889,7 +1889,7 @@
 
   $.fn.typeahead = function (option) {
     return this.each(function () {
-      var $this = $(this)
+      let $this = $(this)
         , data = $this.data('typeahead')
         , options = typeof option == 'object' && option
       if (!data) $this.data('typeahead', (data = new Typeahead(this, options)))
@@ -1913,7 +1913,7 @@
 
   $(function () {
     $('body').on('focus.typeahead.data-api', '[data-provide="typeahead"]', function (e) {
-      var $this = $(this)
+      const $this = $(this)
       if ($this.data('typeahead')) return
       e.preventDefault()
       $this.typeahead($this.data())
@@ -1949,7 +1949,7 @@
  /* AFFIX CLASS DEFINITION
   * ====================== */
 
-  var Affix = function (element, options) {
+  const Affix = function (element, options) {
     this.options = $.extend({}, $.fn.affix.defaults, options)
     this.$window = $(window).on('scroll.affix.data-api', $.proxy(this.checkPosition, this))
     this.$element = $(element)
@@ -1959,7 +1959,7 @@
   Affix.prototype.checkPosition = function () {
     if (!this.$element.is(':visible')) return
 
-    var scrollHeight = $(document).height()
+    let scrollHeight = $(document).height()
       , scrollTop = this.$window.scrollTop()
       , position = this.$element.offset()
       , offset = this.options.offset
@@ -1991,7 +1991,7 @@
 
   $.fn.affix = function (option) {
     return this.each(function () {
-      var $this = $(this)
+      let $this = $(this)
         , data = $this.data('affix')
         , options = typeof option == 'object' && option
       if (!data) $this.data('affix', (data = new Affix(this, options)))
@@ -2011,7 +2011,7 @@
 
   $(window).on('load', function () {
     $('[data-spy="affix"]').each(function () {
-      var $spy = $(this)
+      let $spy = $(this)
         , data = $spy.data()
 
       data.offset = data.offset || {}

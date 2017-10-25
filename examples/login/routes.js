@@ -1,6 +1,6 @@
-var passport = require('passport');
-var Account = require('./models/account');
-var router = require('express').Router();
+const passport = require('passport');
+const Account = require('./models/account');
+const router = require('express').Router();
 
 router.get('/', function(req, res) {
   res.render('index', {user: req.user});
