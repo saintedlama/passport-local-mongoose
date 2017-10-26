@@ -1,3 +1,4 @@
+"use strict";
 const crypto = require('crypto');
 const LocalStrategy = require('passport-local').Strategy;
 
@@ -188,8 +189,7 @@ module.exports = function(schema, options) {
       return cb(new errors.MissingUsernameError(options.errorMessages.MissingUsernameError));
     }
 
-    const self = this;
-    self.findByUsername(user.get(options.usernameField), function(err, existingUser) {
+    this.findByUsername(user.get(options.usernameField), (err, existingUser) => {
       if (err) { return cb(err); }
 
       if (existingUser) {
