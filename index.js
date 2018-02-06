@@ -27,6 +27,9 @@ module.exports = function(schema, options) {
     options.usernameQueryFields = [options.usernameField];
   }
 
+  // option to find username case insensitively
+  options.usernameCaseInsensitive = Boolean(options.usernameCaseInsensitive || false);
+
   // option to convert username to lowercase when finding
   options.usernameLowerCase = options.usernameLowerCase || false;
 
@@ -50,20 +53,20 @@ module.exports = function(schema, options) {
   options.errorMessages.NoSaltValueStoredError = options.errorMessages.NoSaltValueStoredError || 'Authentication not possible. No salt value stored';
   options.errorMessages.IncorrectPasswordError = options.errorMessages.IncorrectPasswordError || 'Password or username is incorrect';
   options.errorMessages.IncorrectUsernameError = options.errorMessages.IncorrectUsernameError || 'Password or username is incorrect';
-  options.errorMessages.MissingUsernameError = options.errorMessages.MissingUsernameError|| 'No username was given';
-  options.errorMessages.UserExistsError = options.errorMessages.UserExistsError|| 'A user with the given username is already registered';
+  options.errorMessages.MissingUsernameError = options.errorMessages.MissingUsernameError || 'No username was given';
+  options.errorMessages.UserExistsError = options.errorMessages.UserExistsError || 'A user with the given username is already registered';
 
   const schemaFields = {};
 
   if (!schema.path(options.usernameField)) {
-    schemaFields[options.usernameField] = {type: String, unique: options.usernameUnique};
+    schemaFields[options.usernameField] = { type: String, unique: options.usernameUnique };
   }
-  schemaFields[options.hashField] = {type: String, select: false};
-  schemaFields[options.saltField] = {type: String, select: false};
+  schemaFields[options.hashField] = { type: String, select: false };
+  schemaFields[options.saltField] = { type: String, select: false };
 
   if (options.limitAttempts) {
-    schemaFields[options.attemptsField] = {type: Number, default: 0};
-    schemaFields[options.lastLoginField] = {type: Date, default: Date.now};
+    schemaFields[options.attemptsField] = { type: Number, default: 0 };
+    schemaFields[options.lastLoginField] = { type: Date, default: Date.now };
   }
 
   schema.add(schemaFields);
@@ -223,7 +226,7 @@ module.exports = function(schema, options) {
     const queryOrParameters = [];
     for (let i = 0; i < options.usernameQueryFields.length; i++) {
       const parameter = {};
-      parameter[options.usernameQueryFields[i]] = username;
+      parameter[options.usernameQueryFields[i]] = options.usernameCaseInsensitive ? new RegExp(`^${username}$`, `i`) : username;
       queryOrParameters.push(parameter);
     }
 
