@@ -16,7 +16,7 @@ module.exports = {
     return function(cb) {
       this.timeout(options.timeout);
 
-      mongoose.connect(connectionString, function(err) {
+      mongoose.connect(connectionString, { useMongoClient: true }, function(err) {
         assert.ifError(err);
 
         mongoose.connection.db.collections(function(err, collections) {
