@@ -1,5 +1,6 @@
 # Passport-Local Mongoose
-Passport-Local Mongoose is a [Mongoose](http://mongoosejs.com/) [plugin](http://mongoosejs.com/docs/plugins.html) 
+
+Passport-Local Mongoose is a [Mongoose](http://mongoosejs.com/) [plugin](http://mongoosejs.com/docs/plugins.html)
 that simplifies building username and password login with [Passport](http://passportjs.org).
 
 [![Build Status](https://travis-ci.org/saintedlama/passport-local-mongoose.png?branch=master)](https://travis-ci.org/saintedlama/passport-local-mongoose)
@@ -7,14 +8,14 @@ that simplifies building username and password login with [Passport](http://pass
 [![passport-local-mongoose analyzed by Codellama.io](https://app.codellama.io/api/badges/5a04399c1b4c363a0f9427f8/fcac8d5ab6ca708f09999469b02890ce)](https://app.codellama.io/repositories/5a04399c1b4c363a0f9427f8)
 
 ## Tutorials
+
 Michael Herman gives a comprehensible walk through for setting up mongoose,
 passport, passport-local and passport-local-mongoose for user authentication in his blog post [User Authentication With Passport.js](http://mherman.org/blog/2013/11/11/user-authentication-with-passport-dot-js/)
-
 
 ## Installation
 
 ```bash
-$ npm install passport-local-mongoose
+> npm install passport-local-mongoose
 ```
 
 Passport-Local Mongoose does not require `passport`, `passport-local` or `mongoose` dependencies directly but expects you
@@ -23,18 +24,17 @@ to have these dependencies installed.
 In case you need to install the whole set of dependencies
 
 ```bash
-$ npm install passport passport-local mongoose passport-local-mongoose --save
+> npm install passport passport-local mongoose passport-local-mongoose --save
 ```
 
 ### Updating from 1.x to 2.x
-The default digest algorithm was changed due to security implications from **sha1** to **sha256**. If you decide
-to upgrade a production system from 1.x to 2.x your users **will not be able to login** since the digest
-algorithm was changed! In these cases plan some migration strategy and/or use the **sha1** option for the 
-digest algorithm.
+
+The default digest algorithm was changed due to security implications from **sha1** to **sha256**. If you decide to upgrade a production system from 1.x to 2.x your users **will not be able to login** since the digest algorithm was changed! In these cases plan some migration strategy and/or use the **sha1** option for the digest algorithm.
 
 ## Usage
 
 ### Plugin Passport-Local Mongoose
+
 First you need to plugin Passport-Local Mongoose into your User schema
 
 ```javascript
@@ -54,6 +54,7 @@ You're free to define your User how you like. Passport-Local Mongoose will add a
 Additionally Passport-Local Mongoose adds some methods to your Schema. See the API Documentation section for more details.
 
 ### Configure Passport/Passport-Local
+
 You should configure Passport/Passport-Local as described in [the Passport Guide](http://passportjs.org/guide/configure/).
 
 Passport-Local Mongoose supports this setup by implementing a `LocalStrategy` and serializeUser/deserializeUser functions.
@@ -75,6 +76,7 @@ passport.deserializeUser(User.deserializeUser());
 Make sure that you have a mongoose connected to mongodb and you're done.
 
 #### Simplified Passport/Passport-Local Configuration
+
 Starting with version 0.2.1 passport-local-mongoose adds a helper method `createStrategy` as static method to your schema.
 The `createStrategy` is responsible to setup passport-local `LocalStrategy` with the correct options.
 
@@ -88,11 +90,22 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 ```
 
-The reason for this functionality is that when using the `usernameField` option to specify an alternative usernameField name, 
-for example "email" passport-local would still expect your frontend login form to contain an input field with name "username"
-instead of email. This can be configured for passport-local but this is double the work. So we got this shortcut implemented.
+The reason for this functionality is that when using the `usernameField` option to specify an alternative usernameField name, for example "email" passport-local would still expect your frontend login form to contain an input field with name "username" instead of email. This can be configured for passport-local but this is double the work. So we got this shortcut implemented.
+
+### Async/Await
+
+Starting with version `5.0.0` passport-local-mongoose is async/await enabled by returning
+Promises for all instance and static methods except `serializeUser` and `deserializeUser`.
+
+```js
+const user = new DefaultUser({username: 'user'});
+await user.setPassword('password');
+await user.save();
+const { user } = await DefaultUser.authenticate()('user', 'password');
+```
 
 ### Options
+
 When plugging in Passport-Local Mongoose plugin additional options can be provided to configure
 the hashing algorithm.
 
@@ -100,15 +113,14 @@ the hashing algorithm.
 User.plugin(passportLocalMongoose, options);
 ```
 
-__Main Options__
+#### Main Options
 
 * saltlen: specifies the salt length in bytes. Default: 32
 * iterations: specifies the number of iterations used in pbkdf2 hashing algorithm. Default: 25000
 * keylen: specifies the length in byte of the generated key. Default: 512
 * digestAlgorithm: specifies the pbkdf2 digest algorithm. Default: sha256. (get a list of supported algorithms with crypto.getHashes())
 * interval: specifies the interval in milliseconds between login attempts. Default: 100
-* usernameField: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different 
-field to hold the username for example "email".
+* usernameField: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different field to hold the username for example "email".
 * usernameUnique : specifies if the username field should be enforced to be unique by a mongodb index or not. Defaults to true.
 * saltField: specifies the field name that holds the salt value. Defaults to 'salt'.
 * hashField: specifies the field name that holds the password hash value. Defaults to 'hash'.
@@ -127,6 +139,7 @@ field to hold the username for example "email".
 *Attention!* Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
 
 #### Error Messages
+
 Override default error messages by setting options.errorMessages.
 
 * MissingPasswordError  'No password was given'
@@ -137,45 +150,52 @@ Override default error messages by setting options.errorMessages.
 * IncorrectUsernameError 'Password or username are incorrect'
 * MissingUsernameError 'No username was given'
 * UserExistsError 'A user with the given username is already registered'
-  
+
 ### Hash Algorithm
+
 Passport-Local Mongoose use the pbkdf2 algorithm of the node crypto library. 
 [Pbkdf2](http://en.wikipedia.org/wiki/PBKDF2) was chosen because platform independent
 (in contrary to bcrypt). For every user a generated salt value is saved to make
 rainbow table attacks even harder.
 
 ### Examples
+
 For a complete example implementing a registration, login and logout see the 
 [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
 
 ## API Documentation
+
 ### Instance methods
 
-#### setPassword(password, cb) 
-asynchronous method to set a user's password hash and salt
+#### setPassword(password, [cb])
 
-#### changePassword(oldPassword, newPassword, cb)
-asynchronous method to change a user's password hash and salt. If oldPassword does
-not match the user's old password an `IncorrectPasswordError` is passed to cb.
+Sets a user password. Does not save the user object. If no callback `cb` is provided a `Promise` is returned.
 
-#### authenticate(password, cb)
-asynchronous method to authenticate a user instance
+#### changePassword(oldPassword, newPassword, [cb])
 
-### resetAttempts(cb)
-asynchronous method to reset a user's number of failed password attempts (only defined if `options.limitAttempts` is true)
+Sets a change a user's password hash and salt. Does not save the user object. If no callback `cb` is provided a `Promise` is returned. If oldPassword does not match the user's old password an `IncorrectPasswordError` is passed to `cb` or the `Promise` is rejected.
 
-**callback arguments**
-- err
-  - null unless the hasing algorithm throws an error
-- thisModel
-  - the model getting authenticated *if* authentication was successful otherwise false
-- passwordErr
-  - an instance of `AuthenticationError` describing the reason the password failed, else undefined.
+#### authenticate(password, [cb])
+
+Authenticate a user object. If no callback `cb` is provided a `Promise` is returned.
+
+#### resetAttempts([cb])
+
+Reset a user's number of failed password attempts (only defined if `options.limitAttempts` is true) If no callback `cb` is provided a `Promise` is returned.
+
+### Callback Arguments
+
+* err
+  * null unless the hasing algorithm throws an error
+* thisModel
+  * the model getting authenticated *if* authentication was successful otherwise false
+* passwordErr
+  * an instance of `AuthenticationError` describing the reason the password failed, else undefined.
 
 Using `setPassword()` will only update the document's password fields, but will not save the document.
 To commit the changed document, remember to use Mongoose's `document.save()` after using `setPassword()`.
 
-**Error Handling**  
+### Error Handling
 
 * `IncorrectPasswordError`: specifies the error message returned when the password is incorrect. Defaults to 'Incorrect password'.
 * `IncorrectUsernameError`: specifies the error message returned when the username is incorrect. Defaults to 'Incorrect username'.
@@ -188,8 +208,8 @@ To commit the changed document, remember to use Mongoose's `document.save()` aft
 
 All those errors inherit from `AuthenticationError`, if you need a more general error class for checking.
 
-
 ### Static methods
+
 Static methods are exposed on the model constructor. For example to use createStrategy function use
 
 ```javascript
@@ -224,7 +244,7 @@ we want to restrict the query to only query users with field `active` set to `tr
 UserSchema.plugin(passportLocalMongoose, {
   // Needed to set usernameUnique to true to avoid a mongodb index on the username column!
   usernameUnique: false,
-  
+
   findByUsername: function(model, queryParameters) {
     // Add additional query parameter - AND condition - active: true
     queryParameters.active = true;
@@ -247,10 +267,10 @@ User.register({username:'username', active: false}, 'password', function(err, us
     if (err) { ... }
 
     // Value 'result' is set to false. The user could not be authenticated since the user is not active
-    
   });
 });
 ```
 
 ## License
+
 Passport-Local Mongoose is licenses under the [MIT license](http://opensource.org/licenses/MIT).

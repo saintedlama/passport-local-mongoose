@@ -58,12 +58,12 @@ describe('issues', function() {
       expect(err).to.not.exist;
       expect(user).to.exist;
 
-      User.authenticate()('hugo', 'none', function(err, auth, reason) {
+      User.authenticate()('hugo', 'none', function(err, auth, error) {
         expect(err).to.not.exist;
         expect(false).to.equal(auth);
-        expect(reason).to.exist;
+        expect(error).to.exist;
 
-        expect('Authentication not possible. No salt value stored').to.equal(reason.message);
+        expect('Authentication not possible. No salt value stored').to.equal(error.message);
 
         done();
       });

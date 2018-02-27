@@ -351,9 +351,10 @@ describe('passportLocalMongoose', function() {
     it('should supply a message when authentication fails', function(done) {
       const user = new DefaultUser();
 
-      setPasswordAndAuthenticate(user, 'password', 'nopassword', function(err, result, options) {
+      setPasswordAndAuthenticate(user, 'password', 'nopassword', function(err, result, error) {
         if (err) { return done(err); }
-        expect(options.message).to.exist;
+
+        expect(error.message).to.exist;
 
         done();
       });
@@ -378,10 +379,10 @@ describe('passportLocalMongoose', function() {
         user.save(function(err) {
           if (err) { return done(err); }
 
-          user.authenticate('password', function(err, user, message) {
+          user.authenticate('password', function(err, user, error) {
             if (err) { return done(err); }
             expect(user).to.be.false;
-            expect(message).to.be.instanceof(errors.AttemptTooSoonError);
+            expect(error).to.be.instanceof(errors.AttemptTooSoonError);
             done();
           });
         });
@@ -408,10 +409,10 @@ describe('passportLocalMongoose', function() {
           if (err) { return done(err); }
 
           user._id = mongoose.Types.ObjectId();
-          user.authenticate('password', function(err, user, message) {
+          user.authenticate('password', function(err, user, error) {
             expect(err).to.exist;
             expect(user).to.not.exist;
-            expect(message).to.not.exist;
+            expect(error).to.not.exist;
             done();
           });
         });
@@ -435,10 +436,10 @@ describe('passportLocalMongoose', function() {
           if (err) { return done(err); }
 
           user._id = mongoose.Types.ObjectId();
-          user.authenticate('password', function(err, user, message) {
+          user.authenticate('password', function(err, user, error) {
             expect(err).to.exist;
             expect(user).to.not.exist;
-            expect(message).to.not.exist;
+            expect(error).to.not.exist;
             done();
           });
         });
@@ -461,11 +462,12 @@ describe('passportLocalMongoose', function() {
         user.save(function(err) {
           if (err) { return done(err); }
 
-          user.authenticate('password', function(err, result, message) {
+          user.authenticate('password', function(err, result, error) {
             if (err) { return done(err); }
+
             expect(result).to.exist;
             expect(result.username).to.equal(user.username);
-            expect(message).to.not.exist;
+            expect(error).to.not.exist;
             done();
           });
         });
@@ -491,10 +493,10 @@ describe('passportLocalMongoose', function() {
 
           user.hash = 'deadbeef'; // force an error on scmp with different length hex.
           user._id = mongoose.Types.ObjectId(); // force the save to fail
-          user.authenticate('password', function(err, user, message) {
+          user.authenticate('password', function(err, user, error) {
             expect(err).to.exist;
             expect(user).to.not.exist;
-            expect(message).to.not.exist;
+            expect(error).to.not.exist;
             done();
           });
         });
@@ -509,10 +511,10 @@ describe('passportLocalMongoose', function() {
     afterEach(() => mongoose.disconnect());
 
     it('should yield false with message option for authenticate', function(done) {
-      DefaultUser.authenticate()('user', 'password', function(err, result, options) {
+      DefaultUser.authenticate()('user', 'password', function(err, result, error) {
         if (err) { return done(err); }
         expect(result).to.equal(false);
-        expect(options.message).to.exist;
+        expect(error.message).to.exist;
 
         done();
       });
@@ -595,10 +597,10 @@ describe('passportLocalMongoose', function() {
         user.save(function(err) {
           if (err) { return done(err); }
 
-          DefaultUser.authenticate()('user', 'wrongpassword', function(err, result, options) {
+          DefaultUser.authenticate()('user', 'wrongpassword', function(err, result, error) {
             if (err) { return done(err); }
             expect(result).to.equal(false);
-            expect(options.message).to.exist;
+            expect(error.message).to.exist;
 
             done();
           });
@@ -715,10 +717,10 @@ describe('passportLocalMongoose', function() {
     afterEach(() => mongoose.disconnect());
 
     it('should yield false with message option for authenticate', async () => {
-      const { user, message } = await DefaultUser.authenticate()('user', 'password');
+      const { user, error } = await DefaultUser.authenticate()('user', 'password');
 
       expect(user).to.equal(false);
-      expect(message).to.exist;
+      expect(error).to.exist;
     });
 
     it('should authenticate existing user with matching password', async () => {
@@ -773,10 +775,10 @@ describe('passportLocalMongoose', function() {
       await user.setPassword('password');
       await user.save();
 
-      const { user: result, message } = await DefaultUser.authenticate()('user', 'wrongpassword');
+      const { user: result, error } = await DefaultUser.authenticate()('user', 'wrongpassword');
 
       expect(result).to.equal(false);
-      expect(message).to.exist;
+      expect(error).to.exist;
     });
 
     it('should lock authenticate after too many login attempts', async() => {
@@ -818,17 +820,17 @@ describe('passportLocalMongoose', function() {
       await user.setPassword('password');
       await user.save();
 
-      const { user: user1, message: message1 } = await User.authenticate()('user', 'WRONGpassword');
+      const { user: user1, error: error1 } = await User.authenticate()('user', 'WRONGpassword');
       expect(user1).to.be.false;
-      expect(message1.message).to.not.contain('locked');
+      expect(error1.message).to.not.contain('locked');
 
-      const { user: user2, message: message2 } = await User.authenticate()('user', 'WRONGpassword');
+      const { user: user2, error: error2 } = await User.authenticate()('user', 'WRONGpassword');
       expect(user2).to.be.false;
-      expect(message2.message).to.not.contain('locked');
+      expect(error2.message).to.not.contain('locked');
 
-      const { user: user3, message: message3 } = await User.authenticate()('user', 'WRONGpassword');
+      const { user: user3, error: error3 } = await User.authenticate()('user', 'WRONGpassword');
       expect(user3).to.be.false;
-      expect(message3.message).to.contain('locked');
+      expect(error3.message).to.contain('locked');
 
       await user.resetAttempts();
 
@@ -1188,10 +1190,10 @@ describe('passportLocalMongoose', function() {
       User.register({username: 'hugo'}, 'password', function(err) {
         if (err) { return done(err); }
 
-        User.authenticate()('hugo', 'password', function(err, user, message) {
+        User.authenticate()('hugo', 'password', function(err, user, error) {
           if (err) { return done(err); }
           expect(user).to.exist;
-          expect(message).to.not.exist;
+          expect(error).to.not.exist;
 
           done();
         });
@@ -1206,10 +1208,10 @@ describe('passportLocalMongoose', function() {
       User.register({username: 'hugo'}, 'password', function(err) {
         if (err) { return done(err); }
 
-        User.authenticate()('hugo', 'wrong_password', function(err, user, message) {
+        User.authenticate()('hugo', 'wrong_password', function(err, user, error) {
           if (err) { return done(err); }
           expect(user).to.equal(false);
-          expect(message).to.exist;
+          expect(error).to.exist;
 
           done();
         });
@@ -1311,10 +1313,10 @@ describe('passportLocalMongoose', function() {
 
       await User.register({ username: 'hugo' }, 'password');
 
-      const { user, message } = await User.authenticate()('hugo', 'password');
+      const { user, error } = await User.authenticate()('hugo', 'password');
 
       expect(user).to.exist;
-      expect(message).to.not.exist;
+      expect(error).to.not.exist;
     });
 
     it('should not authenticate registered user with wrong password', async () => {
@@ -1324,10 +1326,10 @@ describe('passportLocalMongoose', function() {
 
       await User.register({username: 'hugo'}, 'password');
 
-      const { user, message } = await User.authenticate()('hugo', 'wrong_password');
+      const { user, error } = await User.authenticate()('hugo', 'wrong_password');
 
       expect(user).to.equal(false);
-      expect(message).to.exist;
+      expect(error).to.exist;
     });
 
     it('it should add username existing user without username', async () => {

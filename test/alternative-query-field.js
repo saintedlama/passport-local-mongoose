@@ -54,10 +54,10 @@ describe('alternative query field', function() {
     User.register(user, 'password', function(err) {
       expect(err).to.not.exist;
 
-      User.authenticate()('hugo@test.org', 'password', function(err, user, message) {
+      User.authenticate()('hugo@test.org', 'password', function(err, user, error) {
         expect(err).to.not.exist;
         expect(user).to.exist;
-        expect(!message).to.exist;
+        expect(!error).to.exist;
 
         done();
       });
@@ -76,10 +76,10 @@ describe('alternative query field', function() {
     User.register(user, 'password', function(err) {
       expect(err).to.not.exist;
 
-      User.authenticate()('hugo', 'password', function(err, user, message) {
+      User.authenticate()('hugo', 'password', function(err, user, error) {
         expect(err).to.not.exist;
         expect(user).to.exist;
-        expect(!message).to.exist;
+        expect(!error).to.exist;
 
         done();
       });
@@ -99,12 +99,12 @@ describe('alternative query field', function() {
     User.register(user, 'password', function(err) {
       if (err) { return done(err); }
 
-      User.authenticate()('hugo@test.org', 'password', function(err, user, message) {
+      User.authenticate()('hugo@test.org', 'password', function(err, user, error) {
         if (err) { return done(err); }
 
         expect(err).to.not.exist;
         expect(user).to.be.false;
-        expect(message).to.exist;
+        expect(error).to.exist;
 
         done();
       });

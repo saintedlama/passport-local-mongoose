@@ -153,7 +153,7 @@ module.exports = function(schema, options) {
               return authenticate(user, password, options);
             }
 
-            return { user: false, message: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
+            return { user: false, error: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
           });
       });
 
@@ -162,7 +162,7 @@ module.exports = function(schema, options) {
     }
 
     promise
-      .then(({ user, message }) => cb(null, user, message))
+      .then(({ user, error }) => cb(null, user, error))
       .catch(err => cb(err));
   };
 
@@ -194,7 +194,7 @@ module.exports = function(schema, options) {
           return user.authenticate(password);
         }
 
-        return { user: false, message: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
+        return { user: false, error: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
       });
 
       if (!cb) {
@@ -202,7 +202,7 @@ module.exports = function(schema, options) {
       }
 
       promise
-        .then(({ user, message }) => cb(null, user, message))
+        .then(({ user, error }) => cb(null, user, error))
         .catch(err => cb(err));
     };
   };
