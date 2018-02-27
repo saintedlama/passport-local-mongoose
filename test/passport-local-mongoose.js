@@ -1,4 +1,3 @@
-"use strict";
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const expect = require('chai').expect;
@@ -695,13 +694,7 @@ describe('passportLocalMongoose', function() {
   describe('static #deserializeUser()', function() {
     beforeEach(dropMongodbCollections(connectionString));
     beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
-    afterEach(() => {
-      try {
-        return mongoose.disconnect();
-      } catch (e) {
-        console.log('Could not disconnect due to error', e);
-      }
-    });
+    afterEach(() => mongoose.disconnect());
 
     it('should define a static deserializeUser function for passport', function() {
       expect(DefaultUser.deserializeUser).to.exist;
