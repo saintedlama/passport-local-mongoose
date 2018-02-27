@@ -138,7 +138,7 @@ describe('passportLocalMongoose', function() {
     });
   });
 
-  describe('#setPasswordCallback()', function() {
+  describe('#setPassword() callback', function() {
     it('should set yield an error if password is undefined', function(done) {
       const user = new DefaultUser();
 
@@ -172,7 +172,7 @@ describe('passportLocalMongoose', function() {
     });
   });
 
-  describe('#setPasswordAsync()', function() {
+  describe('#setPassword() async', function() {
     it('should set yield an error if password is undefined', () => {
       const user = new DefaultUser();
 
