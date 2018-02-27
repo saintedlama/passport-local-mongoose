@@ -15,6 +15,17 @@ module.exports = function(schema, options) {
   options.digestAlgorithm = options.digestAlgorithm || 'sha256'; // To get a list of supported hashes use crypto.getHashes()
   options.passwordValidator = options.passwordValidator || function(password, cb) { cb(null); };
 
+  options.passwordValidatorPromisified = (password) => {
+    return new Promise((resolve, reject) => {
+      const maybePromise = options.passwordValidator(password, (err) => err?reject(err):resolve());
+
+      if (maybePromise && maybePromise.then && maybePromise.catch) {
+        maybePromise.then(() => resolve);
+        maybePromise.catch((err) => reject(err));
+      }
+    });
+  };
+
   // Populate field names with defaults if not set
   options.usernameField = options.usernameField || 'username';
   options.usernameUnique = options.usernameUnique === undefined ? true : options.usernameUnique;
