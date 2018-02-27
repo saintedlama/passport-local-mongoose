@@ -26,7 +26,7 @@
     "chai": "^4.1.2",
     "coveralls": "^3.0.0",
     "cross-env": "^5.1.3",
-    "drop-mongodb-collections": "^1.2.0",
+    "drop-mongodb-collections": "^1.2.2",
     "eslint": "^4.18.1",
     "mocha": "^5.0.1",
     "mocha-lcov-reporter": "^1.3.0",
