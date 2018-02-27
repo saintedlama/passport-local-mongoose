@@ -13,16 +13,11 @@ module.exports = function(schema, options) {
   options.keylen = options.keylen || 512;
   options.encoding = options.encoding || 'hex';
   options.digestAlgorithm = options.digestAlgorithm || 'sha256'; // To get a list of supported hashes use crypto.getHashes()
+
   options.passwordValidator = options.passwordValidator || function(password, cb) { cb(null); };
-
-  options.passwordValidatorPromisified = (password) => {
+  options.passwordValidatorAsync = options.passwordValidatorAsync || function(password) {
     return new Promise((resolve, reject) => {
-      const maybePromise = options.passwordValidator(password, (err) => err?reject(err):resolve());
-
-      if (maybePromise && maybePromise.then && maybePromise.catch) {
-        maybePromise.then(() => resolve);
-        maybePromise.catch((err) => reject(err));
-      }
+        options.passwordValidator(password, (err) => err?reject(err):resolve());
     });
   };
 
@@ -97,7 +92,7 @@ module.exports = function(schema, options) {
           throw new errors.MissingPasswordError(options.errorMessages.MissingPasswordError);
         }
       })
-      .then(() => options.passwordValidatorPromisified(password))
+      .then(() => options.passwordValidatorAsync(password))
       .then(() => randomBytes(options.saltlen))
       .then(saltBuffer => saltBuffer.toString(options.encoding))
       .then(salt => {
@@ -222,19 +217,19 @@ module.exports = function(schema, options) {
     }
 
     const promise = Promise.resolve()
-        .then(() => {
-          if (!user.get(options.usernameField)) {
-            throw new new errors.MissingUsernameError(options.errorMessages.MissingUsernameError);
-          }
-        })
-        .then(() => this.findByUsername(user.get(options.usernameField)))
-        .then((existingUser) => {
-          if (existingUser) {
-            throw new new errors.UserExistsError(options.errorMessages.UserExistsError);
-          }
-        })
-        .then(() => user.setPassword(password))
-        .then(() => user.save());
+      .then(() => {
+        if (!user.get(options.usernameField)) {
+          throw new errors.MissingUsernameError(options.errorMessages.MissingUsernameError);
+        }
+      })
+      .then(() => this.findByUsername(user.get(options.usernameField)))
+      .then((existingUser) => {
+        if (existingUser) {
+          throw new errors.UserExistsError(options.errorMessages.UserExistsError);
+        }
+      })
+      .then(() => user.setPassword(password))
+      .then(() => user.save());
 
     if (!cb) {
       return promise;

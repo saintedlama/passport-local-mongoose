@@ -2,14 +2,24 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const expect = require('chai').expect;
+const dropMongodbCollections = require('drop-mongodb-collections');
+const debug = require('debug')('passport:local:mongoose');
 const passportLocalMongoose = require('../');
-const mongotest = require('./helpers/mongotest');
+
+const dbName = 'passportlocalmongoosetests';
+let connectionString = `mongodb://localhost/${dbName}`;
+
+if (process.env.MONGO_SERVER) {
+  connectionString = connectionString.replace('mongodb://localhost', 'mongodb://' + process.env.MONGO_SERVER);
+  debug('Using mongodb server from environment variable %s', connectionString);
+}
 
 describe('issues', function() {
   this.timeout(10000); // Ten seconds - mongodb access needed
 
-  beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongooseissues'));
-  afterEach(mongotest.disconnect());
+  beforeEach(dropMongodbCollections(connectionString));
+  beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+  afterEach(() => mongoose.disconnect());
 
   it('should support nested fields - Issue #9', function(done) {
     const UserSchema = new Schema({
@@ -125,19 +135,42 @@ describe('issues', function() {
   it('should support password validation - Issue #57', function(done) {
     const UserSchema = new Schema({});
 
-    const nastyPasswordValidator = function(password, cb) {
-      cb("My nasty error");
-    };
+    function passwordValidator(password, cb) {
+      cb(new Error('No password is valid'));
+    }
 
     UserSchema.plugin(passportLocalMongoose, {
-      passwordValidator: nastyPasswordValidator
+      passwordValidator
     });
+
     const User = mongoose.model('ShouldSupportPasswordValidation_Issue_57', UserSchema);
 
-    User.register({username: "nicolascage"}, 'password', function(err) {
-      expect(err).to.equal("My nasty error");
+    User.register({username: 'nicolascage'}, 'password', function(err) {
+      expect(err.message).to.equal('No password is valid');
       done();
     });
+  });
+
+  it('should support password validation with promises - Issue #57', function() {
+    const UserSchema = new Schema({});
+
+    function passwordValidatorAsync() {
+      return Promise.reject(new Error('No password is valid'));
+    }
+
+    UserSchema.plugin(passportLocalMongoose, {
+      passwordValidatorAsync
+    });
+
+    const User = mongoose.model('ShouldSupportPasswordValidation_With_Promises_Issue_57', UserSchema);
+
+    return User.register({username: 'nicolascage'}, 'password')
+      .then(() => {
+        throw new Error('Expected password validator to throw!')
+      })
+      .catch(err => {
+        expect(err.message).to.equal('No password is valid');
+      });
   });
 
   it('should not expose hash and salt fields - Issue #72', function(done) {

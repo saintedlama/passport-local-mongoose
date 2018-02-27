@@ -2,14 +2,24 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const expect = require('chai').expect;
+const dropMongodbCollections = require('drop-mongodb-collections');
+const debug = require('debug')('passport:local:mongoose');
 const passportLocalMongoose = require('../');
-const mongotest = require('./helpers/mongotest');
+
+const dbName = 'passportlocalmongoosetests';
+let connectionString = `mongodb://localhost/${dbName}`;
+
+if (process.env.MONGO_SERVER) {
+  connectionString = connectionString.replace('mongodb://localhost', 'mongodb://' + process.env.MONGO_SERVER);
+  debug('Using mongodb server from environment variable %s', connectionString);
+}
 
 describe('alternative query field', function() {
   this.timeout(10000); // Ten seconds - mongo db access needed
 
-  beforeEach(mongotest.prepareDb('mongodb://localhost/passportlocalmongooseissues'));
-  afterEach(mongotest.disconnect());
+  beforeEach(dropMongodbCollections(connectionString));
+  beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+  afterEach(() => mongoose.disconnect());
 
   it('should find an existing user by alternative query field', function(done) {
     const UserSchema = new Schema({
