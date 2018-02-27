@@ -1,0 +1,7 @@
+{
+  "presets": ["env"],
+  "ignore": [
+    "index.js",
+    "lib/*.js"
+  ]
+}
