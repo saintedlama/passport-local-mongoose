@@ -121,7 +121,7 @@ module.exports = function(schema, options) {
           throw new errors.MissingPasswordError(options.errorMessages.MissingPasswordError);
         }
       })
-      .then(() => this.authenticateAsync(oldPassword))
+      .then(() => this.authenticate(oldPassword))
       .then(({ user }) => {
         if (!user) {
           throw new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError);
@@ -140,27 +140,30 @@ module.exports = function(schema, options) {
       .catch(err => cb(err));
   };
 
-  schema.methods.authenticateAsync = function(password) {
-    return new Promise((resolve, reject) => {
-      this.authenticate(password, (err, user, errorMessages) => err?reject(err):resolve({ user, errorMessages }))
-    });
-  }
-
   schema.methods.authenticate = function(password, cb) {
-    // With hash/salt marked as "select: false" - load model including the salt/hash fields form db and authenticate
-    if (!this.get(options.saltField)) {
-      this.constructor.findByUsername(this.get(options.usernameField), true, (err, user) => {
-        if (err) { return cb(err); }
-
-        if (user) {
-          return authenticate(user, password, options, cb);
-        } else {
-          return cb(null, false, new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError));
+    const promise = Promise.resolve()
+      .then(() => {
+        if (this.get(options.saltField)) {
+          return authenticate(this, password, options);
         }
+
+        return this.constructor.findByUsername(this.get(options.usernameField), true)
+          .then(user => {
+            if (user) {
+              return authenticate(user, password, options);
+            }
+
+            return { user: false, message: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
+          });
       });
-    } else {
-      return authenticate(this, password, options, cb);
+
+    if (!cb) {
+      return promise;
     }
+
+    promise
+      .then(({ user, message }) => cb(null, user, message))
+      .catch(err => cb(err));
   };
 
   if (options.limitAttempts) {
@@ -184,15 +187,23 @@ module.exports = function(schema, options) {
   // Passport Local Interface
   schema.statics.authenticate = function() {
     return (username, password, cb) => {
-      this.findByUsername(username, true, (err, user) => {
-        if (err) { return cb(err); }
-
+      const promise = Promise.resolve()
+      .then(() => this.findByUsername(username, true))
+      .then((user) => {
         if (user) {
-          return user.authenticate(password, cb);
-        } else {
-          return cb(null, false, new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError));
+          return user.authenticate(password);
         }
+
+        return { user: false, message: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
       });
+
+      if (!cb) {
+        return promise;
+      }
+
+      promise
+        .then(({ user, message }) => cb(null, user, message))
+        .catch(err => cb(err));
     };
   };
 
