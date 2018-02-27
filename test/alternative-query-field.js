@@ -90,17 +90,20 @@ describe('alternative query field', function() {
     const UserSchema = new Schema({
       email: String
     });
+
     UserSchema.plugin(passportLocalMongoose, {iterations: 1, usernameQueryFields: []}); // 1 iteration - safes time in tests
     const User = mongoose.model('NotAuthenticateUnconfiguredAlternativeQueryField', UserSchema);
 
     const email = 'hugo@test.org';
     const user = new User({username: 'hugo', email: email});
     User.register(user, 'password', function(err) {
-      expect(err).to.not.exist;
+      if (err) { return done(err); }
 
       User.authenticate()('hugo@test.org', 'password', function(err, user, message) {
+        if (err) { return done(err); }
+
         expect(err).to.not.exist;
-        expect(!user).to.exist;
+        expect(user).to.be.false;
         expect(message).to.exist;
 
         done();
