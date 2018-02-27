@@ -1,4 +1,3 @@
-"use strict";
 const crypto = require('crypto');
 const LocalStrategy = require('passport-local').Strategy;
 
@@ -264,14 +263,14 @@ module.exports = function(schema, options) {
     const queryOrParameters = [];
     for (let i = 0; i < options.usernameQueryFields.length; i++) {
       const parameter = {};
-      parameter[options.usernameQueryFields[i]] = options.usernameCaseInsensitive ? new RegExp(`^${username}$`, `i`) : username;
+      parameter[options.usernameQueryFields[i]] = options.usernameCaseInsensitive ? new RegExp(`^${username}$`, 'i') : username;
       queryOrParameters.push(parameter);
     }
 
     const query = options.findByUsername(this, { $or: queryOrParameters });
 
     if (opts.selectHashSaltFields) {
-      query.select('+' + options.hashField + " +" + options.saltField);
+      query.select('+' + options.hashField + ' +' + options.saltField);
     }
 
     if (options.selectFields) {

@@ -1,4 +1,3 @@
-"use strict";
 const errors = require('../lib/errors.js');
 const expect = require('chai').expect;
 

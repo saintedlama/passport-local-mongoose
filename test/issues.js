@@ -1,4 +1,3 @@
-"use strict";
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const expect = require('chai').expect;
@@ -179,13 +178,13 @@ describe('issues', function() {
     UserSchema.plugin(passportLocalMongoose, {});
     const User = mongoose.model('ShouldNotExposeHashAndSaltFields_Issue_72', UserSchema);
 
-    User.register({username: "nicolascage"}, 'password', function(err, user) {
+    User.register({username: 'nicolascage'}, 'password', function(err, user) {
       expect(err).to.not.exist;
       expect(user).to.exist;
-      User.findOne({username: "nicolascage"}, function(err, user) {
+      User.findOne({username: 'nicolascage'}, function(err, user) {
         expect(err).to.not.exist;
         expect(user).to.exist;
-        expect(user.username).to.equal("nicolascage");
+        expect(user.username).to.equal('nicolascage');
         expect(user.hash).to.equal(undefined);
         expect(user.salt).to.equal(undefined);
         done();
@@ -239,9 +238,9 @@ describe('issues', function() {
 
       // 3.0 generated hash and salt of 'username', 'password'
       User.create({
-        "salt" : "fd4bb06e65cd4d582efde28427ffdeb8839c64169d72cfe131bd971f70dc08f8",
-        "hash" : "2ce573e406497fcbc2c1e91532cdbcf198ecbe2692cd5b3dffc303c51e6ccf56ae6a1ed9bac17f6f185d2d289ed713f7bd2a7a6246a4974495a35ff95bba234e00757d8a78fb28836a984c3e67465a019ead84d684896712c50f670663134685225b6832ec5a0a99922eabe6ba03abc1e79bc6a29ca2fe23456034eff2987277331f9e32713b3293ab355882feebe9c37ecdcd1a22dcebd6e5799adeb6a4dc32e56398d21ece6eda07b84944c3918de6bda69ab7998be461f98ff1559a07fd5d3100d732da443110b3ac7d27d16098c4e1eab7489f6d2a5849981a5c9f5dadb86d8dbbb9b60ce67304e21221e77d1a2700cab460450702c16b99db2e3b67454765fe9e4054c87a9e436fb17db1774b9d22a129c1b120dad0925b58390b8a02241e7e06acbe87dbe7f0e91b5d000cd93fc7cc8f316f45b901b8eb58ea6853c8e7ead245a9329239ed4f3797bc12a151ffedd8e8d2533547a1aec7231a460ca128ebfb1bd6b6f988455505c21d2dbfe01ee4b321a3d20a5bf6e2a356b6f4dbb8ddb4cff7dc9779b9747881af4d08e2fbcf452746e07275ed350fad0d4e6e8fcbedb0575c1413be5a913ca6ef4fcf17d1021b93fe2b3b410cf612791f967521ae558459673156e431be5203ca944e80652559eaf3faa90250df3d24526d5f9fc3409e508a3e2175daaf492fd6efd748e4418834b631f84fe266ac32f4927c3a426b",
-        "username" : "username"
+        'salt' : 'fd4bb06e65cd4d582efde28427ffdeb8839c64169d72cfe131bd971f70dc08f8',
+        'hash' : '2ce573e406497fcbc2c1e91532cdbcf198ecbe2692cd5b3dffc303c51e6ccf56ae6a1ed9bac17f6f185d2d289ed713f7bd2a7a6246a4974495a35ff95bba234e00757d8a78fb28836a984c3e67465a019ead84d684896712c50f670663134685225b6832ec5a0a99922eabe6ba03abc1e79bc6a29ca2fe23456034eff2987277331f9e32713b3293ab355882feebe9c37ecdcd1a22dcebd6e5799adeb6a4dc32e56398d21ece6eda07b84944c3918de6bda69ab7998be461f98ff1559a07fd5d3100d732da443110b3ac7d27d16098c4e1eab7489f6d2a5849981a5c9f5dadb86d8dbbb9b60ce67304e21221e77d1a2700cab460450702c16b99db2e3b67454765fe9e4054c87a9e436fb17db1774b9d22a129c1b120dad0925b58390b8a02241e7e06acbe87dbe7f0e91b5d000cd93fc7cc8f316f45b901b8eb58ea6853c8e7ead245a9329239ed4f3797bc12a151ffedd8e8d2533547a1aec7231a460ca128ebfb1bd6b6f988455505c21d2dbfe01ee4b321a3d20a5bf6e2a356b6f4dbb8ddb4cff7dc9779b9747881af4d08e2fbcf452746e07275ed350fad0d4e6e8fcbedb0575c1413be5a913ca6ef4fcf17d1021b93fe2b3b410cf612791f967521ae558459673156e431be5203ca944e80652559eaf3faa90250df3d24526d5f9fc3409e508a3e2175daaf492fd6efd748e4418834b631f84fe266ac32f4927c3a426b',
+        'username' : 'username'
       }, function(err) {
         expect(err).to.not.exist;
 
