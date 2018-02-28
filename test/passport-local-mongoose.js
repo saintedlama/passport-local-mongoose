@@ -331,7 +331,7 @@ describe('passportLocalMongoose', function() {
     });
   });
 
-  describe('#authenticate()', function() {
+  describe('#authenticate() callback', function() {
 
     beforeEach(dropMongodbCollections(connectionString));
     beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
@@ -408,6 +408,7 @@ describe('passportLocalMongoose', function() {
         user.save(function(err) {
           if (err) { return done(err); }
 
+          // TODO: This test does not test limit attempts at all but tests a mongoose error 'No document found for query "{ _id: 5a9672ad958eb907e4619736 }"!'
           user._id = mongoose.Types.ObjectId();
           user.authenticate('password', function(err, user, error) {
             expect(err).to.exist;
@@ -435,6 +436,7 @@ describe('passportLocalMongoose', function() {
         user.save(function(err) {
           if (err) { return done(err); }
 
+          // TODO: This test does not test limit attempts at all but tests a mongoose error 'No document found for query "{ _id: 5a9672ad958eb907e4619736 }"!'
           user._id = mongoose.Types.ObjectId();
           user.authenticate('password', function(err, user, error) {
             expect(err).to.exist;
@@ -492,6 +494,8 @@ describe('passportLocalMongoose', function() {
           if (err) { return done(err); }
 
           user.hash = 'deadbeef'; // force an error on scmp with different length hex.
+
+          // TODO: This test does not test limit attempts at all but tests a mongoose error 'No document found for query "{ _id: 5a9672ad958eb907e4619736 }"!'
           user._id = mongoose.Types.ObjectId(); // force the save to fail
           user.authenticate('password', function(err, user, error) {
             expect(err).to.exist;
@@ -502,7 +506,149 @@ describe('passportLocalMongoose', function() {
         });
       });
     });
+  });
 
+  describe('#authenticate() async', function() {
+
+    beforeEach(dropMongodbCollections(connectionString));
+    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+    afterEach(() => mongoose.disconnect());
+
+    it('should yield false with error message in case user cannot be authenticated', async() => {
+      const user = new DefaultUser();
+
+      await user.setPassword('password');
+      const { user: authenticatedUser, error } = await user.authenticate('nopassword');
+
+      expect(authenticatedUser).to.be.false;
+      expect(error.message).to.equal('Password or username is incorrect');
+    });
+
+    it('should supply message when limiting attempts and authenticating too soon', async() => {
+      const UserSchema = new Schema({});
+      UserSchema.plugin(passportLocalMongoose, {
+        limitAttempts: true,
+        interval: 20000
+      });
+      const User = mongoose.model('LimitAttemptsTooSoonUserAsync', UserSchema);
+
+      const user = new User({
+        username: 'mark',
+        attempts: 1,
+        last: Date.now()
+      });
+
+      await user.setPassword('password');
+      await user.save();
+
+      const { user: authenticatedUser, error } = await user.authenticate('password');
+
+      expect(authenticatedUser).to.be.false;
+      expect(error).to.be.instanceof(errors.AttemptTooSoonError);
+    });
+
+    it('should get an error updating when limiting attempts and authenticating too soon', async() => {
+      const UserSchema = new Schema({}, {saveErrorIfNotFound: true});
+      UserSchema.plugin(passportLocalMongoose, {
+        limitAttempts: true,
+        interval: 20000
+      });
+      const User = mongoose.model('LimitAttemptsTooSoonUpdateWithErrorAsync', UserSchema);
+
+      const user = new User({
+        username: 'jimmy',
+        attempts: 1,
+        last: Date.now()
+      });
+
+      await user.setPassword('password');
+      await user.save();
+
+      // TODO: This test does not test limit attempts at all but tests a mongoose error 'No document found for query "{ _id: 5a9672ad958eb907e4619736 }"!'
+      user._id = mongoose.Types.ObjectId();
+
+      try {
+        await user.authenticate('password');
+      } catch(e) {
+        return;
+      }
+
+      throw new Error('Expected user.authenticate to throw');
+    });
+
+    it('should get an error updating the user on password match when limiting attempts', async() => {
+      const UserSchema = new Schema({}, {saveErrorIfNotFound: true});
+      UserSchema.plugin(passportLocalMongoose, {
+        limitAttempts: true
+      });
+      const User = mongoose.model('LimitAttemptsUpdateWithErrorAsync', UserSchema);
+
+      const user = new User({
+        username: 'jane'
+      });
+
+      await user.setPassword('password');
+      await user.save();
+
+      // TODO: This test does not test limit attempts at all but tests a mongoose error 'No document found for query "{ _id: 5a9672ad958eb907e4619736 }"!'
+      user._id = mongoose.Types.ObjectId();
+      try {
+        await user.authenticate('password');
+      } catch (e) {
+        return;
+      }
+
+      throw new Error('Expected user.authenticate to throw');
+    });
+
+    it('should update the user on password match while limiting attempts', async() => {
+      const UserSchema = new Schema({});
+      UserSchema.plugin(passportLocalMongoose, {
+        limitAttempts: true
+      });
+      const User = mongoose.model('LimitAttemptsUpdateWithoutErrorAsync', UserSchema);
+
+      const user = new User({
+        username: 'walter'
+      });
+
+      await user.setPassword('password');
+      await user.save();
+
+      const { user: authenticatedUser, error } = await user.authenticate('password');
+
+      expect(authenticatedUser).to.exist;
+      expect(authenticatedUser.username).to.equal(user.username);
+      expect(error).to.not.exist;
+    });
+
+    it('should fail to update the user on password mismatch while limiting attempts', async() => {
+      const UserSchema = new Schema({}, {saveErrorIfNotFound: true});
+      UserSchema.plugin(passportLocalMongoose, {
+        limitAttempts: true,
+        interval: 20000
+      });
+      const User = mongoose.model('LimitAttemptsMismatchWithAnErrorAsync', UserSchema);
+
+      const user = new User({
+        username: 'wendy'
+      });
+      await user.setPassword('password');
+      await user.save();
+
+      user.hash = 'deadbeef'; // force an error on scmp with different length hex.
+
+      // TODO: This test does not test limit attempts at all but tests a mongoose error 'No document found for query "{ _id: 5a9672ad958eb907e4619736 }"!'
+      user._id = mongoose.Types.ObjectId(); // force the save to fail
+
+      try {
+        await user.authenticate('password');
+      } catch (e) {
+        return;
+      }
+
+      throw new Error('Expected user.authenticate to throw');
+    });
   });
 
   describe('static #authenticate() callback', function() {
