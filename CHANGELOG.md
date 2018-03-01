@@ -1,3 +1,30 @@
+# Change Log
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+<a name="5.0.0"></a>
+# [5.0.0](https://github.com/saintedlama/passport-local-mongoose/compare/v4.5.0...v5.0.0) (2018-03-01)
+
+
+### Bug Fixes
+
+* add back passwordValidatorPromisified ([4794266](https://github.com/saintedlama/passport-local-mongoose/commit/4794266))
+* promise return signature ([0612b5b](https://github.com/saintedlama/passport-local-mongoose/commit/0612b5b))
+* update build matrix ([788e0c9](https://github.com/saintedlama/passport-local-mongoose/commit/788e0c9))
+
+
+### Features
+
+* implement promises for authenticate and static authenticate including tests ([6752e0c](https://github.com/saintedlama/passport-local-mongoose/commit/6752e0c))
+* promisify external functions not part of passport.js interface ([e687753](https://github.com/saintedlama/passport-local-mongoose/commit/e687753))
+
+
+### BREAKING CHANGES
+
+* drop support for node 4 and 5
+
+
+
 4.4.0 / 2017-10-25
 ==================
 
