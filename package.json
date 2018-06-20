@@ -34,7 +34,7 @@
     "mocha": "^5.0.1",
     "mocha-lcov-reporter": "^1.3.0",
     "mongoose": "^5.0.7",
-    "nyc": "^11.5.0",
+    "nyc": "^12.0.2",
     "standard-version": "^4.3.0"
   },
   "scripts": {
