@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.1"></a>
+## [5.0.1](https://github.com/saintedlama/passport-local-mongoose/compare/v5.0.0...v5.0.1) (2018-06-20)
+
+
+### Bug Fixes
+
+* require node engine >= 6.0.0 ([b18f083](https://github.com/saintedlama/passport-local-mongoose/commit/b18f083))
+* update nyc dev dependency ([74854b1](https://github.com/saintedlama/passport-local-mongoose/commit/74854b1))
+
+
+
 <a name="5.0.0"></a>
 # [5.0.0](https://github.com/saintedlama/passport-local-mongoose/compare/v4.5.0...v5.0.0) (2018-03-01)
 
