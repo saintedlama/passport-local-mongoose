@@ -174,7 +174,7 @@ Sets a user password. Does not save the user object. If no callback `cb` is prov
 
 #### changePassword(oldPassword, newPassword, [cb])
 
-Sets a change a user's password hash and salt. Does not save the user object. If no callback `cb` is provided a `Promise` is returned. If oldPassword does not match the user's old password an `IncorrectPasswordError` is passed to `cb` or the `Promise` is rejected.
+Changes a user's password hash and salt and saves the user object. If no callback `cb` is provided a `Promise` is returned. If oldPassword does not match the user's old password an `IncorrectPasswordError` is passed to `cb` or the `Promise` is rejected.
 
 #### authenticate(password, [cb])
 
