@@ -243,7 +243,7 @@ we want to restrict the query to only query users with field `active` set to `tr
 
 ```javascript
 UserSchema.plugin(passportLocalMongoose, {
-  // Needed to set usernameUnique to true to avoid a mongodb index on the username column!
+  // Needed to set usernameUnique to false to avoid a mongodb index on the username column!
   usernameUnique: false,
 
   findByUsername: function(model, queryParameters) {
