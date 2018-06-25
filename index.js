@@ -122,9 +122,9 @@ module.exports = function(schema, options) {
         }
       })
       .then(() => this.authenticate(oldPassword))
-      .then(({ user }) => {
+      .then(({ user, error }) => {
         if (!user) {
-          throw new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError);
+          throw error;
         }
       })
       .then(() => this.setPassword(newPassword))
