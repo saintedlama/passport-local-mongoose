@@ -187,7 +187,7 @@ Reset a user's number of failed password attempts (only defined if `options.limi
 ### Callback Arguments
 
 * err
-  * null unless the hasing algorithm throws an error
+  * null unless the hashing algorithm throws an error
 * thisModel
   * the model getting authenticated *if* authentication was successful otherwise false
 * passwordErr
@@ -229,7 +229,7 @@ User.createStrategy();
 
 ### Allow only "active" users to authenticate
 
-First we define a schema with an additional field `active` of type Boolean. 
+First we define a schema with an additional field `active` of type Boolean.
 
 ```javascript
 var UserSchema = new Schema({
