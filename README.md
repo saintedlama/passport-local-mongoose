@@ -174,15 +174,15 @@ Sets a user password. Does not save the user object. If no callback `cb` is prov
 
 #### changePassword(oldPassword, newPassword, [cb])
 
-Changes a user's password hash and salt and saves the user object. If no callback `cb` is provided a `Promise` is returned. If oldPassword does not match the user's old password an `IncorrectPasswordError` is passed to `cb` or the `Promise` is rejected.
+Changes a user's password hash and salt, resets the user's number of failed password attempts and saves the user object (everything only if oldPassword is correct). If no callback `cb` is provided a `Promise` is returned. If oldPassword does not match the user's old password, an `IncorrectPasswordError` is passed to `cb` or the `Promise` is rejected.
 
 #### authenticate(password, [cb])
 
-Authenticate a user object. If no callback `cb` is provided a `Promise` is returned.
+Authenticates a user object. If no callback `cb` is provided a `Promise` is returned.
 
 #### resetAttempts([cb])
 
-Reset a user's number of failed password attempts (only defined if `options.limitAttempts` is true) If no callback `cb` is provided a `Promise` is returned.
+Resets a user's number of failed password attempts and saves the user object. If no callback `cb` is provided a `Promise` is returned. This method is only defined if `options.limitAttempts` is `true`.
 
 ### Callback Arguments
 
