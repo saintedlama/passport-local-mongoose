@@ -12,7 +12,7 @@ DefaultUserSchema.plugin(passportLocalMongoose);
 const DefaultUser = mongoose.model('DefaultUser', DefaultUserSchema);
 
 const dbName = 'passportlocalmongoosetests';
-let connectionString = `mongodb://localhost/${dbName}`;
+let connectionString = `mongodb://localhost:27017/${dbName}`;
 
 if (process.env.MONGO_SERVER) {
   connectionString = connectionString.replace('mongodb://localhost', 'mongodb://' + process.env.MONGO_SERVER);
@@ -205,7 +205,7 @@ describe('passportLocalMongoose', function() {
 
   describe('#changePassword() callback', function() {
     beforeEach(dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true }));
     afterEach(() => mongoose.disconnect());
 
     it('should change password', function(done) {
@@ -282,7 +282,7 @@ describe('passportLocalMongoose', function() {
 
   describe('#changePassword() async', function() {
     beforeEach(dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true }));
     afterEach(() => mongoose.disconnect());
 
     it('should change password', async () => {
@@ -334,7 +334,7 @@ describe('passportLocalMongoose', function() {
   describe('#authenticate() callback', function() {
 
     beforeEach(dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true }));
     afterEach(() => mongoose.disconnect());
 
     it('should yield false in case user cannot be authenticated', function(done) {
@@ -511,7 +511,7 @@ describe('passportLocalMongoose', function() {
   describe('#authenticate() async', function() {
 
     beforeEach(dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true }));
     afterEach(() => mongoose.disconnect());
 
     it('should yield false with error message in case user cannot be authenticated', async() => {
@@ -653,7 +653,7 @@ describe('passportLocalMongoose', function() {
 
   describe('static #authenticate() callback', function() {
     beforeEach(dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true }));
     afterEach(() => mongoose.disconnect());
 
     it('should yield false with message option for authenticate', function(done) {
@@ -859,7 +859,7 @@ describe('passportLocalMongoose', function() {
 
   describe('static #authenticate() async', function() {
     beforeEach(dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true }));
     afterEach(() => mongoose.disconnect());
 
     it('should yield false with message option for authenticate', async () => {
@@ -1018,7 +1018,7 @@ describe('passportLocalMongoose', function() {
 
   describe('static #deserializeUser()', function() {
     beforeEach(dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true }));
     afterEach(() => mongoose.disconnect());
 
     it('should define a static deserializeUser function for passport', function() {
@@ -1059,7 +1059,7 @@ describe('passportLocalMongoose', function() {
 
   describe('static #findByUsername() callback', function() {
     beforeEach(dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true }));
     afterEach(() => mongoose.disconnect());
 
     it('should define static findByUsername helper function', function() {
@@ -1187,7 +1187,7 @@ describe('passportLocalMongoose', function() {
 
   describe('static #findByUsername() async', function() {
     beforeEach(dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true }));
     afterEach(() => mongoose.disconnect());
 
     it('should define static findByUsername helper function', () => {
@@ -1285,7 +1285,7 @@ describe('passportLocalMongoose', function() {
 
   describe('static #register() callback', function() {
     beforeEach(dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true }));
     afterEach(() => mongoose.disconnect());
 
     it('should define static register helper function', function() {
@@ -1413,7 +1413,7 @@ describe('passportLocalMongoose', function() {
 
   describe('static #register() async', function() {
     beforeEach(dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true }));
     afterEach(() => mongoose.disconnect());
 
     it('should define static register helper function', function() {

@@ -6,7 +6,7 @@ const debug = require('debug')('passport:local:mongoose');
 const passportLocalMongoose = require('../');
 
 const dbName = 'passportlocalmongoosetests';
-let connectionString = `mongodb://localhost/${dbName}`;
+let connectionString = `mongodb://localhost:27017/${dbName}`;
 
 if (process.env.MONGO_SERVER) {
   connectionString = connectionString.replace('mongodb://localhost', 'mongodb://' + process.env.MONGO_SERVER);
@@ -17,7 +17,7 @@ describe('alternative query field', function() {
   this.timeout(10000); // Ten seconds - mongo db access needed
 
   beforeEach(dropMongodbCollections(connectionString));
-  beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
+  beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true }));
   afterEach(() => mongoose.disconnect());
 
   it('should find an existing user by alternative query field', function(done) {
