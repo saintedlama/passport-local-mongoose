@@ -101,7 +101,7 @@ module.exports = function(schema, options) {
       })
       .then(salt => pbkdf2Promisified(password, salt, options))
       .then(hashRaw => {
-        this.set(options.hashField, new Buffer(hashRaw, 'binary').toString(options.encoding));
+        this.set(options.hashField, Buffer.from(hashRaw, 'binary').toString(options.encoding));
       })
       .then(() => this);
 
