@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.0.0"></a>
+# [6.0.0](https://github.com/saintedlama/passport-local-mongoose/compare/v5.0.1...v6.0.0) (2018-08-17)
+
+
+### Bug Fixes
+
+* update dependencies and specify server port in tests ([807d9cf](https://github.com/saintedlama/passport-local-mongoose/commit/807d9cf))
+* use Buffer.from instead of new Buffer ([37375b8](https://github.com/saintedlama/passport-local-mongoose/commit/37375b8))
+
+
+### BREAKING CHANGES
+
+* mongodb driver update requires server port to be specified
+
+
+
 <a name="5.0.1"></a>
 ## [5.0.1](https://github.com/saintedlama/passport-local-mongoose/compare/v5.0.0...v5.0.1) (2018-06-20)
 
