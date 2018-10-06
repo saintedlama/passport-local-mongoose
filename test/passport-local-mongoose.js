@@ -652,6 +652,7 @@ describe('passportLocalMongoose', function() {
   });
 
   describe('static #authenticate() callback', function() {
+
     beforeEach(dropMongodbCollections(connectionString));
     beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true }));
     afterEach(() => mongoose.disconnect());
@@ -850,6 +851,69 @@ describe('passportLocalMongoose', function() {
                   done();
                 });
               });
+            });
+          });
+        });
+      });
+    });
+
+    it('should auto unlock account after unlock interval is reached', function(done) {
+
+      const UserSchema = new Schema({});
+      UserSchema.plugin(passportLocalMongoose, {
+        limitAttempts: true,
+        maxInterval: 1, // Don't require more than a millisecond of waiting
+        maxAttempts: 3,
+        unlockInterval: 1000,
+      });
+
+      const User = mongoose.model('AutoUnLockUserAfterUnlockInterverIsReached', UserSchema);
+
+      function authenticateWithWrongPassword(times, next) {
+        if (times == 0) {
+          return next();
+        }
+
+        User.authenticate()('user', 'WRONGpassword', function(err, result, data) {
+          if (err) { return done(err); }
+          expect(result).to.be.false;
+
+          times--;
+
+          // Use should be locked at last login attempt
+          if (times == 0) {
+            expect(data.message).to.contain('locked');
+          } else {
+            expect(data.message).to.not.contain('locked');
+          }
+
+          authenticateWithWrongPassword(times, next);
+        });
+      }
+
+      const user = new User({username: 'user'});
+      user.setPassword('password', function(err) {
+        if (err) { return done(err); }
+
+        user.save(function(err) {
+          if (err) { return done(err); }
+
+          authenticateWithWrongPassword(3, function() {
+            // After 1000ms user should be unlocked
+            User.authenticate()('user', 'password', function(err, result, data) {
+              if (err) { return done(err); }
+              expect(result).to.be.false;
+              expect(data.message).to.contain('locked');
+
+              setTimeout(function () {
+                User.authenticate()('user', 'password', function(err, result) {
+                  if (err) { return done(err); }
+                  expect(result).to.not.be.false;
+                  expect(result).to.exist;
+
+                  done();
+                });
+              }, 1000);
             });
           });
         });
