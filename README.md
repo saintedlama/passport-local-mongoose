@@ -1,4 +1,5 @@
 # Passport-Local Mongoose
+### Modified by [nax3t](https://github.com/nax3t), see documented changes [here](./ianchanges.md)
 
 Passport-Local Mongoose is a [Mongoose](http://mongoosejs.com/) [plugin](http://mongoosejs.com/docs/plugins.html)
 that simplifies building username and password login with [Passport](http://passportjs.org).

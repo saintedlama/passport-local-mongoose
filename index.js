@@ -50,6 +50,7 @@ module.exports = function(schema, options) {
   }
 
   options.findByUsername = options.findByUsername || function(model, queryParameters) { return model.findOne(queryParameters); }
+  options.findByEmail = options.findByEmail || function(model, queryParameters) { return model.findOne(queryParameters); }
 
   options.errorMessages = options.errorMessages || {};
   options.errorMessages.MissingPasswordError = options.errorMessages.MissingPasswordError || 'No password was given';
@@ -60,6 +61,7 @@ module.exports = function(schema, options) {
   options.errorMessages.IncorrectUsernameError = options.errorMessages.IncorrectUsernameError || 'Password or username is incorrect';
   options.errorMessages.MissingUsernameError = options.errorMessages.MissingUsernameError || 'No username was given';
   options.errorMessages.UserExistsError = options.errorMessages.UserExistsError || 'A user with the given username is already registered';
+  options.errorMessages.EmailExistsError = options.errorMessages.EmailExistsError || 'A user with the given email is already registered';
 
   const schemaFields = {};
 
@@ -101,7 +103,7 @@ module.exports = function(schema, options) {
       })
       .then(salt => pbkdf2Promisified(password, salt, options))
       .then(hashRaw => {
-        this.set(options.hashField, Buffer.from(hashRaw, 'binary').toString(options.encoding));
+        this.set(options.hashField, new Buffer(hashRaw, 'binary').toString(options.encoding));
       })
       .then(() => this);
 
@@ -238,6 +240,12 @@ module.exports = function(schema, options) {
           throw new errors.UserExistsError(options.errorMessages.UserExistsError);
         }
       })
+      .then(() => this.findByEmail(user.get(user.email)))
+      .then((existingUser) => {
+        if (existingUser) {
+          throw new errors.EmailExistsError(options.errorMessages.EmailExistsError);
+        }
+      })
       .then(() => user.setPassword(password))
       .then(() => user.save());
 
@@ -279,6 +287,48 @@ module.exports = function(schema, options) {
     }
 
     const query = options.findByUsername(this, { $or: queryOrParameters });
+
+    if (opts.selectHashSaltFields) {
+      query.select('+' + options.hashField + ' +' + options.saltField);
+    }
+
+    if (options.selectFields) {
+      query.select(options.selectFields);
+    }
+
+    if (options.populateFields) {
+      query.populate(options.populateFields);
+    }
+
+    if (cb) {
+      query.exec(cb);
+      return;
+    }
+
+    return query;
+  };
+
+  schema.statics.findByEmail = function(email, opts, cb) {
+    if (typeof opts === 'function') {
+      cb = opts;
+      opts = {};
+    }
+
+    if (typeof opts == 'boolean') {
+      opts = {
+        selectHashSaltFields: opts
+      };
+    }
+
+    opts = opts || {};
+    opts.selectHashSaltFields = !!opts.selectHashSaltFields;
+
+    // if specified, convert the email to lowercase
+    if (email !== undefined) {
+      email = email.toLowerCase();
+    }
+
+    const query = options.findByEmail(this);
 
     if (opts.selectHashSaltFields) {
       query.select('+' + options.hashField + ' +' + options.saltField);
