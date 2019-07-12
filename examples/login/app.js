@@ -38,11 +38,12 @@ passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
 
 // Connect mongoose
-mongoose.connect('mongodb://localhost/passport_local_mongoose_examples', function(err) {
+mongoose.connect('mongodb://localhost/passport_local_mongoose_examples', { useNewUrlParser: true }, function(err) {
   if (err) {
     console.log('Could not connect to mongodb on localhost. Ensure that you have mongodb running on localhost and mongodb accepts connections on standard ports!');
   }
 });
+mongoose.set('useCreateIndex', true);
 
 // Register routes
 app.use('/', require('./routes'));
@@ -77,6 +78,5 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
 
 module.exports = app;
