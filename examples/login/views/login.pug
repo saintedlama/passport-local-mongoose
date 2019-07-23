@@ -3,6 +3,8 @@ extends layout
 block content
   h2 Log In
 
+  if message != ''
+    .alert.alert-error #{message}
   form(action="/login",method="post")
     div
       label Username
