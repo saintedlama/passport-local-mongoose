@@ -47,6 +47,7 @@ module.exports = function(schema, options) {
     options.interval = options.interval || 100; // 100 ms
     options.maxInterval = options.maxInterval || 300000; // 5 min
     options.maxAttempts = options.maxAttempts || Infinity;
+    options.unlockInterval = options.unlockInterval || 600000; // 10 min
   }
 
   options.findByUsername = options.findByUsername || function(model, queryParameters) { return model.findOne(queryParameters); }

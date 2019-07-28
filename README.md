@@ -120,7 +120,7 @@ User.plugin(passportLocalMongoose, options);
 * keylen: specifies the length in byte of the generated key. Default: 512
 * digestAlgorithm: specifies the pbkdf2 digest algorithm. Default: sha256. (get a list of supported algorithms with crypto.getHashes())
 * interval: specifies the interval in milliseconds between login attempts, which increases exponentially based on the number of failed attempts, up to maxInterval. Default: 100
-* maxInterval: specifies the maximum amount of time an account can be locked. Default 30000 (5 minutes)
+* maxInterval: specifies the maximum amount of time an account can be locked. Default 300000 (5 minutes)
 * usernameField: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different field to hold the username for example "email".
 * usernameUnique : specifies if the username field should be enforced to be unique by a mongodb index or not. Defaults to true.
 * saltField: specifies the field name that holds the salt value. Defaults to 'salt'.
@@ -133,6 +133,7 @@ User.plugin(passportLocalMongoose, options);
 * encoding: specifies the encoding the generated salt and hash will be stored in. Defaults to 'hex'.
 * limitAttempts: specifies whether login attempts should be limited and login failures should be penalized. Default: false.
 * maxAttempts: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
+* unlockInterval: specifies the interval in milliseconds, which is for unlock user automatically after the interval is reached. Default 600000 (10 minutes)
 * passwordValidator: specifies your custom validation function for the password in the form 'function(password,cb)'. Default: validates non-empty passwords.
 * usernameQueryFields: specifies alternative fields of the model for identifying a user (e.g. email).
 * findByUsername: Specifies a query function that is executed with query parameters to restrict the query with extra query parameters. For example query only users with field "active" set to `true`. Default: `function(model, queryParameters) { return model.findOne(queryParameters); }`. See the examples section for a use case.
@@ -154,14 +155,14 @@ Override default error messages by setting options.errorMessages.
 
 ### Hash Algorithm
 
-Passport-Local Mongoose use the pbkdf2 algorithm of the node crypto library. 
+Passport-Local Mongoose use the pbkdf2 algorithm of the node crypto library.
 [Pbkdf2](http://en.wikipedia.org/wiki/PBKDF2) was chosen because platform independent
 (in contrary to bcrypt). For every user a generated salt value is saved to make
 rainbow table attacks even harder.
 
 ### Examples
 
-For a complete example implementing a registration, login and logout see the 
+For a complete example implementing a registration, login and logout see the
 [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
 
 ## API Documentation
