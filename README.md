@@ -133,7 +133,26 @@ User.plugin(passportLocalMongoose, options);
 * encoding: specifies the encoding the generated salt and hash will be stored in. Defaults to 'hex'.
 * limitAttempts: specifies whether login attempts should be limited and login failures should be penalized. Default: false.
 * maxAttempts: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
-* passwordValidator: specifies your custom validation function for the password in the form 'function(password,cb)'. Default: validates non-empty passwords.
+* passwordValidator: specifies your custom validation function for the password in the form:
+    ```
+    passwordValidator = function(password,cb) {
+      if (someValidationErrorExists(password)) {
+        return cb('this is my custom validation error message')
+      }
+      // return an empty cb() on success
+      return cb()
+    }
+    ```
+    Default: validates non-empty passwords.
+* passwordValidatorAsync: specifies your custom validation function for the password with promises in the form:
+    ```
+    passwordValidatorAsync = function(password) {
+      return someAsyncValidation(password)
+        .catch(function(err){
+          return Promise.reject(err)
+        })
+    }
+    ```
 * usernameQueryFields: specifies alternative fields of the model for identifying a user (e.g. email).
 * findByUsername: Specifies a query function that is executed with query parameters to restrict the query with extra query parameters. For example query only users with field "active" set to `true`. Default: `function(model, queryParameters) { return model.findOne(queryParameters); }`. See the examples section for a use case.
 
