@@ -16,7 +16,6 @@
     "node": ">= 6.0.0"
   },
   "dependencies": {
-    "debug": "^4.1.1",
     "generaterr": "^1.5.0",
     "passport-local": "^1.0.0",
     "scmp": "^2.0.0",
@@ -29,6 +28,7 @@
     "chai": "^4.2.0",
     "coveralls": "^3.0.5",
     "cross-env": "^5.2.0",
+    "debug": "^4.1.1",
     "drop-mongodb-collections": "^1.2.4",
     "eslint": "^6.0.1",
     "mocha": "^6.1.4",
