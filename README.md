@@ -51,7 +51,7 @@ module.exports = mongoose.model('User', User);
 
 You're free to define your User how you like. Passport-Local Mongoose will add a username, hash and salt field to store the username, the hashed password and the salt value.
 
-Additionally Passport-Local Mongoose adds some methods to your Schema. See the API Documentation section for more details.
+Additionally Passport-Local Mongoose adds some methods to your Schema. See the [API Documentation](https://github.com/saintedlama/passport-local-mongoose#api-documentation) section for more details.
 
 ### Configure Passport/Passport-Local
 
