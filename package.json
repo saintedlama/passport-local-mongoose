@@ -18,24 +18,24 @@
   "dependencies": {
     "generaterr": "^1.5.0",
     "passport-local": "^1.0.0",
-    "scmp": "^2.0.0",
-    "semver": "^6.2.0"
+    "scmp": "^2.1.0",
+    "semver": "^7.1.1"
   },
   "devDependencies": {
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
     "chai": "^4.2.0",
-    "coveralls": "^3.0.5",
-    "cross-env": "^5.2.0",
+    "coveralls": "^3.0.9",
+    "cross-env": "^6.0.3",
     "debug": "^4.1.1",
     "drop-mongodb-collections": "^1.2.5",
-    "eslint": "^6.0.1",
-    "mocha": "^6.1.4",
+    "eslint": "^6.8.0",
+    "mocha": "^6.2.2",
     "mocha-lcov-reporter": "^1.3.0",
-    "mongoose": "^5.6.4",
-    "nyc": "^14.1.1",
-    "standard-version": "^6.0.1"
+    "mongoose": "^5.8.4",
+    "nyc": "^15.0.0",
+    "standard-version": "^7.0.1"
   },
   "scripts": {
     "test": "cross-env NODE_ENV=test nyc --reporter=text-summary mocha --recursive --throw-deprecation --require babel-polyfill --require babel-core/register",
