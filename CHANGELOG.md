@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [6.0.1](https://github.com/saintedlama/passport-local-mongoose/compare/v6.0.0...v6.0.1) (2020-01-04)
+
+
+### Bug Fixes
+
+* remove superfluous files from package ([b1681a5](https://github.com/saintedlama/passport-local-mongoose/commit/b1681a5d47ef3dc0d50a60d795c925f6a03e0683))
+
 ## [6.0.0](https://github.com/saintedlama/passport-local-mongoose/compare/v5.0.1...v6.0.0) (2020-01-04)
 
 
