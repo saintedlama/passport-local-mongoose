@@ -1,7 +1,7 @@
 {
   "name": "passport-local-mongoose",
   "description": "Mongoose plugin that simplifies building username and password login with Passport",
-  "version": "6.0.0",
+  "version": "5.0.1",
   "main": "index.js",
   "repository": "saintedlama/passport-local-mongoose",
   "author": "Christoph Walcher <christoph.walcher@gmail.com>",
@@ -27,7 +27,6 @@
     "babel-register": "^6.26.0",
     "chai": "^4.2.0",
     "coveralls": "^3.0.9",
-    "cross-env": "^6.0.3",
     "debug": "^4.1.1",
     "drop-mongodb-collections": "^1.2.5",
     "eslint": "^6.8.0",
@@ -38,7 +37,7 @@
     "standard-version": "^7.0.1"
   },
   "scripts": {
-    "test": "cross-env NODE_ENV=test nyc --reporter=text-summary mocha --recursive --throw-deprecation --require babel-polyfill --require babel-core/register",
+    "test": "nyc --reporter=text-summary mocha --recursive --throw-deprecation --require babel-polyfill --require babel-core/register",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
