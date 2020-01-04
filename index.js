@@ -13,12 +13,18 @@ module.exports = function(schema, options) {
   options.encoding = options.encoding || 'hex';
   options.digestAlgorithm = options.digestAlgorithm || 'sha256'; // To get a list of supported hashes use crypto.getHashes()
 
-  options.passwordValidator = options.passwordValidator || function(password, cb) { cb(null); };
-  options.passwordValidatorAsync = options.passwordValidatorAsync || function(password) {
-    return new Promise((resolve, reject) => {
-        options.passwordValidator(password, (err) => err?reject(err):resolve());
-    });
-  };
+  options.passwordValidator =
+    options.passwordValidator ||
+    function(password, cb) {
+      cb(null);
+    };
+  options.passwordValidatorAsync =
+    options.passwordValidatorAsync ||
+    function(password) {
+      return new Promise((resolve, reject) => {
+        options.passwordValidator(password, err => (err ? reject(err) : resolve()));
+      });
+    };
 
   // Populate field names with defaults if not set
   options.usernameField = options.usernameField || 'username';
@@ -49,13 +55,19 @@ module.exports = function(schema, options) {
     options.maxAttempts = options.maxAttempts || Infinity;
   }
 
-  options.findByUsername = options.findByUsername || function(model, queryParameters) { return model.findOne(queryParameters); }
+  options.findByUsername =
+    options.findByUsername ||
+    function(model, queryParameters) {
+      return model.findOne(queryParameters);
+    };
 
   options.errorMessages = options.errorMessages || {};
   options.errorMessages.MissingPasswordError = options.errorMessages.MissingPasswordError || 'No password was given';
   options.errorMessages.AttemptTooSoonError = options.errorMessages.AttemptTooSoonError || 'Account is currently locked. Try again later';
-  options.errorMessages.TooManyAttemptsError = options.errorMessages.TooManyAttemptsError || 'Account locked due to too many failed login attempts';
-  options.errorMessages.NoSaltValueStoredError = options.errorMessages.NoSaltValueStoredError || 'Authentication not possible. No salt value stored';
+  options.errorMessages.TooManyAttemptsError =
+    options.errorMessages.TooManyAttemptsError || 'Account locked due to too many failed login attempts';
+  options.errorMessages.NoSaltValueStoredError =
+    options.errorMessages.NoSaltValueStoredError || 'Authentication not possible. No salt value stored';
   options.errorMessages.IncorrectPasswordError = options.errorMessages.IncorrectPasswordError || 'Password or username is incorrect';
   options.errorMessages.IncorrectUsernameError = options.errorMessages.IncorrectUsernameError || 'Password or username is incorrect';
   options.errorMessages.MissingUsernameError = options.errorMessages.MissingUsernameError || 'No username was given';
@@ -109,9 +121,7 @@ module.exports = function(schema, options) {
       return promise;
     }
 
-    promise
-      .then(result => cb(null, result))
-      .catch(err => cb(err));
+    promise.then(result => cb(null, result)).catch(err => cb(err));
   };
 
   schema.methods.changePassword = function(oldPassword, newPassword, cb) {
@@ -135,52 +145,43 @@ module.exports = function(schema, options) {
       return promise;
     }
 
-    promise
-      .then(result => cb(null, result))
-      .catch(err => cb(err));
+    promise.then(result => cb(null, result)).catch(err => cb(err));
   };
 
   schema.methods.authenticate = function(password, cb) {
-    const promise = Promise.resolve()
-      .then(() => {
-        if (this.get(options.saltField)) {
-          return authenticate(this, password, options);
+    const promise = Promise.resolve().then(() => {
+      if (this.get(options.saltField)) {
+        return authenticate(this, password, options);
+      }
+
+      return this.constructor.findByUsername(this.get(options.usernameField), true).then(user => {
+        if (user) {
+          return authenticate(user, password, options);
         }
 
-        return this.constructor.findByUsername(this.get(options.usernameField), true)
-          .then(user => {
-            if (user) {
-              return authenticate(user, password, options);
-            }
-
-            return { user: false, error: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
-          });
+        return { user: false, error: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
       });
+    });
 
     if (!cb) {
       return promise;
     }
 
-    promise
-      .then(({ user, error }) => cb(null, user, error))
-      .catch(err => cb(err));
+    promise.then(({ user, error }) => cb(null, user, error)).catch(err => cb(err));
   };
 
   if (options.limitAttempts) {
     schema.methods.resetAttempts = function(cb) {
-      const promise = Promise.resolve()
-        .then(() => {
-          this.set(options.attemptsField, 0);
-          return this.save();
-        });
+      const promise = Promise.resolve().then(() => {
+        this.set(options.attemptsField, 0);
+        return this.save();
+      });
 
       if (!cb) {
         return promise;
       }
 
-      promise
-        .then(result => cb(null, result))
-        .catch(err => cb(err));
+      promise.then(result => cb(null, result)).catch(err => cb(err));
     };
   }
 
@@ -188,22 +189,20 @@ module.exports = function(schema, options) {
   schema.statics.authenticate = function() {
     return (username, password, cb) => {
       const promise = Promise.resolve()
-      .then(() => this.findByUsername(username, true))
-      .then((user) => {
-        if (user) {
-          return user.authenticate(password);
-        }
+        .then(() => this.findByUsername(username, true))
+        .then(user => {
+          if (user) {
+            return user.authenticate(password);
+          }
 
-        return { user: false, error: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
-      });
+          return { user: false, error: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
+        });
 
       if (!cb) {
         return promise;
       }
 
-      promise
-        .then(({ user, error }) => cb(null, user, error))
-        .catch(err => cb(err));
+      promise.then(({ user, error }) => cb(null, user, error)).catch(err => cb(err));
     };
   };
 
@@ -233,7 +232,7 @@ module.exports = function(schema, options) {
         }
       })
       .then(() => this.findByUsername(user.get(options.usernameField)))
-      .then((existingUser) => {
+      .then(existingUser => {
         if (existingUser) {
           throw new errors.UserExistsError(options.errorMessages.UserExistsError);
         }
@@ -245,9 +244,7 @@ module.exports = function(schema, options) {
       return promise;
     }
 
-    promise
-      .then(result => cb(null, result))
-      .catch(err => cb(err));
+    promise.then(result => cb(null, result)).catch(err => cb(err));
   };
 
   schema.statics.findByUsername = function(username, opts, cb) {
@@ -306,11 +303,11 @@ module.exports = function(schema, options) {
 };
 
 function pbkdf2Promisified(password, salt, options) {
-  return new Promise((resolve, reject) => pbkdf2(password, salt, options, (err, hashRaw) => err ? reject(err) : resolve(hashRaw)));
+  return new Promise((resolve, reject) => pbkdf2(password, salt, options, (err, hashRaw) => (err ? reject(err) : resolve(hashRaw))));
 }
 
 function randomBytes(saltlen) {
-  return new Promise((resolve, reject) => crypto.randomBytes(saltlen, (err, saltBuffer) => err ? reject(err) : resolve(saltBuffer)));
+  return new Promise((resolve, reject) => crypto.randomBytes(saltlen, (err, saltBuffer) => (err ? reject(err) : resolve(saltBuffer))));
 }
 
 module.exports.errors = errors;
