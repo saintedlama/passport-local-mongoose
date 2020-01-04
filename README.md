@@ -5,7 +5,6 @@ that simplifies building username and password login with [Passport](http://pass
 
 [![Build Status](https://travis-ci.org/saintedlama/passport-local-mongoose.png?branch=master)](https://travis-ci.org/saintedlama/passport-local-mongoose)
 [![Coverage Status](https://coveralls.io/repos/saintedlama/passport-local-mongoose/badge.png?branch=master)](https://coveralls.io/r/saintedlama/passport-local-mongoose?branch=master)
-[![passport-local-mongoose analyzed by Codellama.io](https://app.codellama.io/api/badges/5a04399c1b4c363a0f9427f8/fcac8d5ab6ca708f09999469b02890ce)](https://app.codellama.io/repositories/5a04399c1b4c363a0f9427f8)
 
 ## Tutorials
 
@@ -173,14 +172,14 @@ Override default error messages by setting options.errorMessages.
 
 ### Hash Algorithm
 
-Passport-Local Mongoose use the pbkdf2 algorithm of the node crypto library. 
+Passport-Local Mongoose use the pbkdf2 algorithm of the node crypto library.
 [Pbkdf2](http://en.wikipedia.org/wiki/PBKDF2) was chosen because platform independent
 (in contrary to bcrypt). For every user a generated salt value is saved to make
 rainbow table attacks even harder.
 
 ### Examples
 
-For a complete example implementing a registration, login and logout see the 
+For a complete example implementing a registration, login and logout see the
 [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
 
 ## API Documentation
