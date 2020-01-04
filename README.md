@@ -26,10 +26,6 @@ In case you need to install the whole set of dependencies
 > npm install passport passport-local mongoose passport-local-mongoose --save
 ```
 
-### Updating from 1.x to 2.x
-
-The default digest algorithm was changed due to security implications from **sha1** to **sha256**. If you decide to upgrade a production system from 1.x to 2.x your users **will not be able to login** since the digest algorithm was changed! In these cases plan some migration strategy and/or use the **sha1** option for the digest algorithm.
-
 ## Usage
 
 ### Plugin Passport-Local Mongoose
@@ -289,6 +285,10 @@ User.register({username:'username', active: false}, 'password', function(err, us
   });
 });
 ```
+
+## Updating from 1.x to 2.x
+
+The default digest algorithm was changed due to security implications from **sha1** to **sha256**. If you decide to upgrade a production system from 1.x to 2.x your users **will not be able to login** since the digest algorithm was changed! In these cases plan some migration strategy and/or use the **sha1** option for the digest algorithm.
 
 ## License
 
