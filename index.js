@@ -271,7 +271,7 @@ module.exports = function(schema, options) {
     const queryOrParameters = [];
     for (let i = 0; i < options.usernameQueryFields.length; i++) {
       const parameter = {};
-      const usernameEscaped = username.replace(/[~`!@#$%^&*()_\-+={}[\]|\\:;"'<>,.?/]/g, '\\$&');
+      const usernameEscaped = username.replace(/[$^*()+\-=<>{}()[|\]:\\.?]/g, '\\$&');
       parameter[options.usernameQueryFields[i]] = options.usernameCaseInsensitive ? new RegExp(`^${usernameEscaped}$`, 'i') : username;
       queryOrParameters.push(parameter);
     }
