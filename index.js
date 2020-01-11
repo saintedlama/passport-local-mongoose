@@ -269,7 +269,7 @@ module.exports = function(schema, options) {
 
     // escape regex tokens
     if (username !== undefined && options.usernameCaseInsensitive) {
-      username = username.replace(/[$^*()+\-=<>{}()[|\]:\\.?]/g, '\\$&');
+      username = username.replace(/[!#$()*+\-./:<=>?[\\\]^{|}]/g, '\\$&');
     }
     
     // Add each username query field
