@@ -119,6 +119,7 @@ User.plugin(passportLocalMongoose, options);
 * usernameField: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different field to hold the username for example "email".
 * usernameUnique : specifies if the username field should be enforced to be unique by a mongodb index or not. Defaults to true.
 * saltField: specifies the field name that holds the salt value. Defaults to 'salt'.
+* rawSalt: specifies whether to send salt raw bytes during password hashing, or encoded salt using hex, or encoding specified in encoding option. Default: false.
 * hashField: specifies the field name that holds the password hash value. Defaults to 'hash'.
 * attemptsField: specifies the field name that holds the number of login failures since the last successful login. Defaults to 'attempts'.
 * lastLoginField: specifies the field name that holds the timestamp of the last login attempt. Defaults to 'last'.
