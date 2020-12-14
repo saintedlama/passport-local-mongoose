@@ -301,6 +301,22 @@ describe('passportLocalMongoose', function() {
         });
       });
     });
+
+    it('should fail when no replacement password given', function(done) {
+      const user = new DefaultUser();
+
+      user.setPassword('password1', function(err) {
+        if (err) {
+          return done(err);
+        }
+
+        user.changePassword('password1', '', function(err) {
+          expect(err).to.be.instanceof(errors.MissingPasswordError);
+
+          done();
+        });
+      });
+    });
   });
 
   describe('#changePassword() async', function() {
@@ -353,6 +369,16 @@ describe('passportLocalMongoose', function() {
 
       const changePasswordUser = await user.changePassword('password1', 'password2');
       expect(changePasswordUser).to.exist;
+    });
+
+    it('should fail when no replacement password given', async () => {
+      const user = new DefaultUser();
+
+      await user.setPassword('password1');
+
+      const result = await user.changePassword('password1', '').catch(err => err);
+
+      expect(result).to.be.instanceof(errors.MissingPasswordError);
     });
   });
 
@@ -526,6 +552,21 @@ describe('passportLocalMongoose', function() {
         });
       });
     });
+
+    it('should supply message if username is not registered', function(done) {
+      const user = new DefaultUser({
+        username: 'andrew'
+      });
+      user.authenticate('password', function(err, result, error) {
+        if (err) {
+          return done(err);
+        }
+
+        expect(result).to.be.false;
+        expect(error.message).to.exist;
+        done();
+      });
+    });
   });
 
   describe('#authenticate() async', function() {
@@ -630,6 +671,16 @@ describe('passportLocalMongoose', function() {
 
       expect(authenticatedUser).to.be.false;
       expect(error).to.be.instanceof(errors.IncorrectPasswordError);
+    });
+
+    it('should supply message if username is not registered', async () => {
+      const user = new DefaultUser({
+        username: 'andrew'
+      });
+      const { user: authenticatedUser, error } = await user.authenticate('password');
+
+      expect(authenticatedUser).to.be.false;
+      expect(error.message).to.exist;
     });
   });
 
