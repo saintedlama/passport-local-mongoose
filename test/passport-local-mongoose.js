@@ -448,44 +448,10 @@ describe('passportLocalMongoose', function() {
             return done(err);
           }
 
-          // TODO: This test does not test limit attempts at all but tests a mongoose error 'No document found for query "{ _id: 5a9672ad958eb907e4619736 }"!'
-          user._id = mongoose.Types.ObjectId();
           user.authenticate('password', function(err, user, error) {
-            expect(err).to.exist;
-            expect(user).to.not.exist;
-            expect(error).to.not.exist;
-            done();
-          });
-        });
-      });
-    });
-
-    it('should get an error updating the user on password match when limiting attempts', function(done) {
-      const UserSchema = new Schema({}, { saveErrorIfNotFound: true });
-      UserSchema.plugin(passportLocalMongoose, {
-        limitAttempts: true
-      });
-      const User = mongoose.model('LimitAttemptsUpdateWithError', UserSchema);
-
-      const user = new User({
-        username: 'jane'
-      });
-      user.setPassword('password', function(err) {
-        if (err) {
-          return done(err);
-        }
-
-        user.save(function(err) {
-          if (err) {
-            return done(err);
-          }
-
-          // TODO: This test does not test limit attempts at all but tests a mongoose error 'No document found for query "{ _id: 5a9672ad958eb907e4619736 }"!'
-          user._id = mongoose.Types.ObjectId();
-          user.authenticate('password', function(err, user, error) {
-            expect(err).to.exist;
-            expect(user).to.not.exist;
-            expect(error).to.not.exist;
+            expect(err).to.not.exist;
+            expect(user).to.be.false;
+            expect(error).to.be.instanceOf(errors.AttemptTooSoonError);
             done();
           });
         });
@@ -535,7 +501,9 @@ describe('passportLocalMongoose', function() {
       const User = mongoose.model('LimitAttemptsMismatchWithAnError', UserSchema);
 
       const user = new User({
-        username: 'wendy'
+        username: 'wendy',
+        attempts: 1,
+        last: Date.now()
       });
       user.setPassword('password', function(err) {
         if (err) {
@@ -547,14 +515,12 @@ describe('passportLocalMongoose', function() {
             return done(err);
           }
 
-          user.hash = 'deadbeef'; // force an error on scmp with different length hex.
-
-          // TODO: This test does not test limit attempts at all but tests a mongoose error 'No document found for query "{ _id: 5a9672ad958eb907e4619736 }"!'
-          user._id = mongoose.Types.ObjectId(); // force the save to fail
-          user.authenticate('password', function(err, user, error) {
-            expect(err).to.exist;
-            expect(user).to.not.exist;
-            expect(error).to.not.exist;
+          user.authenticate('WRONGpassword', function(err, user, error) {
+            if (err) {
+              return done(err);
+            }
+            expect(user).to.be.false;
+            expect(error).to.be.instanceof(errors.AttemptTooSoonError);
             done();
           });
         });
@@ -619,41 +585,10 @@ describe('passportLocalMongoose', function() {
       await user.setPassword('password');
       await user.save();
 
-      // TODO: This test does not test limit attempts at all but tests a mongoose error 'No document found for query "{ _id: 5a9672ad958eb907e4619736 }"!'
-      user._id = mongoose.Types.ObjectId();
+      const { user: authenticatedUser, error } = await user.authenticate('password');
 
-      try {
-        await user.authenticate('password');
-      } catch (e) {
-        return;
-      }
-
-      throw new Error('Expected user.authenticate to throw');
-    });
-
-    it('should get an error updating the user on password match when limiting attempts', async () => {
-      const UserSchema = new Schema({}, { saveErrorIfNotFound: true });
-      UserSchema.plugin(passportLocalMongoose, {
-        limitAttempts: true
-      });
-      const User = mongoose.model('LimitAttemptsUpdateWithErrorAsync', UserSchema);
-
-      const user = new User({
-        username: 'jane'
-      });
-
-      await user.setPassword('password');
-      await user.save();
-
-      // TODO: This test does not test limit attempts at all but tests a mongoose error 'No document found for query "{ _id: 5a9672ad958eb907e4619736 }"!'
-      user._id = mongoose.Types.ObjectId();
-      try {
-        await user.authenticate('password');
-      } catch (e) {
-        return;
-      }
-
-      throw new Error('Expected user.authenticate to throw');
+      expect(authenticatedUser).to.be.false;
+      expect(error).to.be.instanceof(errors.AttemptTooSoonError);
     });
 
     it('should update the user on password match while limiting attempts', async () => {
@@ -691,18 +626,10 @@ describe('passportLocalMongoose', function() {
       await user.setPassword('password');
       await user.save();
 
-      user.hash = 'deadbeef'; // force an error on scmp with different length hex.
+      const { user: authenticatedUser, error } = await user.authenticate('WRONGpassword');
 
-      // TODO: This test does not test limit attempts at all but tests a mongoose error 'No document found for query "{ _id: 5a9672ad958eb907e4619736 }"!'
-      user._id = mongoose.Types.ObjectId(); // force the save to fail
-
-      try {
-        await user.authenticate('password');
-      } catch (e) {
-        return;
-      }
-
-      throw new Error('Expected user.authenticate to throw');
+      expect(authenticatedUser).to.be.false;
+      expect(error).to.be.instanceof(errors.IncorrectPasswordError);
     });
   });
 
@@ -742,7 +669,7 @@ describe('passportLocalMongoose', function() {
               return done(err);
             }
 
-            expect(result instanceof DefaultUser).to.exist;
+            expect(result).to.be.instanceof(DefaultUser);
             expect(result.username).to.equal(user.username);
 
             expect(result.salt).to.equal(user.salt);
@@ -754,9 +681,33 @@ describe('passportLocalMongoose', function() {
       });
     });
 
-    it('should authenticate existing user with case insensitive username with matching password', function(done) {
+    it('should authenticate existing user with usernameLowerCase enabled and with matching password', function(done) {
       const UserSchema = new Schema();
       UserSchema.plugin(passportLocalMongoose, { usernameLowerCase: true });
+      const User = mongoose.model('AuthenticateWithLowerCaseUsername', UserSchema);
+
+      const username = 'userName';
+      User.register({ username: username }, 'password', function(err) {
+        if (err) {
+          return done(err);
+        }
+
+        User.authenticate()('username', 'password', function(err, result) {
+          if (err) {
+            return done(err);
+          }
+
+          expect(result).to.be.instanceof(User);
+          expect('username').to.equal(result.username);
+
+          done();
+        });
+      });
+    });
+
+    it('should authenticate existing user with case insensitive username with matching password', function(done) {
+      const UserSchema = new Schema();
+      UserSchema.plugin(passportLocalMongoose, { usernameCaseInsensitive: true });
       const User = mongoose.model('AuthenticateWithCaseInsensitiveUsername', UserSchema);
 
       const username = 'userName';
@@ -770,8 +721,8 @@ describe('passportLocalMongoose', function() {
             return done(err);
           }
 
-          expect(result instanceof User).to.exist;
-          expect('username').to.equal(result.username);
+          expect(result).to.be.instanceof(User);
+          expect(username).to.equal(result.username);
 
           done();
         });
@@ -798,7 +749,7 @@ describe('passportLocalMongoose', function() {
             return done(err);
           }
 
-          expect(result instanceof User).to.exist;
+          expect(result).to.be.instanceof(User);
           expect(result.email).to.equal(user.email);
           expect(result.saltValue).to.equal(user.saltValue);
           expect(result.hashValue).to.equal(user.hashValue);
@@ -980,16 +931,30 @@ describe('passportLocalMongoose', function() {
       await user.save();
       const { user: result } = await DefaultUser.authenticate()('user', 'password');
 
-      expect(result instanceof DefaultUser).to.exist;
+      expect(result).to.be.instanceof(DefaultUser);
       expect(result.username).to.equal(user.username);
 
       expect(result.salt).to.equal(user.salt);
       expect(result.hash).to.equal(user.hash);
     });
 
-    it('should authenticate existing user with case insensitive username with matching password', async () => {
+    it('should authenticate existing user with usernameLowerCase enabled and with matching password', async () => {
       const UserSchema = new Schema();
       UserSchema.plugin(passportLocalMongoose, { usernameLowerCase: true });
+      const User = mongoose.model('AuthenticateWithLowerCaseUsernameAsync', UserSchema);
+
+      const username = 'userName';
+      await User.register({ username: username }, 'password');
+
+      const { user: result } = await User.authenticate()('username', 'password');
+
+      expect(result).to.be.instanceof(User);
+      expect('username').to.equal(result.username);
+    });
+
+    it('should authenticate existing user with case insensitive username with matching password', async () => {
+      const UserSchema = new Schema();
+      UserSchema.plugin(passportLocalMongoose, { usernameCaseInsensitive: true });
       const User = mongoose.model('AuthenticateWithCaseInsensitiveUsernameAsync', UserSchema);
 
       const username = 'userName';
@@ -997,8 +962,8 @@ describe('passportLocalMongoose', function() {
 
       const { user: result } = await User.authenticate()('username', 'password');
 
-      expect(result instanceof User).to.exist;
-      expect('username').to.equal(result.username);
+      expect(result).to.be.instanceof(User);
+      expect(username).to.equal(result.username);
     });
 
     it('should authenticate existing user with matching password with field overrides', async () => {
@@ -1015,7 +980,7 @@ describe('passportLocalMongoose', function() {
 
       const { user: result } = await User.authenticate()(email, 'password');
 
-      expect(result instanceof User).to.exist;
+      expect(result).to.be.instanceof(User);
       expect(result.email).to.equal(user.email);
       expect(result.saltValue).to.equal(user.saltValue);
       expect(result.hashValue).to.equal(user.hashValue);
