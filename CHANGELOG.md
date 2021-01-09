@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.1.0](https://github.com/saintedlama/passport-local-mongoose/compare/v6.0.1...v6.1.0) (2021-01-09)
+
+
+### Features
+
+* remove babel and semver checks for crypto parameters ([857f93a](https://github.com/saintedlama/passport-local-mongoose/commit/857f93aabd3ee392aefe3dfb005ac4d88b1252d4))
+
 ### [6.0.1](https://github.com/saintedlama/passport-local-mongoose/compare/v6.0.0...v6.0.1) (2020-01-04)
 
 
