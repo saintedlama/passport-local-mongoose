@@ -37,7 +37,7 @@
   },
   "scripts": {
     "test": "nyc --reporter=text-summary mocha --recursive --throw-deprecation",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "test:ci": "nyc --reporter=lcov mocha --recursive --throw-deprecation",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "release": "standard-version"

@@ -27,7 +27,7 @@ jobs:
       with:
         mongodb-version: ${{ matrix.mongodb-version }}
     - run: npm ci
-    - run: npm test
+    - run: npm run test:ci
     - name: Coveralls Parallel
       uses: coverallsapp/github-action@master
       with:
