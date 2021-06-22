@@ -110,26 +110,26 @@ User.plugin(passportLocalMongoose, options);
 
 #### Main Options
 
-* saltlen: specifies the salt length in bytes. Default: 32
-* iterations: specifies the number of iterations used in pbkdf2 hashing algorithm. Default: 25000
-* keylen: specifies the length in byte of the generated key. Default: 512
-* digestAlgorithm: specifies the pbkdf2 digest algorithm. Default: sha256. (get a list of supported algorithms with crypto.getHashes())
-* interval: specifies the interval in milliseconds between login attempts, which increases exponentially based on the number of failed attempts, up to maxInterval. Default: 100
-* maxInterval: specifies the maximum amount of time an account can be locked. Default 30000 (5 minutes)
-* usernameField: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different field to hold the username for example "email".
-* usernameUnique : specifies if the username field should be enforced to be unique by a mongodb index or not. Defaults to true.
-* saltField: specifies the field name that holds the salt value. Defaults to 'salt'.
-* hashField: specifies the field name that holds the password hash value. Defaults to 'hash'.
-* attemptsField: specifies the field name that holds the number of login failures since the last successful login. Defaults to 'attempts'.
-* lastLoginField: specifies the field name that holds the timestamp of the last login attempt. Defaults to 'last'.
-* selectFields: specifies the fields of the model to be selected from mongodb (and stored in the session). Defaults to 'undefined' so that all fields of the model are selected.
-* usernameLowerCase: convert username field value to lower case when saving an querying. Defaults to 'false'.
-* populateFields: specifies fields to populate in findByUsername function. Defaults to 'undefined'.
-* encoding: specifies the encoding the generated salt and hash will be stored in. Defaults to 'hex'.
-* limitAttempts: specifies whether login attempts should be limited and login failures should be penalized. Default: false.
-* maxAttempts: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
-* passwordValidator: specifies your custom validation function for the password in the form:
-    ```
+* `saltlen`: specifies the salt length in bytes. Default: 32
+* `iterations`: specifies the number of iterations used in pbkdf2 hashing algorithm. Default: 25000
+* `keylen`: specifies the length in byte of the generated key. Default: 512
+* `digestAlgorithm`: specifies the pbkdf2 digest algorithm. Default: sha256. (get a list of supported algorithms with crypto.getHashes())
+* `interval`: specifies the interval in milliseconds between login attempts, which increases exponentially based on the number of failed attempts, up to maxInterval. Default: 100
+* `maxInterval`: specifies the maximum amount of time an account can be locked. Default 30000 (5 minutes)
+* `usernameField`: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different field to hold the username for example "email".
+* `usernameUnique`: specifies if the username field should be enforced to be unique by a mongodb index or not. Defaults to true.
+* `saltField`: specifies the field name that holds the salt value. Defaults to 'salt'.
+* `hashField`: specifies the field name that holds the password hash value. Defaults to 'hash'.
+* `attemptsField`: specifies the field name that holds the number of login failures since the last successful login. Defaults to 'attempts'.
+* `lastLoginField`: specifies the field name that holds the timestamp of the last login attempt. Defaults to 'last'.
+* `selectFields`: specifies the fields of the model to be selected from mongodb (and stored in the session). Defaults to 'undefined' so that all fields of the model are selected.
+* `usernameLowerCase`: convert username field value to lower case when saving an querying. Defaults to 'false'.
+* `populateFields`: specifies fields to populate in findByUsername function. Defaults to 'undefined'.
+* `encoding`: specifies the encoding the generated salt and hash will be stored in. Defaults to 'hex'.
+* `limitAttempts`: specifies whether login attempts should be limited and login failures should be penalized. Default: false.
+* `maxAttempts`: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
+* `passwordValidator`: specifies your custom validation function for the password in the form:
+    ```js
     passwordValidator = function(password,cb) {
       if (someValidationErrorExists(password)) {
         return cb('this is my custom validation error message')
@@ -139,8 +139,8 @@ User.plugin(passportLocalMongoose, options);
     }
     ```
     Default: validates non-empty passwords.
-* passwordValidatorAsync: specifies your custom validation function for the password with promises in the form:
-    ```
+* `passwordValidatorAsync`: specifies your custom validation function for the password with promises in the form:
+    ```js
     passwordValidatorAsync = function(password) {
       return someAsyncValidation(password)
         .catch(function(err){
@@ -148,23 +148,23 @@ User.plugin(passportLocalMongoose, options);
         })
     }
     ```
-* usernameQueryFields: specifies alternative fields of the model for identifying a user (e.g. email).
-* findByUsername: Specifies a query function that is executed with query parameters to restrict the query with extra query parameters. For example query only users with field "active" set to `true`. Default: `function(model, queryParameters) { return model.findOne(queryParameters); }`. See the examples section for a use case.
+* `usernameQueryFields`: specifies alternative fields of the model for identifying a user (e.g. email).
+* `findByUsername`: Specifies a query function that is executed with query parameters to restrict the query with extra query parameters. For example query only users with field "active" set to `true`. Default: `function(model, queryParameters) { return model.findOne(queryParameters); }`. See the examples section for a use case.
 
-*Attention!* Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
+**_Attention!_** Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
 
 #### Error Messages
 
-Override default error messages by setting options.errorMessages.
+Override default error messages by setting `options.errorMessages`.
 
-* MissingPasswordError  'No password was given'
-* AttemptTooSoonError 'Account is currently locked. Try again later'
-* TooManyAttemptsError 'Account locked due to too many failed login attempts'
-* NoSaltValueStoredError 'Authentication not possible. No salt value stored'
-* IncorrectPasswordError 'Password or username are incorrect'
-* IncorrectUsernameError 'Password or username are incorrect'
-* MissingUsernameError 'No username was given'
-* UserExistsError 'A user with the given username is already registered'
+* `MissingPasswordError`: 'No password was given'
+* `AttemptTooSoonError`: 'Account is currently locked. Try again later'
+* `TooManyAttemptsError`: 'Account locked due to too many failed login attempts'
+* `NoSaltValueStoredError`: 'Authentication not possible. No salt value stored'
+* `IncorrectPasswordError`: 'Password or username are incorrect'
+* `IncorrectUsernameError`: 'Password or username are incorrect'
+* `MissingUsernameError`: 'No username was given'
+* `UserExistsError`: 'A user with the given username is already registered'
 
 ### Hash Algorithm
 
@@ -200,11 +200,11 @@ Resets a user's number of failed password attempts and saves the user object. If
 
 ### Callback Arguments
 
-* err
+* `err`
   * null unless the hashing algorithm throws an error
-* thisModel
-  * the model getting authenticated *if* authentication was successful otherwise false
-* passwordErr
+* `thisModel`
+  * the model getting authenticated **_if_** authentication was successful otherwise false
+* `passwordErr`
   * an instance of `AuthenticationError` describing the reason the password failed, else undefined.
 
 Using `setPassword()` will only update the document's password fields, but will not save the document.
@@ -232,12 +232,12 @@ const User = require('./models/user');
 User.createStrategy();
 ```
 
-* authenticate() Generates a function that is used in Passport's LocalStrategy
-* serializeUser() Generates a function that is used by Passport to serialize users into the session
-* deserializeUser() Generates a function that is used by Passport to deserialize users into the session
-* register(user, password, cb) Convenience method to register a new user instance with a given password. Checks if username is unique. See [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
-* findByUsername() Convenience method to find a user instance by it's unique username.
-* createStrategy() Creates a configured passport-local `LocalStrategy` instance that can be used in passport.
+* `authenticate()` Generates a function that is used in Passport's LocalStrategy
+* `serializeUser()` Generates a function that is used by Passport to serialize users into the session
+* `deserializeUser()` Generates a function that is used by Passport to deserialize users into the session
+* `register(user, password, cb) Convenience method to register a new user instance with a given password. Checks if username is unique. See [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
+* `findByUsername()` Convenience method to find a user instance by it's unique username.
+* `createStrategy()` Creates a configured passport-local `LocalStrategy` instance that can be used in passport.
 
 ## Examples
 
