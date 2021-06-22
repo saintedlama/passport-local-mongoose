@@ -2,7 +2,7 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master, githubactions ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
