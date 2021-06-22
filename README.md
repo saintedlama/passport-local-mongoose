@@ -247,7 +247,7 @@ User.createStrategy();
 First we define a schema with an additional field `active` of type Boolean.
 
 ```javascript
-var UserSchema = new Schema({
+const UserSchema = new Schema({
   active: Boolean
 });
 ```
@@ -273,12 +273,12 @@ To test the implementation we can simply create (register) a user with field `ac
 in a second step:
 
 ```javascript
-var User = mongoose.model('Users', UserSchema);
+const User = mongoose.model('Users', UserSchema);
 
 User.register({username:'username', active: false}, 'password', function(err, user) {
   if (err) { ... }
 
-  var authenticate = User.authenticate();
+  const authenticate = User.authenticate();
   authenticate('username', 'password', function(err, result) {
     if (err) { ... }
 
