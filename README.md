@@ -123,6 +123,7 @@ User.plugin(passportLocalMongoose, options);
 * attemptsField: specifies the field name that holds the number of login failures since the last successful login. Defaults to 'attempts'.
 * lastLoginField: specifies the field name that holds the timestamp of the last login attempt. Defaults to 'last'.
 * selectFields: specifies the fields of the model to be selected from mongodb (and stored in the session). Defaults to 'undefined' so that all fields of the model are selected.
+* usernameCaseInsensitive: specifies usernames to be case insensitive. Defaults to 'false'.
 * usernameLowerCase: convert username field value to lower case when saving an querying. Defaults to 'false'.
 * populateFields: specifies fields to populate in findByUsername function. Defaults to 'undefined'.
 * encoding: specifies the encoding the generated salt and hash will be stored in. Defaults to 'hex'.
