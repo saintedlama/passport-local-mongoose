@@ -28,3 +28,19 @@ jobs:
         mongodb-version: ${{ matrix.mongodb-version }}
     - run: npm ci
     - run: npm test
+    - name: Coveralls Parallel
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        flag-name: run-node-${{ matrix.node-version }}-mongodb-${{ matrix.mongodb-version }}
+        parallel: true
+
+  coverage:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        parallel-finished: true
