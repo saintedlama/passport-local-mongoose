@@ -115,7 +115,7 @@ User.plugin(passportLocalMongoose, options);
 * `keylen`: specifies the length in byte of the generated key. Default: 512
 * `digestAlgorithm`: specifies the pbkdf2 digest algorithm. Default: sha256. (get a list of supported algorithms with crypto.getHashes())
 * `interval`: specifies the interval in milliseconds between login attempts, which increases exponentially based on the number of failed attempts, up to maxInterval. Default: 100
-* `maxInterval`: specifies the maximum amount of time an account can be locked. Default 30000 (5 minutes)
+* `maxInterval`: specifies the maximum amount of time an account can be locked. Default 300000 (5 minutes)
 * `usernameField`: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different field to hold the username for example "email".
 * `usernameUnique`: specifies if the username field should be enforced to be unique by a mongodb index or not. Defaults to true.
 * `saltField`: specifies the field name that holds the salt value. Defaults to 'salt'.
