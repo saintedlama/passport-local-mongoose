@@ -4,75 +4,11 @@ const LocalStrategy = require('passport-local').Strategy;
 const pbkdf2 = require('./lib/pbkdf2');
 const errors = require('./lib/errors');
 const authenticate = require('./lib/authenticate');
+const validateOptions = require('./lib/options-validator');
 
-module.exports = function(schema, options) {
-  options = options || {};
-  options.saltlen = options.saltlen || 32;
-  options.iterations = options.iterations || 25000;
-  options.keylen = options.keylen || 512;
-  options.encoding = options.encoding || 'hex';
-  options.digestAlgorithm = options.digestAlgorithm || 'sha256'; // To get a list of supported hashes use crypto.getHashes()
-
-  function defaultPasswordValidator(password, cb) {
-    cb(null);
-  }
-
-  function defaultPasswordValidatorAsync(password) {
-    return new Promise((resolve, reject) => {
-      options.passwordValidator(password, err => (err ? reject(err) : resolve()));
-    });
-  }
-
-  options.passwordValidator = options.passwordValidator || defaultPasswordValidator;
-  options.passwordValidatorAsync = options.passwordValidatorAsync || defaultPasswordValidatorAsync;
-
-  // Populate field names with defaults if not set
-  options.usernameField = options.usernameField || 'username';
-  options.usernameUnique = options.usernameUnique === undefined ? true : options.usernameUnique;
-
-  // Populate username query fields with defaults if not set,
-  // otherwise add username field to query fields.
-  if (options.usernameQueryFields) {
-    options.usernameQueryFields.push(options.usernameField);
-  } else {
-    options.usernameQueryFields = [options.usernameField];
-  }
-
-  // option to find username case insensitively
-  options.usernameCaseInsensitive = Boolean(options.usernameCaseInsensitive || false);
-
-  // option to convert username to lowercase when finding
-  options.usernameLowerCase = options.usernameLowerCase || false;
-
-  options.hashField = options.hashField || 'hash';
-  options.saltField = options.saltField || 'salt';
-
-  if (options.limitAttempts) {
-    options.lastLoginField = options.lastLoginField || 'last';
-    options.attemptsField = options.attemptsField || 'attempts';
-    options.interval = options.interval || 100; // 100 ms
-    options.maxInterval = options.maxInterval || 300000; // 5 min
-    options.maxAttempts = options.maxAttempts || Infinity;
-  }
-
-  options.findByUsername =
-    options.findByUsername ||
-    function(model, queryParameters) {
-      return model.findOne(queryParameters);
-    };
-
-  options.errorMessages = options.errorMessages || {};
-  options.errorMessages.MissingPasswordError = options.errorMessages.MissingPasswordError || 'No password was given';
-  options.errorMessages.AttemptTooSoonError = options.errorMessages.AttemptTooSoonError || 'Account is currently locked. Try again later';
-  options.errorMessages.TooManyAttemptsError =
-    options.errorMessages.TooManyAttemptsError || 'Account locked due to too many failed login attempts';
-  options.errorMessages.NoSaltValueStoredError =
-    options.errorMessages.NoSaltValueStoredError || 'Authentication not possible. No salt value stored';
-  options.errorMessages.IncorrectPasswordError = options.errorMessages.IncorrectPasswordError || 'Password or username is incorrect';
-  options.errorMessages.IncorrectUsernameError = options.errorMessages.IncorrectUsernameError || 'Password or username is incorrect';
-  options.errorMessages.MissingUsernameError = options.errorMessages.MissingUsernameError || 'No username was given';
-  options.errorMessages.UserExistsError = options.errorMessages.UserExistsError || 'A user with the given username is already registered';
-
+module.exports = function(schema, inputOptions) {
+  const options = validateOptions(inputOptions);
+  
   const schemaFields = {};
 
   if (!schema.path(options.usernameField)) {
