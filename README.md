@@ -236,7 +236,7 @@ User.createStrategy();
 * `authenticate()` Generates a function that is used in Passport's LocalStrategy
 * `serializeUser()` Generates a function that is used by Passport to serialize users into the session
 * `deserializeUser()` Generates a function that is used by Passport to deserialize users into the session
-* `register(user, password, cb) Convenience method to register a new user instance with a given password. Checks if username is unique. See [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
+* `register(user, password, cb)` Convenience method to register a new user instance with a given password. Checks if username is unique. See [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
 * `findByUsername()` Convenience method to find a user instance by it's unique username.
 * `createStrategy()` Creates a configured passport-local `LocalStrategy` instance that can be used in passport.
 
