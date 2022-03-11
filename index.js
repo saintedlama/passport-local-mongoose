@@ -5,7 +5,7 @@ const pbkdf2 = require('./lib/pbkdf2');
 const errors = require('./lib/errors');
 const authenticate = require('./lib/authenticate');
 
-module.exports = function(schema, options) {
+module.exports = function (schema, options) {
   options = options || {};
   options.saltlen = options.saltlen || 32;
   options.iterations = options.iterations || 25000;
@@ -19,7 +19,7 @@ module.exports = function(schema, options) {
 
   function defaultPasswordValidatorAsync(password) {
     return new Promise((resolve, reject) => {
-      options.passwordValidator(password, err => (err ? reject(err) : resolve()));
+      options.passwordValidator(password, (err) => (err ? reject(err) : resolve()));
     });
   }
 
@@ -57,7 +57,7 @@ module.exports = function(schema, options) {
 
   options.findByUsername =
     options.findByUsername ||
-    function(model, queryParameters) {
+    function (model, queryParameters) {
       return model.findOne(queryParameters);
     };
 
@@ -88,7 +88,7 @@ module.exports = function(schema, options) {
 
   schema.add(schemaFields);
 
-  schema.pre('save', function(next) {
+  schema.pre('save', function (next) {
     if (options.usernameLowerCase && this[options.usernameField]) {
       this[options.usernameField] = this[options.usernameField].toLowerCase();
     }
@@ -96,7 +96,7 @@ module.exports = function(schema, options) {
     next();
   });
 
-  schema.methods.setPassword = function(password, cb) {
+  schema.methods.setPassword = function (password, cb) {
     const promise = Promise.resolve()
       .then(() => {
         if (!password) {
@@ -105,14 +105,14 @@ module.exports = function(schema, options) {
       })
       .then(() => options.passwordValidatorAsync(password))
       .then(() => randomBytes(options.saltlen))
-      .then(saltBuffer => saltBuffer.toString(options.encoding))
-      .then(salt => {
+      .then((saltBuffer) => saltBuffer.toString(options.encoding))
+      .then((salt) => {
         this.set(options.saltField, salt);
 
         return salt;
       })
-      .then(salt => pbkdf2Promisified(password, salt, options))
-      .then(hashRaw => {
+      .then((salt) => pbkdf2Promisified(password, salt, options))
+      .then((hashRaw) => {
         this.set(options.hashField, Buffer.from(hashRaw, 'binary').toString(options.encoding));
       })
       .then(() => this);
@@ -121,10 +121,10 @@ module.exports = function(schema, options) {
       return promise;
     }
 
-    promise.then(result => cb(null, result)).catch(err => cb(err));
+    promise.then((result) => cb(null, result)).catch((err) => cb(err));
   };
 
-  schema.methods.changePassword = function(oldPassword, newPassword, cb) {
+  schema.methods.changePassword = function (oldPassword, newPassword, cb) {
     const promise = Promise.resolve()
       .then(() => {
         if (!oldPassword || !newPassword) {
@@ -145,16 +145,16 @@ module.exports = function(schema, options) {
       return promise;
     }
 
-    promise.then(result => cb(null, result)).catch(err => cb(err));
+    promise.then((result) => cb(null, result)).catch((err) => cb(err));
   };
 
-  schema.methods.authenticate = function(password, cb) {
+  schema.methods.authenticate = function (password, cb) {
     const promise = Promise.resolve().then(() => {
       if (this.get(options.saltField)) {
         return authenticate(this, password, options);
       }
 
-      return this.constructor.findByUsername(this.get(options.usernameField), true).then(user => {
+      return this.constructor.findByUsername(this.get(options.usernameField), true).then((user) => {
         if (user) {
           return authenticate(user, password, options);
         }
@@ -167,11 +167,11 @@ module.exports = function(schema, options) {
       return promise;
     }
 
-    promise.then(({ user, error }) => cb(null, user, error)).catch(err => cb(err));
+    promise.then(({ user, error }) => cb(null, user, error)).catch((err) => cb(err));
   };
 
   if (options.limitAttempts) {
-    schema.methods.resetAttempts = function(cb) {
+    schema.methods.resetAttempts = function (cb) {
       const promise = Promise.resolve().then(() => {
         this.set(options.attemptsField, 0);
         return this.save();
@@ -181,16 +181,16 @@ module.exports = function(schema, options) {
         return promise;
       }
 
-      promise.then(result => cb(null, result)).catch(err => cb(err));
+      promise.then((result) => cb(null, result)).catch((err) => cb(err));
     };
   }
 
   // Passport Local Interface
-  schema.statics.authenticate = function() {
+  schema.statics.authenticate = function () {
     return (username, password, cb) => {
       const promise = Promise.resolve()
         .then(() => this.findByUsername(username, true))
-        .then(user => {
+        .then((user) => {
           if (user) {
             return user.authenticate(password);
           }
@@ -202,24 +202,24 @@ module.exports = function(schema, options) {
         return promise;
       }
 
-      promise.then(({ user, error }) => cb(null, user, error)).catch(err => cb(err));
+      promise.then(({ user, error }) => cb(null, user, error)).catch((err) => cb(err));
     };
   };
 
   // Passport Interface
-  schema.statics.serializeUser = function() {
-    return function(user, cb) {
+  schema.statics.serializeUser = function () {
+    return function (user, cb) {
       cb(null, user.get(options.usernameField));
     };
   };
 
-  schema.statics.deserializeUser = function() {
+  schema.statics.deserializeUser = function () {
     return (username, cb) => {
       this.findByUsername(username, cb);
     };
   };
 
-  schema.statics.register = function(user, password, cb) {
+  schema.statics.register = function (user, password, cb) {
     // Create an instance of this in case user isn't already an instance
     if (!(user instanceof this)) {
       user = new this(user);
@@ -232,7 +232,7 @@ module.exports = function(schema, options) {
         }
       })
       .then(() => this.findByUsername(user.get(options.usernameField)))
-      .then(existingUser => {
+      .then((existingUser) => {
         if (existingUser) {
           throw new errors.UserExistsError(options.errorMessages.UserExistsError);
         }
@@ -244,10 +244,10 @@ module.exports = function(schema, options) {
       return promise;
     }
 
-    promise.then(result => cb(null, result)).catch(err => cb(err));
+    promise.then((result) => cb(null, result)).catch((err) => cb(err));
   };
 
-  schema.statics.findByUsername = function(username, opts, cb) {
+  schema.statics.findByUsername = function (username, opts, cb) {
     if (typeof opts === 'function') {
       cb = opts;
       opts = {};
@@ -255,7 +255,7 @@ module.exports = function(schema, options) {
 
     if (typeof opts == 'boolean') {
       opts = {
-        selectHashSaltFields: opts
+        selectHashSaltFields: opts,
       };
     }
 
@@ -297,7 +297,7 @@ module.exports = function(schema, options) {
     return query;
   };
 
-  schema.statics.createStrategy = function() {
+  schema.statics.createStrategy = function () {
     return new LocalStrategy(options, this.authenticate());
   };
 };
