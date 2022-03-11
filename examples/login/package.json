@@ -6,18 +6,18 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "body-parser": "^1.19.0",
+    "body-parser": "^1.19.2",
     "connect-flash": "^0.1.1",
-    "cookie-parser": "^1.4.4",
-    "cookie-session": "^1.3.3",
-    "debug": "^4.1.1",
-    "express": "^4.17.1",
-    "mongoose": "^5.8.4",
-    "morgan": "^1.9.1",
-    "passport": "^0.4.1",
+    "cookie-parser": "^1.4.6",
+    "cookie-session": "^2.0.0",
+    "debug": "^4.3.3",
+    "express": "^4.17.3",
+    "mongoose": "^6.2.5",
+    "morgan": "^1.10.0",
+    "passport": "^0.5.2",
     "passport-local": "1.0.x",
-    "passport-local-mongoose": "^5.0.1",
-    "pug": "^2.0.4",
+    "passport-local-mongoose": "^6.1.0",
+    "pug": "^3.0.2",
     "serve-favicon": "^2.5.0"
   }
 }
