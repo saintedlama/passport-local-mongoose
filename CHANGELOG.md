@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.3.0](https://github.com/saintedlama/passport-local-mongoose/compare/v6.2.2...v6.3.0) (2022-03-12)
+
+
+### Features
+
+* reset maxAttempts after unlockInterval if activated ([#349](https://github.com/saintedlama/passport-local-mongoose/issues/349)) ([a752854](https://github.com/saintedlama/passport-local-mongoose/commit/a752854ce66220bff9e4c09f9b3713fafb9a0f2f))
+
 ### [6.2.2](https://github.com/saintedlama/passport-local-mongoose/compare/v6.2.1...v6.2.2) (2022-03-12)
 
 ### [6.2.1](https://github.com/saintedlama/passport-local-mongoose/compare/v6.2.0...v6.2.1) (2022-03-12)
