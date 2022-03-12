@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: ['Node.js CI']
     types: [completed]
-    branches: ['*'] #[main]
+    branches: [main]
 
 jobs:
   publish-new-version:
@@ -21,13 +21,13 @@ jobs:
       - name: npm install
         run: npm ci
       - name: npm release
-        run: npm run release -- --dry-run
-#      - run: npm publish
-#        env:
-#          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-#      - name: push changes to github
-#        uses: ad-m/github-push-action@master
-#        with:
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
-#          branch: ${{ github.ref }}
-#          tags: true
+        run: npm run release
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: push changes to github
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: true
