@@ -1,0 +1,38 @@
+name: 'Publish to NPM'
+
+on:
+  workflow_run:
+    workflows: ['Node.js CI']
+    types: [completed]
+    branches: [main]
+
+jobs:
+  publish-new-version:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: git setup
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+      - name: setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          registry-url: 'https://registry.npmjs.org'
+      - name: npm install
+        run: npm ci
+      - name: npm release
+        run: npm run release
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: push changes to github
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: true

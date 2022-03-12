@@ -1,22 +1,41 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-<a name="6.0.0"></a>
-# [6.0.0](https://github.com/saintedlama/passport-local-mongoose/compare/v5.0.1...v6.0.0) (2018-08-17)
+## [6.2.0](https://github.com/saintedlama/passport-local-mongoose/compare/v6.1.0...v6.2.0) (2022-03-12)
+
+
+### Features
+
+* escape username regex ([#296](https://github.com/saintedlama/passport-local-mongoose/issues/296)) ([6713c4e](https://github.com/saintedlama/passport-local-mongoose/commit/6713c4e02c9a2aabbe3cd4a9c2efc032e686eb3d))
+* upgrade dependencies and drop support of legacy mongodb and node versions ([#344](https://github.com/saintedlama/passport-local-mongoose/issues/344)) ([2d88e70](https://github.com/saintedlama/passport-local-mongoose/commit/2d88e70c9afcbddd46076cde46e34111e6ab029d))
+
+## [6.1.0](https://github.com/saintedlama/passport-local-mongoose/compare/v6.0.1...v6.1.0) (2021-01-09)
+
+
+### Features
+
+* remove babel and semver checks for crypto parameters ([857f93a](https://github.com/saintedlama/passport-local-mongoose/commit/857f93aabd3ee392aefe3dfb005ac4d88b1252d4))
+
+### [6.0.1](https://github.com/saintedlama/passport-local-mongoose/compare/v6.0.0...v6.0.1) (2020-01-04)
 
 
 ### Bug Fixes
 
-* update dependencies and specify server port in tests ([807d9cf](https://github.com/saintedlama/passport-local-mongoose/commit/807d9cf))
-* use Buffer.from instead of new Buffer ([37375b8](https://github.com/saintedlama/passport-local-mongoose/commit/37375b8))
+* remove superfluous files from package ([b1681a5](https://github.com/saintedlama/passport-local-mongoose/commit/b1681a5d47ef3dc0d50a60d795c925f6a03e0683))
+
+## [6.0.0](https://github.com/saintedlama/passport-local-mongoose/compare/v5.0.1...v6.0.0) (2020-01-04)
 
 
-### BREAKING CHANGES
+### ⚠ BREAKING CHANGES
 
 * mongodb driver update requires server port to be specified
 
+### Bug Fixes
 
+* make debug a dev dependency ([c9b0a78](https://github.com/saintedlama/passport-local-mongoose/commit/c9b0a78761c53edfde6850ed997662e001c430e7))
+* update dependencies and specify server port in tests ([807d9cf](https://github.com/saintedlama/passport-local-mongoose/commit/807d9cf669f7a7c433eb0206c97574761c03b8e5))
+* use Buffer.from instead of new Buffer ([37375b8](https://github.com/saintedlama/passport-local-mongoose/commit/37375b8b5555d82e6e6241fbd053f2f6b8d670d1))
 
 <a name="5.0.1"></a>
 ## [5.0.1](https://github.com/saintedlama/passport-local-mongoose/compare/v5.0.0...v5.0.1) (2018-06-20)

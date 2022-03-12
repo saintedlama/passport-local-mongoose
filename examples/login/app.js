@@ -9,12 +9,13 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const flash = require('connect-flash');
 
 const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
@@ -23,6 +24,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(session({keys: ['secretkey1', 'secretkey2', '...']}));
+app.use(flash());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -38,11 +40,12 @@ passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
 
 // Connect mongoose
-mongoose.connect('mongodb://localhost/passport_local_mongoose_examples', function(err) {
+mongoose.connect('mongodb://localhost/passport_local_mongoose_examples', { useNewUrlParser: true, useUnifiedTopology: true }, function(err) {
   if (err) {
     console.log('Could not connect to mongodb on localhost. Ensure that you have mongodb running on localhost and mongodb accepts connections on standard ports!');
   }
 });
+mongoose.set('useCreateIndex', true);
 
 // Register routes
 app.use('/', require('./routes'));
@@ -77,6 +80,5 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
 
 module.exports = app;

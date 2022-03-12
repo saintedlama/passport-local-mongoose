@@ -3,9 +3,8 @@
 Passport-Local Mongoose is a [Mongoose](http://mongoosejs.com/) [plugin](http://mongoosejs.com/docs/plugins.html)
 that simplifies building username and password login with [Passport](http://passportjs.org).
 
-[![Build Status](https://travis-ci.org/saintedlama/passport-local-mongoose.png?branch=master)](https://travis-ci.org/saintedlama/passport-local-mongoose)
+[![Node.js CI](https://github.com/saintedlama/passport-local-mongoose/actions/workflows/ci.yml/badge.svg)](https://github.com/saintedlama/passport-local-mongoose/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/saintedlama/passport-local-mongoose/badge.png?branch=master)](https://coveralls.io/r/saintedlama/passport-local-mongoose?branch=master)
-[![passport-local-mongoose analyzed by Codellama.io](https://app.codellama.io/api/badges/5a04399c1b4c363a0f9427f8/fcac8d5ab6ca708f09999469b02890ce)](https://app.codellama.io/repositories/5a04399c1b4c363a0f9427f8)
 
 ## Tutorials
 
@@ -18,18 +17,14 @@ passport, passport-local and passport-local-mongoose for user authentication in 
 > npm install passport-local-mongoose
 ```
 
-Passport-Local Mongoose does not require `passport`, `passport-local` or `mongoose` dependencies directly but expects you
+Passport-Local Mongoose does not require `passport` or `mongoose` dependencies directly but expects you
 to have these dependencies installed.
 
 In case you need to install the whole set of dependencies
 
 ```bash
-> npm install passport passport-local mongoose passport-local-mongoose --save
+> npm install passport mongoose passport-local-mongoose
 ```
-
-### Updating from 1.x to 2.x
-
-The default digest algorithm was changed due to security implications from **sha1** to **sha256**. If you decide to upgrade a production system from 1.x to 2.x your users **will not be able to login** since the digest algorithm was changed! In these cases plan some migration strategy and/or use the **sha1** option for the digest algorithm.
 
 ## Usage
 
@@ -51,7 +46,7 @@ module.exports = mongoose.model('User', User);
 
 You're free to define your User how you like. Passport-Local Mongoose will add a username, hash and salt field to store the username, the hashed password and the salt value.
 
-Additionally Passport-Local Mongoose adds some methods to your Schema. See the API Documentation section for more details.
+Additionally Passport-Local Mongoose adds some methods to your Schema. See the [API Documentation](https://github.com/saintedlama/passport-local-mongoose#api-documentation) section for more details.
 
 ### Configure Passport/Passport-Local
 
@@ -115,43 +110,63 @@ User.plugin(passportLocalMongoose, options);
 
 #### Main Options
 
-* saltlen: specifies the salt length in bytes. Default: 32
-* iterations: specifies the number of iterations used in pbkdf2 hashing algorithm. Default: 25000
-* keylen: specifies the length in byte of the generated key. Default: 512
-* digestAlgorithm: specifies the pbkdf2 digest algorithm. Default: sha256. (get a list of supported algorithms with crypto.getHashes())
-* interval: specifies the interval in milliseconds between login attempts, which increases exponentially based on the number of failed attempts, up to maxInterval. Default: 100
-* maxInterval: specifies the maximum amount of time an account can be locked. Default 300000 (5 minutes)
-* usernameField: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different field to hold the username for example "email".
-* usernameUnique : specifies if the username field should be enforced to be unique by a mongodb index or not. Defaults to true.
-* saltField: specifies the field name that holds the salt value. Defaults to 'salt'.
-* hashField: specifies the field name that holds the password hash value. Defaults to 'hash'.
-* attemptsField: specifies the field name that holds the number of login failures since the last successful login. Defaults to 'attempts'.
-* lastLoginField: specifies the field name that holds the timestamp of the last login attempt. Defaults to 'last'.
-* selectFields: specifies the fields of the model to be selected from mongodb (and stored in the session). Defaults to 'undefined' so that all fields of the model are selected.
-* usernameLowerCase: convert username field value to lower case when saving an querying. Defaults to 'false'.
-* populateFields: specifies fields to populate in findByUsername function. Defaults to 'undefined'.
-* encoding: specifies the encoding the generated salt and hash will be stored in. Defaults to 'hex'.
-* limitAttempts: specifies whether login attempts should be limited and login failures should be penalized. Default: false.
-* maxAttempts: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
-* unlockInterval: specifies the interval in milliseconds, which is for unlock user automatically after the interval is reached. Defaults to 'undefined' which means deactivated.
-* passwordValidator: specifies your custom validation function for the password in the form 'function(password,cb)'. Default: validates non-empty passwords.
-* usernameQueryFields: specifies alternative fields of the model for identifying a user (e.g. email).
-* findByUsername: Specifies a query function that is executed with query parameters to restrict the query with extra query parameters. For example query only users with field "active" set to `true`. Default: `function(model, queryParameters) { return model.findOne(queryParameters); }`. See the examples section for a use case.
+* `saltlen`: specifies the salt length in bytes. Default: 32
+* `iterations`: specifies the number of iterations used in pbkdf2 hashing algorithm. Default: 25000
+* `keylen`: specifies the length in byte of the generated key. Default: 512
+* `digestAlgorithm`: specifies the pbkdf2 digest algorithm. Default: sha256. (get a list of supported algorithms with crypto.getHashes())
+* `interval`: specifies the interval in milliseconds between login attempts, which increases exponentially based on the number of failed attempts, up to maxInterval. Default: 100
+* `maxInterval`: specifies the maximum amount of time an account can be locked. Default 30000 (5 minutes)
+* `usernameField`: specifies the field name that holds the username. Defaults to 'username'. This option can be used if you want to use a different field to hold the username for example "email".
+* `usernameUnique`: specifies if the username field should be enforced to be unique by a mongodb index or not. Defaults to true.
+* `saltField`: specifies the field name that holds the salt value. Defaults to 'salt'.
+* `hashField`: specifies the field name that holds the password hash value. Defaults to 'hash'.
+* `attemptsField`: specifies the field name that holds the number of login failures since the last successful login. Defaults to 'attempts'.
+* `lastLoginField`: specifies the field name that holds the timestamp of the last login attempt. Defaults to 'last'.
+* `selectFields`: specifies the fields of the model to be selected from mongodb (and stored in the session). Defaults to 'undefined' so that all fields of the model are selected.
+* `usernameCaseInsensitive`: specifies the usernames to be case insensitive. Defaults to 'false'.
+* `usernameLowerCase`: convert username field value to lower case when saving an querying. Defaults to 'false'.
+* `populateFields`: specifies fields to populate in findByUsername function. Defaults to 'undefined'.
+* `encoding`: specifies the encoding the generated salt and hash will be stored in. Defaults to 'hex'.
+* `limitAttempts`: specifies whether login attempts should be limited and login failures should be penalized. Default: false.
+* `maxAttempts`: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
+* `unlockInterval`: specifies the interval in milliseconds, which is for unlock user automatically after the interval is reached. Defaults to 'undefined' which means deactivated.
+* `passwordValidator`: specifies your custom validation function for the password in the form:
+    ```js
+    passwordValidator = function(password,cb) {
+      if (someValidationErrorExists(password)) {
+        return cb('this is my custom validation error message')
+      }
+      // return an empty cb() on success
+      return cb()
+    }
+    ```
+    Default: validates non-empty passwords.
+* `passwordValidatorAsync`: specifies your custom validation function for the password with promises in the form:
+    ```js
+    passwordValidatorAsync = function(password) {
+      return someAsyncValidation(password)
+        .catch(function(err){
+          return Promise.reject(err)
+        })
+    }
+    ```
+* `usernameQueryFields`: specifies alternative fields of the model for identifying a user (e.g. email).
+* `findByUsername`: Specifies a query function that is executed with query parameters to restrict the query with extra query parameters. For example query only users with field "active" set to `true`. Default: `function(model, queryParameters) { return model.findOne(queryParameters); }`. See the examples section for a use case.
 
-*Attention!* Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
+**_Attention!_** Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
 
 #### Error Messages
 
-Override default error messages by setting options.errorMessages.
+Override default error messages by setting `options.errorMessages`.
 
-* MissingPasswordError  'No password was given'
-* AttemptTooSoonError 'Account is currently locked. Try again later'
-* TooManyAttemptsError 'Account locked due to too many failed login attempts'
-* NoSaltValueStoredError 'Authentication not possible. No salt value stored'
-* IncorrectPasswordError 'Password or username are incorrect'
-* IncorrectUsernameError 'Password or username are incorrect'
-* MissingUsernameError 'No username was given'
-* UserExistsError 'A user with the given username is already registered'
+* `MissingPasswordError`: 'No password was given'
+* `AttemptTooSoonError`: 'Account is currently locked. Try again later'
+* `TooManyAttemptsError`: 'Account locked due to too many failed login attempts'
+* `NoSaltValueStoredError`: 'Authentication not possible. No salt value stored'
+* `IncorrectPasswordError`: 'Password or username are incorrect'
+* `IncorrectUsernameError`: 'Password or username are incorrect'
+* `MissingUsernameError`: 'No username was given'
+* `UserExistsError`: 'A user with the given username is already registered'
 
 ### Hash Algorithm
 
@@ -187,11 +202,11 @@ Resets a user's number of failed password attempts and saves the user object. If
 
 ### Callback Arguments
 
-* err
+* `err`
   * null unless the hashing algorithm throws an error
-* thisModel
-  * the model getting authenticated *if* authentication was successful otherwise false
-* passwordErr
+* `thisModel`
+  * the model getting authenticated **_if_** authentication was successful otherwise false
+* `passwordErr`
   * an instance of `AuthenticationError` describing the reason the password failed, else undefined.
 
 Using `setPassword()` will only update the document's password fields, but will not save the document.
@@ -219,12 +234,12 @@ const User = require('./models/user');
 User.createStrategy();
 ```
 
-* authenticate() Generates a function that is used in Passport's LocalStrategy
-* serializeUser() Generates a function that is used by Passport to serialize users into the session
-* deserializeUser() Generates a function that is used by Passport to deserialize users into the session
-* register(user, password, cb) Convenience method to register a new user instance with a given password. Checks if username is unique. See [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
-* findByUsername() Convenience method to find a user instance by it's unique username.
-* createStrategy() Creates a configured passport-local `LocalStrategy` instance that can be used in passport.
+* `authenticate()` Generates a function that is used in Passport's LocalStrategy
+* `serializeUser()` Generates a function that is used by Passport to serialize users into the session
+* `deserializeUser()` Generates a function that is used by Passport to deserialize users into the session
+* `register(user, password, cb)` Convenience method to register a new user instance with a given password. Checks if username is unique. See [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
+* `findByUsername()` Convenience method to find a user instance by it's unique username.
+* `createStrategy()` Creates a configured passport-local `LocalStrategy` instance that can be used in passport.
 
 ## Examples
 
@@ -233,7 +248,7 @@ User.createStrategy();
 First we define a schema with an additional field `active` of type Boolean.
 
 ```javascript
-var UserSchema = new Schema({
+const UserSchema = new Schema({
   active: Boolean
 });
 ```
@@ -259,12 +274,12 @@ To test the implementation we can simply create (register) a user with field `ac
 in a second step:
 
 ```javascript
-var User = mongoose.model('Users', UserSchema);
+const User = mongoose.model('Users', UserSchema);
 
 User.register({username:'username', active: false}, 'password', function(err, user) {
   if (err) { ... }
 
-  var authenticate = User.authenticate();
+  const authenticate = User.authenticate();
   authenticate('username', 'password', function(err, result) {
     if (err) { ... }
 
@@ -272,6 +287,10 @@ User.register({username:'username', active: false}, 'password', function(err, us
   });
 });
 ```
+
+## Updating from 1.x to 2.x
+
+The default digest algorithm was changed due to security implications from **sha1** to **sha256**. If you decide to upgrade a production system from 1.x to 2.x your users **will not be able to login** since the digest algorithm was changed! In these cases plan some migration strategy and/or use the **sha1** option for the digest algorithm.
 
 ## License
 

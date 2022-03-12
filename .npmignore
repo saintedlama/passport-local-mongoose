@@ -2,9 +2,7 @@ test
 examples
 coverage
 docs
-.idea
-.gitattributes
 *.tgz
 *~
-.travis.yml
 gulpfile.js
+.*
