@@ -961,8 +961,7 @@ describe('passportLocalMongoose', function () {
       });
     });
 
-    it('should auto unlock account after unlock interval is reached', function(done) {
-
+    it('should auto unlock account after unlock interval is reached', function (done) {
       const UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {
         limitAttempts: true,
@@ -978,8 +977,10 @@ describe('passportLocalMongoose', function () {
           return next();
         }
 
-        User.authenticate()('user', 'WRONGpassword', function(err, result, data) {
-          if (err) { return done(err); }
+        User.authenticate()('user', 'WRONGpassword', function (err, result, data) {
+          if (err) {
+            return done(err);
+          }
           expect(result).to.be.false;
 
           times--;
@@ -995,23 +996,31 @@ describe('passportLocalMongoose', function () {
         });
       }
 
-      const user = new User({username: 'user'});
-      user.setPassword('password', function(err) {
-        if (err) { return done(err); }
+      const user = new User({ username: 'user' });
+      user.setPassword('password', function (err) {
+        if (err) {
+          return done(err);
+        }
 
-        user.save(function(err) {
-          if (err) { return done(err); }
+        user.save(function (err) {
+          if (err) {
+            return done(err);
+          }
 
-          authenticateWithWrongPassword(3, function() {
+          authenticateWithWrongPassword(3, function () {
             // After 1000ms user should be unlocked
-            User.authenticate()('user', 'password', function(err, result, data) {
-              if (err) { return done(err); }
+            User.authenticate()('user', 'password', function (err, result, data) {
+              if (err) {
+                return done(err);
+              }
               expect(result).to.be.false;
               expect(data.message).to.contain('locked');
 
               setTimeout(function () {
-                User.authenticate()('user', 'password', function(err, result) {
-                  if (err) { return done(err); }
+                User.authenticate()('user', 'password', function (err, result) {
+                  if (err) {
+                    return done(err);
+                  }
                   expect(result).to.not.be.false;
                   expect(result).to.exist;
 
@@ -1169,7 +1178,7 @@ describe('passportLocalMongoose', function () {
       expect(user5).to.exist;
     });
 
-    it('should auto unlock account after unlock interval is reached', async() => {
+    it('should auto unlock account after unlock interval is reached', async () => {
       const UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, {
         limitAttempts: true,
@@ -1180,7 +1189,7 @@ describe('passportLocalMongoose', function () {
 
       const User = mongoose.model('AutoUnLockUserAfterUnlockInterverIsReachedAsync', UserSchema);
 
-      const user = new User({username: 'user'});
+      const user = new User({ username: 'user' });
       await user.setPassword('password');
       await user.save();
 
@@ -1197,7 +1206,7 @@ describe('passportLocalMongoose', function () {
       expect(error3.message).to.contain('locked');
 
       function timeout(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        return new Promise((resolve) => setTimeout(resolve, ms));
       }
       await timeout(1000);
 
