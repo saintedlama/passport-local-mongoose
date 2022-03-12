@@ -960,6 +960,78 @@ describe('passportLocalMongoose', function () {
         });
       });
     });
+
+    it('should auto unlock account after unlock interval is reached', function (done) {
+      const UserSchema = new Schema({});
+      UserSchema.plugin(passportLocalMongoose, {
+        limitAttempts: true,
+        maxInterval: 1, // Don't require more than a millisecond of waiting
+        maxAttempts: 3,
+        unlockInterval: 1000,
+      });
+
+      const User = mongoose.model('AutoUnLockUserAfterUnlockInterverIsReached', UserSchema);
+
+      function authenticateWithWrongPassword(times, next) {
+        if (times == 0) {
+          return next();
+        }
+
+        User.authenticate()('user', 'WRONGpassword', function (err, result, data) {
+          if (err) {
+            return done(err);
+          }
+          expect(result).to.be.false;
+
+          times--;
+
+          // Use should be locked at last login attempt
+          if (times == 0) {
+            expect(data.message).to.contain('locked');
+          } else {
+            expect(data.message).to.not.contain('locked');
+          }
+
+          authenticateWithWrongPassword(times, next);
+        });
+      }
+
+      const user = new User({ username: 'user' });
+      user.setPassword('password', function (err) {
+        if (err) {
+          return done(err);
+        }
+
+        user.save(function (err) {
+          if (err) {
+            return done(err);
+          }
+
+          authenticateWithWrongPassword(3, function () {
+            // After 1000ms user should be unlocked
+            User.authenticate()('user', 'password', function (err, result, data) {
+              if (err) {
+                return done(err);
+              }
+              expect(result).to.be.false;
+              expect(data.message).to.contain('locked');
+
+              setTimeout(function () {
+                User.authenticate()('user', 'password', function (err, result) {
+                  if (err) {
+                    return done(err);
+                  }
+                  expect(result).to.not.be.false;
+                  expect(result).to.exist;
+
+                  done();
+                });
+              }, 1000);
+            });
+          });
+        });
+      });
+    });
   });
 
   describe('static #authenticate() async', function () {
@@ -1103,6 +1175,44 @@ describe('passportLocalMongoose', function () {
 
       // User should be unlocked
       const { user: user5 } = await User.authenticate()('user', 'password');
+      expect(user5).to.exist;
+    });
+
+    it('should auto unlock account after unlock interval is reached', async () => {
+      const UserSchema = new Schema({});
+      UserSchema.plugin(passportLocalMongoose, {
+        limitAttempts: true,
+        maxInterval: 1, // Don't require more than a millisecond of waiting
+        maxAttempts: 3,
+        unlockInterval: 1000,
+      });
+
+      const User = mongoose.model('AutoUnLockUserAfterUnlockInterverIsReachedAsync', UserSchema);
+
+      const user = new User({ username: 'user' });
+      await user.setPassword('password');
+      await user.save();
+
+      const { user: user1, error: error1 } = await User.authenticate()('user', 'WRONGpassword');
+      expect(user1).to.be.false;
+      expect(error1.message).to.not.contain('locked');
+
+      const { user: user2, error: error2 } = await User.authenticate()('user', 'WRONGpassword');
+      expect(user2).to.be.false;
+      expect(error2.message).to.not.contain('locked');
+
+      const { user: user3, error: error3 } = await User.authenticate()('user', 'WRONGpassword');
+      expect(user3).to.be.false;
+      expect(error3.message).to.contain('locked');
+
+      function timeout(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+      await timeout(1000);
+
+      // User should be unlocked
+      const { user: user5 } = await User.authenticate()('user', 'password');
+      expect(user5).to.not.be.false;
       expect(user5).to.exist;
     });
   });

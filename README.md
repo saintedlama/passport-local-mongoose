@@ -129,6 +129,7 @@ User.plugin(passportLocalMongoose, options);
 * `encoding`: specifies the encoding the generated salt and hash will be stored in. Defaults to 'hex'.
 * `limitAttempts`: specifies whether login attempts should be limited and login failures should be penalized. Default: false.
 * `maxAttempts`: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
+* `unlockInterval`: specifies the interval in milliseconds, which is for unlock user automatically after the interval is reached. Defaults to 'undefined' which means deactivated.
 * `passwordValidator`: specifies your custom validation function for the password in the form:
     ```js
     passwordValidator = function(password,cb) {
