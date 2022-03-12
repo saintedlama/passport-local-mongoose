@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.2.0](https://github.com/saintedlama/passport-local-mongoose/compare/v6.1.0...v6.2.0) (2022-03-12)
+
+
+### Features
+
+* escape username regex ([#296](https://github.com/saintedlama/passport-local-mongoose/issues/296)) ([6713c4e](https://github.com/saintedlama/passport-local-mongoose/commit/6713c4e02c9a2aabbe3cd4a9c2efc032e686eb3d))
+* upgrade dependencies and drop support of legacy mongodb and node versions ([#344](https://github.com/saintedlama/passport-local-mongoose/issues/344)) ([2d88e70](https://github.com/saintedlama/passport-local-mongoose/commit/2d88e70c9afcbddd46076cde46e34111e6ab029d))
+
 ## [6.1.0](https://github.com/saintedlama/passport-local-mongoose/compare/v6.0.1...v6.1.0) (2021-01-09)
 
 
