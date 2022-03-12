@@ -267,6 +267,11 @@ module.exports = function (schema, options) {
       username = username.toLowerCase();
     }
 
+    // escape regex tokens
+    if (username !== undefined && options.usernameCaseInsensitive) {
+      username = username.replace(/[!#$()*+\-./:<=>?[\\\]^{|}]/g, '\\$&');
+    }
+    
     // Add each username query field
     const queryOrParameters = [];
     for (let i = 0; i < options.usernameQueryFields.length; i++) {
