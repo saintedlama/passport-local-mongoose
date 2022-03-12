@@ -133,7 +133,7 @@ User.plugin(passportLocalMongoose, options);
 * encoding: specifies the encoding the generated salt and hash will be stored in. Defaults to 'hex'.
 * limitAttempts: specifies whether login attempts should be limited and login failures should be penalized. Default: false.
 * maxAttempts: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
-* unlockInterval: specifies the interval in milliseconds, which is for unlock user automatically after the interval is reached. Default 600000 (10 minutes)
+* unlockInterval: specifies the interval in milliseconds, which is for unlock user automatically after the interval is reached. Defaults to 'undefined' which means deactivated.
 * passwordValidator: specifies your custom validation function for the password in the form 'function(password,cb)'. Default: validates non-empty passwords.
 * usernameQueryFields: specifies alternative fields of the model for identifying a user (e.g. email).
 * findByUsername: Specifies a query function that is executed with query parameters to restrict the query with extra query parameters. For example query only users with field "active" set to `true`. Default: `function(model, queryParameters) { return model.findOne(queryParameters); }`. See the examples section for a use case.
