@@ -25,14 +25,28 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: npm install
         run: npm ci
+
       - name: Should release
+        id: should_release
+        continue-on-error: true
         run: npm run should-release -- -v
-      - name: npm release
+
+      - name: No release
+        if: steps.should_release.outcome != 'success'
+        run: echo "No release required. Skipping publishing."
+
+      - name: Version bump
+        if: steps.should_release.outcome == 'success'
         run: npm run release
-      - run: npm publish
+
+      - name: Publish to NPM
+        if: steps.should_release.outcome == 'success'
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: push changes to github
+
+      - name: Push commits to GitHub
+        if: steps.should_release.outcome == 'success'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
