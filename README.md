@@ -68,7 +68,7 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 ```
 
-Make sure that you have a mongoose connected to mongodb and you're done.
+Make sure that you have mongoose connected to mongodb and you're done.
 
 #### Simplified Passport/Passport-Local Configuration
 
