@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.1.0](https://github.com/saintedlama/passport-local-mongoose/compare/v7.0.0...v7.1.0) (2022-05-17)
+
+
+### Features
+
+* add basic type definitions ([#354](https://github.com/saintedlama/passport-local-mongoose/issues/354)) ([92849db](https://github.com/saintedlama/passport-local-mongoose/commit/92849db3329efd1f10af52a16f8b020e657e1b98)), closes [#335](https://github.com/saintedlama/passport-local-mongoose/issues/335)
+
 ## [7.0.0](https://github.com/saintedlama/passport-local-mongoose/compare/v6.2.2...v7.0.0) (2022-03-13)
 
 
