@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [7.1.1](https://github.com/saintedlama/passport-local-mongoose/compare/v7.1.0...v7.1.1) (2022-05-17)
+
+
+### Bug Fixes
+
+* add usernameCaseInsensitive to the typings ([#355](https://github.com/saintedlama/passport-local-mongoose/issues/355)) ([26f4991](https://github.com/saintedlama/passport-local-mongoose/commit/26f49919220db8f489cfe7fd7f6534535ff0c544))
+
 ## [7.1.0](https://github.com/saintedlama/passport-local-mongoose/compare/v7.0.0...v7.1.0) (2022-05-17)
 
 
