@@ -65,6 +65,7 @@ declare module 'mongoose' {
       selectFields?: string | undefined;
       populateFields?: string | undefined;
 
+      usernameCaseInsensitive?: boolean | undefined;
       usernameLowerCase?: boolean | undefined;
 
       hashField?: string | undefined;
