@@ -16,7 +16,7 @@ if (process.env.MONGO_SERVER) {
 describe('alternative query field', function () {
   this.timeout(10000); // Ten seconds - mongo db access needed
 
-  beforeEach(dropMongodbCollections(connectionString));
+  beforeEach(async () => await dropMongodbCollections(connectionString));
   beforeEach(() =>
     mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
   );
