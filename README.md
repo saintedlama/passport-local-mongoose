@@ -46,7 +46,7 @@ module.exports = mongoose.model('User', User);
 
 You're free to define your User how you like. Passport-Local Mongoose will add a username, hash and salt field to store the username, the hashed password and the salt value.
 
-Additionally Passport-Local Mongoose adds some methods to your Schema. See the [API Documentation](https://github.com/saintedlama/passport-local-mongoose#api-documentation) section for more details.
+Additionally, Passport-Local Mongoose adds some methods to your Schema. See the [API Documentation](https://github.com/saintedlama/passport-local-mongoose#api-documentation) section for more details.
 
 ### Configure Passport/Passport-Local
 
@@ -72,7 +72,7 @@ Make sure that you have mongoose connected to mongodb and you're done.
 
 #### Simplified Passport/Passport-Local Configuration
 
-Starting with version 0.2.1 passport-local-mongoose adds a helper method `createStrategy` as static method to your schema.
+Starting from version 0.2.1, passport-local-mongoose adds a helper method `createStrategy` as static method to your schema.
 The `createStrategy` is responsible to setup passport-local `LocalStrategy` with the correct options.
 
 ```javascript
@@ -89,7 +89,7 @@ The reason for this functionality is that when using the `usernameField` option 
 
 ### Async/Await
 
-Starting with version `5.0.0` passport-local-mongoose is async/await enabled by returning
+Starting from version `5.0.0`, passport-local-mongoose is async/await enabled by returning
 Promises for all instance and static methods except `serializeUser` and `deserializeUser`.
 
 ```js
@@ -101,7 +101,7 @@ const { user } = await DefaultUser.authenticate()('user', 'password');
 
 ### Options
 
-When plugging in Passport-Local Mongoose plugin additional options can be provided to configure
+When plugging in Passport-Local Mongoose plugin, additional options can be provided to configure
 the hashing algorithm.
 
 ```javascript
@@ -153,7 +153,7 @@ User.plugin(passportLocalMongoose, options);
 * `usernameQueryFields`: specifies alternative fields of the model for identifying a user (e.g. email).
 * `findByUsername`: Specifies a query function that is executed with query parameters to restrict the query with extra query parameters. For example query only users with field "active" set to `true`. Default: `function(model, queryParameters) { return model.findOne(queryParameters); }`. See the examples section for a use case.
 
-**_Attention!_** Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent that existing users to authenticate!
+**_Attention!_** Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent existing users from authenticating!
 
 #### Error Messages
 
@@ -245,7 +245,7 @@ User.createStrategy();
 
 ### Allow only "active" users to authenticate
 
-First we define a schema with an additional field `active` of type Boolean.
+First, we define a schema with an additional field `active` of type Boolean.
 
 ```javascript
 const UserSchema = new Schema({
@@ -253,8 +253,8 @@ const UserSchema = new Schema({
 });
 ```
 
-When plugging in Passport-Local Mongoose we set `usernameUnique` to avoid creating a unique mongodb index on field `username`. To avoid
-non active users to be queried by mongodb we can specify the option `findByUsername` that allows us to restrict a query. In our case
+When plugging in Passport-Local Mongoose, we set `usernameUnique` to avoid creating a unique mongodb index on field `username`. To avoid
+non active users being queried by mongodb, we can specify the option `findByUsername` that allows us to restrict a query. In our case
 we want to restrict the query to only query users with field `active` set to `true`. The `findByUsername` MUST return a Mongoose query.
 
 ```javascript
@@ -270,7 +270,7 @@ UserSchema.plugin(passportLocalMongoose, {
 });
 ```
 
-To test the implementation we can simply create (register) a user with field `active` set to `false` and try to authenticate this user
+To test the implementation, we can simply create (register) a user with field `active` set to `false` and try to authenticate this user
 in a second step:
 
 ```javascript
@@ -290,8 +290,8 @@ User.register({username:'username', active: false}, 'password', function(err, us
 
 ## Updating from 1.x to 2.x
 
-The default digest algorithm was changed due to security implications from **sha1** to **sha256**. If you decide to upgrade a production system from 1.x to 2.x your users **will not be able to login** since the digest algorithm was changed! In these cases plan some migration strategy and/or use the **sha1** option for the digest algorithm.
+The default digest algorithm was changed due to security implications from **sha1** to **sha256**. If you decide to upgrade a production system from 1.x to 2.x, your users **will not be able to login** since the digest algorithm was changed! In these cases plan some migration strategy and/or use the **sha1** option for the digest algorithm.
 
 ## License
 
-Passport-Local Mongoose is licenses under the [MIT license](http://opensource.org/licenses/MIT).
+Passport-Local Mongoose is licensed under the [MIT license](http://opensource.org/licenses/MIT).
