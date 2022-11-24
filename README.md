@@ -23,7 +23,7 @@ to have these dependencies installed.
 In case you need to install the whole set of dependencies
 
 ```bash
-> npm install passport mongoose passport-local-mongoose
+> npm install passport passport-local mongoose passport-local-mongoose
 ```
 
 ## Usage
