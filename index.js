@@ -295,7 +295,10 @@ module.exports = function (schema, options) {
     }
 
     if (cb) {
-      query.exec(cb);
+      query
+        .exec()
+        .then((user) => cb(null, user))
+        .catch(cb);
       return;
     }
 

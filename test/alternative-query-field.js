@@ -31,9 +31,7 @@ describe('alternative query field', function () {
 
     const email = 'hugo@test.org';
     const user = new User({ username: 'hugo', email: email });
-    user.save(function (err) {
-      expect(err).to.not.exist;
-
+    user.save().then(function () {
       User.findByUsername(email, function (err, user) {
         expect(err).to.not.exist;
         expect(user).to.exist;

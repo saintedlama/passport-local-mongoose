@@ -434,20 +434,21 @@ describe('passportLocalMongoose', function () {
           return done(err);
         }
 
-        user.save(function (err) {
-          if (err) {
+        user
+          .save()
+          .then(function () {
+            user.authenticate('password', function (err, user, error) {
+              if (err) {
+                return done(err);
+              }
+              expect(user).to.be.false;
+              expect(error).to.be.instanceof(errors.AttemptTooSoonError);
+              done();
+            });
+          })
+          .catch(function (err) {
             return done(err);
-          }
-
-          user.authenticate('password', function (err, user, error) {
-            if (err) {
-              return done(err);
-            }
-            expect(user).to.be.false;
-            expect(error).to.be.instanceof(errors.AttemptTooSoonError);
-            done();
           });
-        });
       });
     });
 
@@ -469,18 +470,19 @@ describe('passportLocalMongoose', function () {
           return done(err);
         }
 
-        user.save(function (err) {
-          if (err) {
+        user
+          .save()
+          .then(function () {
+            user.authenticate('password', function (err, user, error) {
+              expect(err).to.not.exist;
+              expect(user).to.be.false;
+              expect(error).to.be.instanceOf(errors.AttemptTooSoonError);
+              done();
+            });
+          })
+          .catch(function (err) {
             return done(err);
-          }
-
-          user.authenticate('password', function (err, user, error) {
-            expect(err).to.not.exist;
-            expect(user).to.be.false;
-            expect(error).to.be.instanceOf(errors.AttemptTooSoonError);
-            done();
           });
-        });
       });
     });
 
@@ -499,22 +501,23 @@ describe('passportLocalMongoose', function () {
           return done(err);
         }
 
-        user.save(function (err) {
-          if (err) {
+        user
+          .save()
+          .then(function () {
+            user.authenticate('password', function (err, result, error) {
+              if (err) {
+                return done(err);
+              }
+
+              expect(result).to.exist;
+              expect(result.username).to.equal(user.username);
+              expect(error).to.not.exist;
+              done();
+            });
+          })
+          .catch(function (err) {
             return done(err);
-          }
-
-          user.authenticate('password', function (err, result, error) {
-            if (err) {
-              return done(err);
-            }
-
-            expect(result).to.exist;
-            expect(result.username).to.equal(user.username);
-            expect(error).to.not.exist;
-            done();
           });
-        });
       });
     });
 
@@ -536,20 +539,21 @@ describe('passportLocalMongoose', function () {
           return done(err);
         }
 
-        user.save(function (err) {
-          if (err) {
+        user
+          .save()
+          .then(function () {
+            user.authenticate('WRONGpassword', function (err, user, error) {
+              if (err) {
+                return done(err);
+              }
+              expect(user).to.be.false;
+              expect(error).to.be.instanceof(errors.AttemptTooSoonError);
+              done();
+            });
+          })
+          .catch(function (err) {
             return done(err);
-          }
-
-          user.authenticate('WRONGpassword', function (err, user, error) {
-            if (err) {
-              return done(err);
-            }
-            expect(user).to.be.false;
-            expect(error).to.be.instanceof(errors.AttemptTooSoonError);
-            done();
           });
-        });
       });
     });
 
@@ -711,25 +715,26 @@ describe('passportLocalMongoose', function () {
           return done(err);
         }
 
-        user.save(function (err) {
-          if (err) {
+        user
+          .save()
+          .then(function () {
+            DefaultUser.authenticate()('user', 'password', function (err, result) {
+              if (err) {
+                return done(err);
+              }
+
+              expect(result).to.be.instanceof(DefaultUser);
+              expect(result.username).to.equal(user.username);
+
+              expect(result.salt).to.equal(user.salt);
+              expect(result.hash).to.equal(user.hash);
+
+              done();
+            });
+          })
+          .catch(function (err) {
             return done(err);
-          }
-
-          DefaultUser.authenticate()('user', 'password', function (err, result) {
-            if (err) {
-              return done(err);
-            }
-
-            expect(result).to.be.instanceof(DefaultUser);
-            expect(result.username).to.equal(user.username);
-
-            expect(result.salt).to.equal(user.salt);
-            expect(result.hash).to.equal(user.hash);
-
-            done();
           });
-        });
       });
     });
 
@@ -818,21 +823,22 @@ describe('passportLocalMongoose', function () {
           return done(err);
         }
 
-        user.save(function (err) {
-          if (err) {
+        user
+          .save()
+          .then(function () {
+            DefaultUser.authenticate()('user', 'wrongpassword', function (err, result, error) {
+              if (err) {
+                return done(err);
+              }
+              expect(result).to.equal(false);
+              expect(error.message).to.exist;
+
+              done();
+            });
+          })
+          .catch(function (err) {
             return done(err);
-          }
-
-          DefaultUser.authenticate()('user', 'wrongpassword', function (err, result, error) {
-            if (err) {
-              return done(err);
-            }
-            expect(result).to.equal(false);
-            expect(error.message).to.exist;
-
-            done();
           });
-        });
       });
     });
 
@@ -848,17 +854,9 @@ describe('passportLocalMongoose', function () {
           return done(err);
         }
 
-        user.save(function (err) {
-          if (err) {
-            return done(err);
-          }
-
-          User.authenticate()('user', 'WRONGpassword', function (err, result) {
-            if (err) {
-              return done(err);
-            }
-            expect(result).to.be.false;
-
+        user
+          .save()
+          .then(function () {
             User.authenticate()('user', 'WRONGpassword', function (err, result) {
               if (err) {
                 return done(err);
@@ -871,19 +869,28 @@ describe('passportLocalMongoose', function () {
                 }
                 expect(result).to.be.false;
 
-                // Last login attempt should lock the user!
-                User.authenticate()('user', 'password', function (err, result) {
+                User.authenticate()('user', 'WRONGpassword', function (err, result) {
                   if (err) {
                     return done(err);
                   }
                   expect(result).to.be.false;
 
-                  done();
+                  // Last login attempt should lock the user!
+                  User.authenticate()('user', 'password', function (err, result) {
+                    if (err) {
+                      return done(err);
+                    }
+                    expect(result).to.be.false;
+
+                    done();
+                  });
                 });
               });
             });
+          })
+          .catch(function (err) {
+            return done(err);
           });
-        });
       });
     });
 
@@ -927,38 +934,39 @@ describe('passportLocalMongoose', function () {
           return done(err);
         }
 
-        user.save(function (err) {
-          if (err) {
-            return done(err);
-          }
-
-          authenticateWithWrongPassword(3, function () {
-            // Login attempt before should have locked the user!
-            User.authenticate()('user', 'password', function (err, result, data) {
-              if (err) {
-                return done(err);
-              }
-              expect(result).to.be.false;
-              expect(data.message).to.contain('locked');
-
-              user.resetAttempts(function (err) {
+        user
+          .save()
+          .then(function () {
+            authenticateWithWrongPassword(3, function () {
+              // Login attempt before should have locked the user!
+              User.authenticate()('user', 'password', function (err, result, data) {
                 if (err) {
                   return done(err);
                 }
+                expect(result).to.be.false;
+                expect(data.message).to.contain('locked');
 
-                // User should be unlocked
-                User.authenticate()('user', 'password', function (err, result) {
+                user.resetAttempts(function (err) {
                   if (err) {
                     return done(err);
                   }
-                  expect(result).to.exist;
 
-                  done();
+                  // User should be unlocked
+                  User.authenticate()('user', 'password', function (err, result) {
+                    if (err) {
+                      return done(err);
+                    }
+                    expect(result).to.exist;
+
+                    done();
+                  });
                 });
               });
             });
+          })
+          .catch(function (err) {
+            return done(err);
           });
-        });
       });
     });
 
@@ -1003,34 +1011,35 @@ describe('passportLocalMongoose', function () {
           return done(err);
         }
 
-        user.save(function (err) {
-          if (err) {
-            return done(err);
-          }
+        user
+          .save()
+          .then(function () {
+            authenticateWithWrongPassword(3, function () {
+              // After 1000ms user should be unlocked
+              User.authenticate()('user', 'password', function (err, result, data) {
+                if (err) {
+                  return done(err);
+                }
+                expect(result).to.be.false;
+                expect(data.message).to.contain('locked');
 
-          authenticateWithWrongPassword(3, function () {
-            // After 1000ms user should be unlocked
-            User.authenticate()('user', 'password', function (err, result, data) {
-              if (err) {
-                return done(err);
-              }
-              expect(result).to.be.false;
-              expect(data.message).to.contain('locked');
+                setTimeout(function () {
+                  User.authenticate()('user', 'password', function (err, result) {
+                    if (err) {
+                      return done(err);
+                    }
+                    expect(result).to.not.be.false;
+                    expect(result).to.exist;
 
-              setTimeout(function () {
-                User.authenticate()('user', 'password', function (err, result) {
-                  if (err) {
-                    return done(err);
-                  }
-                  expect(result).to.not.be.false;
-                  expect(result).to.exist;
-
-                  done();
-                });
-              }, 1000);
+                    done();
+                  });
+                }, 1000);
+              });
             });
+          })
+          .catch(function (err) {
+            return done(err);
           });
-        });
       });
     });
   });
@@ -1320,21 +1329,22 @@ describe('passportLocalMongoose', function () {
       const User = mongoose.model('FindByUsername', UserSchema);
 
       const user = new User({ username: 'hugo' });
-      user.save(function (err) {
-        if (err) {
+      user
+        .save()
+        .then(function () {
+          User.findByUsername('hugo', function (err, user) {
+            if (err) {
+              return done(err);
+            }
+            expect(user).to.exist;
+            expect('hugo').to.equal(user.username);
+
+            done();
+          });
+        })
+        .catch(function (err) {
           return done(err);
-        }
-
-        User.findByUsername('hugo', function (err, user) {
-          if (err) {
-            return done(err);
-          }
-          expect(user).to.exist;
-          expect('hugo').to.equal(user.username);
-
-          done();
         });
-      });
     });
 
     it('should return a query object when no callback is specified', function (done) {
@@ -1343,25 +1353,28 @@ describe('passportLocalMongoose', function () {
       const User = mongoose.model('FindByUsernameQueryObject', UserSchema);
 
       const user = new User({ username: 'hugo' });
-      user.save(function (err) {
-        if (err) {
+      user
+        .save()
+        .then(function () {
+          const query = User.findByUsername('hugo');
+
+          expect(query).to.exist;
+
+          query
+            .exec()
+            .then(function (user) {
+              expect(user).to.exist;
+              expect(user.username).to.equal('hugo');
+
+              done();
+            })
+            .catch(function (err) {
+              return done(err);
+            });
+        })
+        .catch(function (err) {
           return done(err);
-        }
-
-        const query = User.findByUsername('hugo');
-
-        expect(query).to.exist;
-
-        query.exec(function (err, user) {
-          if (err) {
-            return done(err);
-          }
-          expect(user).to.exist;
-          expect(user.username).to.equal('hugo');
-
-          done();
         });
-      });
     });
 
     it('should select all fields', function (done) {
@@ -1370,22 +1383,23 @@ describe('passportLocalMongoose', function () {
       const User = mongoose.model('FindByUsernameWithAllFields', UserSchema);
 
       const user = new User({ username: 'hugo', department: 'DevOps' });
-      user.save(function (err) {
-        if (err) {
+      user
+        .save()
+        .then(function () {
+          User.findByUsername('hugo', function (err, user) {
+            if (err) {
+              return done(err);
+            }
+            expect(user).to.exist;
+            expect(user.username).to.equal('hugo');
+            expect(user.department).to.equal('DevOps');
+
+            done();
+          });
+        })
+        .catch(function (err) {
           return done(err);
-        }
-
-        User.findByUsername('hugo', function (err, user) {
-          if (err) {
-            return done(err);
-          }
-          expect(user).to.exist;
-          expect(user.username).to.equal('hugo');
-          expect(user.department).to.equal('DevOps');
-
-          done();
         });
-      });
     });
 
     it('should select fields specified by selectFields option', function (done) {
@@ -1394,22 +1408,23 @@ describe('passportLocalMongoose', function () {
       const User = mongoose.model('FindByUsernameWithSelectFieldsOption', UserSchema);
 
       const user = new User({ username: 'hugo', department: 'DevOps' });
-      user.save(function (err) {
-        if (err) {
+      user
+        .save()
+        .then(function () {
+          User.findByUsername('hugo', function (err, user) {
+            if (err) {
+              return done(err);
+            }
+            expect(user).to.exist;
+            expect(user.username).to.equal('hugo');
+            expect(user.department).to.equal(undefined);
+
+            done();
+          });
+        })
+        .catch(function (err) {
           return done(err);
-        }
-
-        User.findByUsername('hugo', function (err, user) {
-          if (err) {
-            return done(err);
-          }
-          expect(user).to.exist;
-          expect(user.username).to.equal('hugo');
-          expect(user.department).to.equal(undefined);
-
-          done();
         });
-      });
     });
 
     it('should retrieve saved user with findByUsername helper function with username field override', function (done) {
@@ -1420,21 +1435,22 @@ describe('passportLocalMongoose', function () {
       const email = 'emailUsedForUsername';
       const user = new User({ email: email });
 
-      user.save(function (err) {
-        if (err) {
+      user
+        .save()
+        .then(function () {
+          User.findByUsername(email, function (err, user) {
+            if (err) {
+              return done(err);
+            }
+            expect(user).to.exist;
+            expect(email).to.equal(user.email);
+
+            done();
+          });
+        })
+        .catch(function (err) {
           return done(err);
-        }
-
-        User.findByUsername(email, function (err, user) {
-          if (err) {
-            return done(err);
-          }
-          expect(user).to.exist;
-          expect(email).to.equal(user.email);
-
-          done();
         });
-      });
     });
 
     it('should not throw if lowercase option is specified and no username is supplied', function (done) {
@@ -1654,28 +1670,30 @@ describe('passportLocalMongoose', function () {
       const User = mongoose.model('RegisterExistingUser', UserSchema);
 
       const existingUser = new User({});
-      existingUser.save(function (err, user) {
-        if (err) {
-          return done(err);
-        }
-        expect(user).to.exist;
-
-        user.username = 'hugo';
-        User.register(user, 'password', function (err, user) {
-          if (err) {
-            return done(err);
-          }
+      existingUser
+        .save()
+        .then(function (user) {
           expect(user).to.exist;
 
-          User.findByUsername('hugo', function (err, user) {
+          user.username = 'hugo';
+          User.register(user, 'password', function (err, user) {
             if (err) {
               return done(err);
             }
             expect(user).to.exist;
-            done();
+
+            User.findByUsername('hugo', function (err, user) {
+              if (err) {
+                return done(err);
+              }
+              expect(user).to.exist;
+              done();
+            });
           });
+        })
+        .catch(function (err) {
+          return done(err);
         });
-      });
     });
 
     it('should result in AuthenticationError error in case no username was given', function (done) {
