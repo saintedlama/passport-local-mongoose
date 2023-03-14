@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.0.0](https://github.com/saintedlama/passport-local-mongoose/compare/v7.1.2...v8.0.0) (2023-03-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* Upgraded to mongoose 7 and removed node 12 support
+
+### Features
+
+* upgrade to mongoose 7 ([#370](https://github.com/saintedlama/passport-local-mongoose/issues/370)) ([a397c00](https://github.com/saintedlama/passport-local-mongoose/commit/a397c00330494563c8141bb6e1334b83d6aa16c7))
+
 ### [7.1.2](https://github.com/saintedlama/passport-local-mongoose/compare/v7.1.1...v7.1.2) (2022-05-21)
 
 ### [7.1.1](https://github.com/saintedlama/passport-local-mongoose/compare/v7.1.0...v7.1.1) (2022-05-17)
