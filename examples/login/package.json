@@ -14,7 +14,7 @@
     "express": "^4.17.3",
     "mongoose": "^6.2.5",
     "morgan": "^1.10.0",
-    "passport": "^0.5.2",
+    "passport": "^0.6.0",
     "passport-local": "1.0.x",
     "passport-local-mongoose": "^6.1.0",
     "pug": "^3.0.2",
