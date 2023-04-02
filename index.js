@@ -228,7 +228,19 @@ module.exports = function (schema, options) {
     const promise = Promise.resolve()
       .then(() => {
         if (!user.get(options.usernameField)) {
-          throw new errors.MissingUsernameError(options.errorMessages.MissingUsernameError);
+          const { usernameQueryFields } = options;
+          let usernameFound = false;
+          for (let i = 0; i < (usernameQueryFields?.length || 0); i++) {
+            const usernameQueryField = usernameQueryFields[i];
+            if (user.get(usernameQueryField)) {
+              usernameFound = true;
+              options.usernameField = usernameQueryField;
+              break;
+            }
+          }
+          if (!usernameFound) {
+            throw new errors.MissingUsernameError(options.errorMessages.MissingUsernameError);
+          }
         }
       })
       .then(() => this.findByUsername(user.get(options.usernameField)))
