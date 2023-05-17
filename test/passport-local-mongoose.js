@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 const expect = require('chai').expect;
 const dropMongodbCollections = require('drop-mongodb-collections');
 const debug = require('debug')('passport:local:mongoose');
+const crypto = require('crypto');
 
 const errors = require('../lib/errors.js');
 const passportLocalMongoose = require('../');
@@ -1842,6 +1843,74 @@ describe('passportLocalMongoose', function () {
       const strategy = User.createStrategy();
       expect(strategy).to.exist;
     });
+  });
+});
+
+describe('Password Hashing', function () {
+  beforeEach(async () => await dropMongodbCollections(connectionString));
+
+  beforeEach(() =>
+    mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
+  );
+
+  afterEach(() => mongoose.disconnect());
+
+  it('should authenticate with custom hash function', async function () {
+    const UserSchema = new Schema({});
+    UserSchema.plugin(passportLocalMongoose, {
+      verifyPasswordHashAsync: async (password, user, options) => {
+        const hash = crypto
+          .createHash('sha256')
+          .update(password + user.get(options.saltField))
+          .digest('base64');
+
+        return user.get(options.hashField) === hash;
+      },
+      generatePasswordHashAsync: async (password) => {
+        const saltBuffer = await new Promise((resolve, reject) =>
+          crypto.randomBytes(200, (err, saltBuffer) => (err ? reject(err) : resolve(saltBuffer)))
+        );
+
+        const salt = saltBuffer.toString('utf-8');
+
+        // don't use this for password hashing, it's insecure and only used for testing
+        const hash = crypto
+          .createHash('sha256')
+          .update(password + salt)
+          .digest('base64');
+
+        return { hash, salt };
+      },
+    });
+
+    const User = mongoose.model('CustomHashRegisterAndNotAuthenticateUser', UserSchema);
+
+    await User.register({ username: 'hugo' }, 'secret');
+    const { user, error } = await User.authenticate()('hugo', 'wrong_password');
+    expect(user).to.equal(false);
+    expect(error).to.exist;
+
+    const { user: user2, error: error2 } = await User.authenticate()('hugo', 'secret');
+    expect(user2).to.not.equal(false);
+    expect(error2).to.not.exist;
+  });
+
+  it('should not authenticate if custom hash function throws error', async function () {
+    const UserSchema = new Schema({});
+    UserSchema.plugin(passportLocalMongoose, {
+      verifyPasswordHashAsync: async () => {
+        throw new Error('');
+      },
+      generatePasswordHashAsync: async (password) => ({
+        hash: password === 'secret' ? 'hash' : 'someotherhash',
+        salt: 'mysalt',
+      }),
+    });
+
+    const User = mongoose.model('CustomInvalidHashRegisterAndNotAuthenticateUser', UserSchema);
+
+    await User.register({ username: 'hugo' }, 'secret');
+    expect(async () => await User.authenticate()('hugo', 'secret')).to.throw;
   });
 });
 

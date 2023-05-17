@@ -152,6 +152,8 @@ User.plugin(passportLocalMongoose, options);
     ```
 * `usernameQueryFields`: specifies alternative fields of the model for identifying a user (e.g. email).
 * `findByUsername`: Specifies a query function that is executed with query parameters to restrict the query with extra query parameters. For example query only users with field "active" set to `true`. Default: `function(model, queryParameters) { return model.findOne(queryParameters); }`. See the examples section for a use case.
+* `generatePasswordHashAsync`: specifies a custom function for generating the password hash. Default: see `lib/pbkdfs.js`.
+* `verifyPasswordHashAsync`: specifies a custom function for verifying the password hash. Default: see `lib/pbkdfs.js`.
 
 **_Attention!_** Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent existing users from authenticating!
 

@@ -1,9 +1,9 @@
-const crypto = require('crypto');
 const LocalStrategy = require('passport-local').Strategy;
 
-const pbkdf2 = require('./lib/pbkdf2');
 const errors = require('./lib/errors');
 const authenticate = require('./lib/authenticate');
+
+const { defaultPasswordHashGeneratorAsync, defaultPasswordHashVerifierAsync } = require('./lib/pbkdf2');
 
 module.exports = function (schema, options) {
   options = options || {};
@@ -22,6 +22,9 @@ module.exports = function (schema, options) {
       options.passwordValidator(password, (err) => (err ? reject(err) : resolve()));
     });
   }
+
+  options.verifyPasswordHashAsync = options.verifyPasswordHashAsync || defaultPasswordHashVerifierAsync;
+  options.generatePasswordHashAsync = options.generatePasswordHashAsync || defaultPasswordHashGeneratorAsync;
 
   options.passwordValidator = options.passwordValidator || defaultPasswordValidator;
   options.passwordValidatorAsync = options.passwordValidatorAsync || defaultPasswordValidatorAsync;
@@ -104,16 +107,14 @@ module.exports = function (schema, options) {
         }
       })
       .then(() => options.passwordValidatorAsync(password))
-      .then(() => randomBytes(options.saltlen))
-      .then((saltBuffer) => saltBuffer.toString(options.encoding))
-      .then((salt) => {
-        this.set(options.saltField, salt);
+      .then(() => options.generatePasswordHashAsync(password, options))
+      .then(({ hash, salt }) => {
+        if (!hash) {
+          throw new Error('Failed to generate valid password hash');
+        }
 
-        return salt;
-      })
-      .then((salt) => pbkdf2Promisified(password, salt, options))
-      .then((hashRaw) => {
-        this.set(options.hashField, Buffer.from(hashRaw, 'binary').toString(options.encoding));
+        this.set(options.saltField, salt);
+        this.set(options.hashField, hash);
       })
       .then(() => this);
 
@@ -299,6 +300,7 @@ module.exports = function (schema, options) {
         .exec()
         .then((user) => cb(null, user))
         .catch(cb);
+
       return;
     }
 
@@ -309,13 +311,5 @@ module.exports = function (schema, options) {
     return new LocalStrategy(options, this.authenticate());
   };
 };
-
-function pbkdf2Promisified(password, salt, options) {
-  return new Promise((resolve, reject) => pbkdf2(password, salt, options, (err, hashRaw) => (err ? reject(err) : resolve(hashRaw))));
-}
-
-function randomBytes(saltlen) {
-  return new Promise((resolve, reject) => crypto.randomBytes(saltlen, (err, saltBuffer) => (err ? reject(err) : resolve(saltBuffer))));
-}
 
 module.exports.errors = errors;
