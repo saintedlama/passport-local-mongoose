@@ -56,6 +56,9 @@ declare module 'mongoose' {
       encoding?: string | undefined;
       digestAlgorithm?: string | undefined;
       passwordValidator?: ((password: string, cb: (err: any) => void) => void) | undefined;
+      verifyPasswordHashAsync: (password: string) => Promise<{ hash: string, salt: string }>;
+      generatePasswordHashAsync: (password: string, user: Document, options: PassportLocalOptions) => Promise<boolean>;
+
 
       usernameField?: string | undefined;
       usernameUnique?: boolean | undefined;
