@@ -5,6 +5,8 @@ const pbkdf2 = require('./lib/pbkdf2');
 const errors = require('./lib/errors');
 const authenticate = require('./lib/authenticate');
 
+const NodeCache = require('node-cache');
+
 module.exports = function (schema, options) {
   options = options || {};
   options.saltlen = options.saltlen || 32;
@@ -55,11 +57,33 @@ module.exports = function (schema, options) {
     options.maxAttempts = options.maxAttempts || Infinity;
   }
 
+  options.ttl = options.ttl || 5 * 60 * 1000;
+  options.checkperiod = options.checkperiod || 100;
+  options.deleteOnExpire = options.deleteOnExpire || true;
+
+  const cache = new NodeCache({
+    stdTTL: options.ttl,
+    checkperiod: options.checkperiod,
+    deleteOnExpire: options.deleteOnExpire,
+  });
+
   options.findByUsername =
     options.findByUsername ||
     function (model, queryParameters) {
-      return model.findOne(queryParameters);
+      let result = undefined;
+      const username = this.get(options.usernameField);
+      if (username) result = cache.get(username);
+      if (result === undefined) {
+        result = model.findOne(queryParameters);
+        if (username) cache.set(username, result);
+      }
+      return result;
     };
+
+  schema.pre(['update', 'updateOne', 'findOneAndUpdate', 'delete', 'deleteOne', 'findOneAndDelete'], function (next) {
+    if (options.usernameField) cache.del(this.get(options.usernameField));
+    next();
+  });
 
   options.errorMessages = options.errorMessages || {};
   options.errorMessages.MissingPasswordError = options.errorMessages.MissingPasswordError || 'No password was given';
