@@ -1,9 +1,9 @@
 {
-  "name": "passport-local-mongoose",
+  "name": "@hyperdx/passport-local-mongoose",
   "description": "Mongoose plugin that simplifies building username and password login with Passport",
   "version": "8.0.0",
   "main": "index.js",
-  "repository": "saintedlama/passport-local-mongoose",
+  "repository": "hyperdxio/passport-local-mongoose",
   "author": "Christoph Walcher <christoph.walcher@gmail.com>",
   "license": "MIT",
   "keywords": [
