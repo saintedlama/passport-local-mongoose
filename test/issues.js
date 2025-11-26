@@ -18,7 +18,7 @@ describe('issues', function () {
 
   beforeEach(async () => await dropMongodbCollections(connectionString));
   beforeEach(() =>
-    mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
+    mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false })
   );
   afterEach(() => mongoose.disconnect());
 

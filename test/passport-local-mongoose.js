@@ -211,7 +211,7 @@ describe('passportLocalMongoose', function () {
   describe('#changePassword() callback', function () {
     beforeEach(async () => await dropMongodbCollections(connectionString));
     beforeEach(() =>
-      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
+      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false })
     );
     afterEach(() => mongoose.disconnect());
 
@@ -322,7 +322,7 @@ describe('passportLocalMongoose', function () {
   describe('#changePassword() async', function () {
     beforeEach(async () => await dropMongodbCollections(connectionString));
     beforeEach(() =>
-      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
+      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false })
     );
     afterEach(() => mongoose.disconnect());
 
@@ -385,7 +385,7 @@ describe('passportLocalMongoose', function () {
   describe('#authenticate() callback', function () {
     beforeEach(async () => await dropMongodbCollections(connectionString));
     beforeEach(() =>
-      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
+      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false})
     );
     afterEach(() => mongoose.disconnect());
 
@@ -576,7 +576,7 @@ describe('passportLocalMongoose', function () {
   describe('#authenticate() async', function () {
     beforeEach(async () => await dropMongodbCollections(connectionString));
     beforeEach(() =>
-      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
+      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false })
     );
     afterEach(() => mongoose.disconnect());
 
@@ -692,7 +692,7 @@ describe('passportLocalMongoose', function () {
     beforeEach(async () => await dropMongodbCollections(connectionString));
 
     beforeEach(() =>
-      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
+      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false })
     );
     afterEach(() => mongoose.disconnect());
 
@@ -1047,7 +1047,7 @@ describe('passportLocalMongoose', function () {
   describe('static #authenticate() async', function () {
     beforeEach(async () => await dropMongodbCollections(connectionString));
     beforeEach(() =>
-      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
+      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false })
     );
     afterEach(() => mongoose.disconnect());
 
@@ -1260,7 +1260,7 @@ describe('passportLocalMongoose', function () {
   describe('static #deserializeUser()', function () {
     beforeEach(async () => await dropMongodbCollections(connectionString));
     beforeEach(() =>
-      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
+      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false })
     );
     afterEach(() => mongoose.disconnect());
 
@@ -1311,7 +1311,7 @@ describe('passportLocalMongoose', function () {
   describe('static #findByUsername() callback', function () {
     beforeEach(async () => await dropMongodbCollections(connectionString));
     beforeEach(() =>
-      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
+      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false })
     );
     afterEach(() => mongoose.disconnect());
 
@@ -1470,7 +1470,7 @@ describe('passportLocalMongoose', function () {
   describe('static #findByUsername() async', function () {
     beforeEach(async () => await dropMongodbCollections(connectionString));
     beforeEach(() =>
-      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
+      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false })
     );
     afterEach(() => mongoose.disconnect());
 
@@ -1570,7 +1570,7 @@ describe('passportLocalMongoose', function () {
   describe('static #register() callback', function () {
     beforeEach(async () => await dropMongodbCollections(connectionString));
     beforeEach(() =>
-      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
+      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false })
     );
     afterEach(() => mongoose.disconnect());
 
@@ -1722,7 +1722,7 @@ describe('passportLocalMongoose', function () {
   describe('static #register() async', function () {
     beforeEach(async () => await dropMongodbCollections(connectionString));
     beforeEach(() =>
-      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false, useNewUrlParser: true, useUnifiedTopology: true })
+      mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false })
     );
     afterEach(() => mongoose.disconnect());
 
