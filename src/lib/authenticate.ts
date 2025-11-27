@@ -1,9 +1,15 @@
-const scmp = require('scmp');
+import scmp from 'scmp';
+import { Document } from 'mongoose';
 
-const pbkdf2 = require('./pbkdf2');
-const errors = require('./errors');
+import { pbkdf2 } from './pbkdf2';
+import * as errors from './errors';
+import { PassportLocalOptions, AuthenticationResult } from '../types';
 
-module.exports = async function authenticate(user, password, options) {
+export async function authenticate(
+  user: Document,
+  password: string,
+  options: Required<PassportLocalOptions>,
+): Promise<AuthenticationResult> {
   if (options.limitAttempts) {
     const attemptsInterval = Math.pow(options.interval, Math.log(user.get(options.attemptsField) + 1));
     const calculatedInterval = attemptsInterval < options.maxInterval ? attemptsInterval : options.maxInterval;
@@ -11,22 +17,22 @@ module.exports = async function authenticate(user, password, options) {
     if (Date.now() - user.get(options.lastLoginField) < calculatedInterval) {
       user.set(options.lastLoginField, Date.now());
       await user.save();
-      return { user: false, error: new errors.AttemptTooSoonError(options.errorMessages.AttemptTooSoonError) };
+      return { user: false, error: new errors.AttemptTooSoonError(options.errorMessages.AttemptTooSoonError!) };
     }
 
-    if (user.get(options.attemptsField) >= options.maxAttempts) {
+    if (user.get(options.attemptsField) >= options.maxAttempts!) {
       if (options.unlockInterval && Date.now() - user.get(options.lastLoginField) > options.unlockInterval) {
         user.set(options.lastLoginField, Date.now());
         user.set(options.attemptsField, 0);
         await user.save();
       } else {
-        return { user: false, error: new errors.TooManyAttemptsError(options.errorMessages.TooManyAttemptsError) };
+        return { user: false, error: new errors.TooManyAttemptsError(options.errorMessages.TooManyAttemptsError!) };
       }
     }
   }
 
   if (!user.get(options.saltField)) {
-    return { user: false, error: new errors.NoSaltValueStoredError(options.errorMessages.NoSaltValueStoredError) };
+    return { user: false, error: new errors.NoSaltValueStoredError(options.errorMessages.NoSaltValueStoredError!) };
   }
 
   const hashBuffer = await pbkdf2(password, user.get(options.saltField), options);
@@ -44,13 +50,13 @@ module.exports = async function authenticate(user, password, options) {
       user.set(options.attemptsField, user.get(options.attemptsField) + 1);
       await user.save();
 
-      if (user.get(options.attemptsField) >= options.maxAttempts) {
-        return { user: false, error: new errors.TooManyAttemptsError(options.errorMessages.TooManyAttemptsError) };
+      if (user.get(options.attemptsField) >= options.maxAttempts!) {
+        return { user: false, error: new errors.TooManyAttemptsError(options.errorMessages.TooManyAttemptsError!) };
       } else {
-        return { user: false, error: new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError) };
+        return { user: false, error: new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError!) };
       }
-    } else {
-      return { user: false, error: new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError) };
     }
+
+    return { user: false, error: new errors.IncorrectPasswordError(options.errorMessages.IncorrectPasswordError!) };
   }
-};
+}

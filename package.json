@@ -2,7 +2,11 @@
   "name": "passport-local-mongoose",
   "description": "Mongoose plugin that simplifies building username and password login with Passport",
   "version": "8.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "repository": "saintedlama/passport-local-mongoose",
   "author": "Christoph Walcher <christoph.walcher@gmail.com>",
   "license": "MIT",
@@ -21,9 +25,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/mongoose": "^5.11.96",
+    "@types/node": "^24.10.1",
     "@types/passport": "1.0.17",
     "@types/passport-local": "1.0.38",
-    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/coverage-v8": "^4.0.14",
     "debug": "^4.4.3",
     "drop-mongodb-collections": "^2.0.0",
     "eslint": "^9.39.1",
@@ -32,16 +38,24 @@
     "globals": "^16.5.0",
     "mongoose": "^9.0.0",
     "prettier": "^3.6.2",
-    "vitest": "^2.1.8"
+    "rimraf": "^6.1.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.0",
+    "vitest": "^4.0.14"
   },
   "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "prebuild": "rimraf dist",
+    "prepublishOnly": "npm run build",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:ci": "vitest run --coverage --reporter=verbose",
     "test:tsd": "tsd",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix"
   },
   "tsd": {
     "directory": "test/types"

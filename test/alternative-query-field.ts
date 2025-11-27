@@ -1,8 +1,9 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const dropMongodbCollections = require('drop-mongodb-collections');
-const debug = require('debug')('passport:local:mongoose');
-const passportLocalMongoose = require('../');
+import mongoose, { Schema } from 'mongoose';
+import dropMongodbCollections from 'drop-mongodb-collections';
+import Debug from 'debug';
+import passportLocalMongoose from '../dist/index.js';
+
+const debug = Debug('passport:local:mongoose');
 
 const dbName = 'passportlocalmongoosetests';
 let connectionString = `mongodb://localhost:27017/${dbName}`;

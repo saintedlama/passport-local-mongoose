@@ -21,3 +21,6 @@ README.html
 *.tgz
 docs/
 .vscode/
+
+# TypeScript
+dist/

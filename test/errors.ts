@@ -1,8 +1,8 @@
-const errors = require('../lib/errors.js');
+import { errors } from '../dist/index.js';
 
 describe('AuthenticationError', function () {
   it('should construct a valid error with stack trace and name', function () {
-    const error = new errors.AuthenticationError();
+    const error = new errors.AuthenticationError('');
 
     expect(error.stack).to.exist;
     expect(error.name).to.equal('AuthenticationError');
@@ -15,7 +15,7 @@ describe('AuthenticationError', function () {
   });
 
   it('should construct an AuthenticationError with empty message if no message was passed', function () {
-    const error = new errors.AuthenticationError();
+    const error = new errors.AuthenticationError('');
 
     expect(error.message).to.equal('');
   });

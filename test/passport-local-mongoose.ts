@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const dropMongodbCollections = require('drop-mongodb-collections');
-const debug = require('debug')('passport:local:mongoose');
+import mongoose, { Schema } from 'mongoose';
+import dropMongodbCollections from 'drop-mongodb-collections';
+import Debug from 'debug';
+import { errors } from '../dist/index.js';
+import passportLocalMongoose from '../dist/index.js';
 
-const errors = require('../lib/errors.js');
-const passportLocalMongoose = require('../');
+const debug = Debug('passport:local:mongoose');
 
 const DefaultUserSchema = new Schema();
 DefaultUserSchema.plugin(passportLocalMongoose);
@@ -113,7 +113,7 @@ describe('passportLocalMongoose', function () {
       const UserSchema = new Schema({ username: usernameField });
       UserSchema.plugin(passportLocalMongoose);
 
-      const usernameFieldOptions = UserSchema.path('username').options;
+      const usernameFieldOptions = UserSchema.path('username')!.options;
 
       expect(usernameFieldOptions.type).to.deep.equal(usernameField.type);
       expect(usernameFieldOptions.required).to.deep.equal(usernameField.required);
@@ -124,14 +124,14 @@ describe('passportLocalMongoose', function () {
       const UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose);
 
-      expect(UserSchema.path('username').options.unique).to.equal(true);
+      expect(UserSchema.path('username')!.options.unique).to.equal(true);
     });
 
     it('should add "username" field to as non unique if specified by option', function () {
       const UserSchema = new Schema({});
       UserSchema.plugin(passportLocalMongoose, { usernameUnique: false });
 
-      expect(UserSchema.path('username').options.unique).to.equal(false);
+      expect(UserSchema.path('username')!.options.unique).to.equal(false);
     });
   });
 
@@ -140,7 +140,7 @@ describe('passportLocalMongoose', function () {
       const user = new DefaultUser();
 
       try {
-        await user.setPassword();
+        await (user as any).setPassword();
         throw new Error('Should yieldd an error if password is undefined');
       } catch (_err) {
         // Expected error
@@ -207,8 +207,8 @@ describe('passportLocalMongoose', function () {
 
       await user.setPassword('password1');
 
-      delete user.salt;
-      delete user.hash;
+      delete (user as any).salt;
+      delete (user as any).hash;
 
       const changePasswordUser = await user.changePassword('password1', 'password2');
       expect(changePasswordUser).to.exist;
@@ -240,7 +240,7 @@ describe('passportLocalMongoose', function () {
       const { user: authenticatedUser, error } = await user.authenticate('nopassword');
 
       expect(authenticatedUser).to.be.false;
-      expect(error.message).to.equal('Password or username is incorrect');
+      expect(error!.message).to.equal('Password or username is incorrect');
     });
 
     it('should supply message when limiting attempts and authenticating too soon', async () => {
@@ -337,7 +337,7 @@ describe('passportLocalMongoose', function () {
       const { user: authenticatedUser, error } = await user.authenticate('password');
 
       expect(authenticatedUser).to.be.false;
-      expect(error.message).to.exist;
+      expect(error!.message).to.exist;
     });
   });
 
@@ -466,17 +466,17 @@ describe('passportLocalMongoose', function () {
 
       const { user: user1, error: error1 } = await User.authenticate()('user', 'WRONGpassword');
       expect(user1).to.be.false;
-      expect(error1.message).to.not.contain('locked');
+      expect(error1!.message).to.not.contain('locked');
 
       const { user: user2, error: error2 } = await User.authenticate()('user', 'WRONGpassword');
       expect(user2).to.be.false;
-      expect(error2.message).to.not.contain('locked');
+      expect(error2!.message).to.not.contain('locked');
 
       const { user: user3, error: error3 } = await User.authenticate()('user', 'WRONGpassword');
       expect(user3).to.be.false;
-      expect(error3.message).to.contain('locked');
+      expect(error3!.message).to.contain('locked');
 
-      await user.resetAttempts();
+      await user.resetAttempts!();
 
       // User should be unlocked
       const { user: user5 } = await User.authenticate()('user', 'password');
@@ -500,17 +500,17 @@ describe('passportLocalMongoose', function () {
 
       const { user: user1, error: error1 } = await User.authenticate()('user', 'WRONGpassword');
       expect(user1).to.be.false;
-      expect(error1.message).to.not.contain('locked');
+      expect(error1!.message).to.not.contain('locked');
 
       const { user: user2, error: error2 } = await User.authenticate()('user', 'WRONGpassword');
       expect(user2).to.be.false;
-      expect(error2.message).to.not.contain('locked');
+      expect(error2!.message).to.not.contain('locked');
 
       const { user: user3, error: error3 } = await User.authenticate()('user', 'WRONGpassword');
       expect(user3).to.be.false;
-      expect(error3.message).to.contain('locked');
+      expect(error3!.message).to.contain('locked');
 
-      function timeout(ms) {
+      function timeout(ms: number) {
         return new Promise((resolve) => setTimeout(resolve, ms));
       }
       await timeout(1000);
@@ -607,7 +607,7 @@ describe('passportLocalMongoose', function () {
       const foundUser = await User.findByUsername('hugo');
 
       expect(foundUser).to.exist;
-      expect(foundUser.username).to.equal('hugo');
+      expect(foundUser!.username).to.equal('hugo');
     });
 
     it('should return a query object when no callback is specified', async () => {
@@ -624,7 +624,7 @@ describe('passportLocalMongoose', function () {
 
       const foundUser = await query.exec();
       expect(foundUser).to.exist;
-      expect(foundUser.username).to.equal('hugo');
+      expect(foundUser!.username).to.equal('hugo');
     });
 
     it('should select all fields', async () => {
@@ -638,8 +638,8 @@ describe('passportLocalMongoose', function () {
       const foundUser = await User.findByUsername('hugo');
 
       expect(foundUser).to.exist;
-      expect(foundUser.username).to.equal('hugo');
-      expect(foundUser.department).to.equal('DevOps');
+      expect(foundUser!.username).to.equal('hugo');
+      expect(foundUser!.department).to.equal('DevOps');
     });
 
     it('should select fields specified by selectFields option', async () => {
@@ -653,8 +653,8 @@ describe('passportLocalMongoose', function () {
       const foundUser = await User.findByUsername('hugo');
 
       expect(foundUser).to.exist;
-      expect(foundUser.username).to.equal('hugo');
-      expect(foundUser.department).to.equal(undefined);
+      expect(foundUser!.username).to.equal('hugo');
+      expect(foundUser!.department).to.equal(undefined);
     });
 
     it('should retrieve saved user with findByUsername helper function with username field override', async () => {
@@ -669,7 +669,7 @@ describe('passportLocalMongoose', function () {
       const foundUser = await User.findByUsername(email);
 
       expect(foundUser).to.exist;
-      expect(foundUser.email).to.equal(user.email);
+      expect(foundUser!.email).to.equal(user.email);
     });
 
     it('should not throw if lowercase option is specified and no username is supplied', async () => {
@@ -677,7 +677,7 @@ describe('passportLocalMongoose', function () {
       UserSchema.plugin(passportLocalMongoose, { usernameLowerCase: true });
       const User = mongoose.model('FindByUsernameWithUndefinedUsernameAsync', UserSchema);
 
-      await User.findByUsername(undefined);
+      await User.findByUsername(undefined as any);
     });
   });
 
@@ -785,7 +785,7 @@ describe('passportLocalMongoose', function () {
       const User = mongoose.model('RegisterUserWithoutPasswordAsync', UserSchema);
 
       try {
-        await User.register({ username: 'hugo' }, undefined);
+        await User.register({ username: 'hugo' }, undefined as any);
       } catch (e) {
         expect(e).to.be.instanceof(errors.AuthenticationError);
         return;
@@ -805,18 +805,18 @@ describe('passportLocalMongoose', function () {
   });
 });
 
-async function setPasswordAndAuthenticate(user, passwordToSet, passwordToAuthenticate) {
+async function setPasswordAndAuthenticate(user: any, passwordToSet: string, passwordToAuthenticate: string) {
   await user.setPassword(passwordToSet);
   return await user.authenticate(passwordToAuthenticate);
 }
 
-function usingPromise(fn) {
+function usingPromise<T>(fn: (cb: (err: any, result?: T) => void) => void): Promise<T> {
   return new Promise((resolve, reject) => {
     fn((err, result) => {
       if (err) {
         return reject(err);
       }
-      resolve(result);
+      resolve(result!);
     });
   });
 }

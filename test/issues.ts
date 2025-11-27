@@ -1,8 +1,9 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const dropMongodbCollections = require('drop-mongodb-collections');
-const debug = require('debug')('passport:local:mongoose');
-const passportLocalMongoose = require('../');
+import mongoose, { Schema } from 'mongoose';
+import dropMongodbCollections from 'drop-mongodb-collections';
+import Debug from 'debug';
+import passportLocalMongoose from '../dist/index.js';
+
+const debug = Debug('passport:local:mongoose');
 
 const dbName = 'passportlocalmongoosetests';
 let connectionString = `mongodb://localhost:27017/${dbName}`;
@@ -52,7 +53,7 @@ describe('issues', function () {
     const { user: auth, error } = await User.authenticate()('hugo', 'none');
     expect(false).to.equal(auth);
     expect(error).to.exist;
-    expect('Authentication not possible. No salt value stored').to.equal(error.message);
+    expect('Authentication not possible. No salt value stored').to.equal(error!.message);
   });
 
   it('should support not throw exception in case hash and salt are not selected - Issue #27', async () => {
@@ -86,7 +87,7 @@ describe('issues', function () {
     const login = await Login.create({ date: loginDate, success: loginSuccess });
     expect(login).to.exist;
 
-    const logins = [];
+    const logins: any[] = [];
     logins.push(login._id);
 
     const user = await User.register(new User({ username: 'hugo', logins: logins }), 'password');
@@ -104,7 +105,7 @@ describe('issues', function () {
   it('should support password validation - Issue #57', async () => {
     const UserSchema = new Schema({});
 
-    async function passwordValidator(_password) {
+    async function passwordValidator(_password: string) {
       throw new Error('No password is valid');
     }
 
@@ -117,7 +118,7 @@ describe('issues', function () {
     try {
       await User.register({ username: 'nicolascage' }, 'password');
       throw new Error('Expected validation to fail');
-    } catch (err) {
+    } catch (err: any) {
       expect(err.message).to.equal('No password is valid');
     }
   });
@@ -138,7 +139,7 @@ describe('issues', function () {
     try {
       await User.register({ username: 'nicolascage' }, 'password');
       throw new Error('Expected password validator to throw!');
-    } catch (err) {
+    } catch (err: any) {
       expect(err.message).to.equal('No password is valid');
     }
   });
@@ -154,9 +155,9 @@ describe('issues', function () {
 
     const foundUser = await User.findOne({ username: 'nicolascage' });
     expect(foundUser).to.exist;
-    expect(foundUser.username).to.equal('nicolascage');
-    expect(foundUser.hash).to.equal(undefined);
-    expect(foundUser.salt).to.equal(undefined);
+    expect(foundUser!.username).to.equal('nicolascage');
+    expect(foundUser!.hash).to.equal(undefined);
+    expect(foundUser!.salt).to.equal(undefined);
   });
 
   describe('authentication should work with salt/hash field marked as select: false - Issue #96', function () {
@@ -173,9 +174,9 @@ describe('issues', function () {
     it('instance.authenticate( password)', async function () {
       const user = await User.findOne({ username: userName });
       expect(user).to.exist;
-      expect(user.username).to.equal(userName);
+      expect(user!.username).to.equal(userName);
 
-      const auth = await user.authenticate('password');
+      const auth = await user!.authenticate('password');
       expect(auth).to.exist;
     });
 
