@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const expect = require('chai').expect;
 const dropMongodbCollections = require('drop-mongodb-collections');
 const debug = require('debug')('passport:local:mongoose');
 const passportLocalMongoose = require('../');
@@ -14,8 +13,6 @@ if (process.env.MONGO_SERVER) {
 }
 
 describe('issues', function () {
-  this.timeout(10000); // Ten seconds - mongodb access needed
-
   beforeEach(async () => await dropMongodbCollections(connectionString));
   beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
   afterEach(() => mongoose.disconnect());

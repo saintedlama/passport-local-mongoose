@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const expect = require('chai').expect;
 const dropMongodbCollections = require('drop-mongodb-collections');
 const debug = require('debug')('passport:local:mongoose');
 
@@ -20,8 +19,6 @@ if (process.env.MONGO_SERVER) {
 }
 
 describe('passportLocalMongoose', function () {
-  this.timeout(10000); // Ten seconds - mongo db access needed
-
   it('should expose errors', function () {
     expect(passportLocalMongoose.errors).to.exist;
   });

@@ -1,5 +1,4 @@
 const errors = require('../lib/errors.js');
-const expect = require('chai').expect;
 
 describe('AuthenticationError', function () {
   it('should construct a valid error with stack trace and name', function () {
