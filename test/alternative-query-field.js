@@ -20,7 +20,7 @@ describe('alternative query field', function () {
   beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
   afterEach(() => mongoose.disconnect());
 
-  it('should find an existing user by alternative query field', function (done) {
+  it('should find an existing user by alternative query field', async () => {
     const UserSchema = new Schema({
       email: String,
     });
@@ -29,18 +29,14 @@ describe('alternative query field', function () {
 
     const email = 'hugo@test.org';
     const user = new User({ username: 'hugo', email: email });
-    user.save().then(function () {
-      User.findByUsername(email, function (err, user) {
-        expect(err).to.not.exist;
-        expect(user).to.exist;
-        expect(user.email).to.equal(email);
+    await user.save();
 
-        done();
-      });
-    });
+    const foundUser = await User.findByUsername(email);
+    expect(foundUser).to.exist;
+    expect(foundUser.email).to.equal(email);
   });
 
-  it('should authenticate an existing user by alternative query field', function (done) {
+  it('should authenticate an existing user by alternative query field', async () => {
     const UserSchema = new Schema({
       email: String,
     });
@@ -49,20 +45,14 @@ describe('alternative query field', function () {
 
     const email = 'hugo@test.org';
     const user = new User({ username: 'hugo', email: email });
-    User.register(user, 'password', function (err) {
-      expect(err).to.not.exist;
+    await User.register(user, 'password');
 
-      User.authenticate()('hugo@test.org', 'password', function (err, user, error) {
-        expect(err).to.not.exist;
-        expect(user).to.exist;
-        expect(!error).to.exist;
-
-        done();
-      });
-    });
+    const { user: authUser, error } = await User.authenticate()('hugo@test.org', 'password');
+    expect(authUser).to.exist;
+    expect(error).to.not.exist;
   });
 
-  it('should authenticate an existing user by default username field', function (done) {
+  it('should authenticate an existing user by default username field', async () => {
     const UserSchema = new Schema({
       email: String,
     });
@@ -71,20 +61,14 @@ describe('alternative query field', function () {
 
     const email = 'hugo@test.org';
     const user = new User({ username: 'hugo', email: email });
-    User.register(user, 'password', function (err) {
-      expect(err).to.not.exist;
+    await User.register(user, 'password');
 
-      User.authenticate()('hugo', 'password', function (err, user, error) {
-        expect(err).to.not.exist;
-        expect(user).to.exist;
-        expect(!error).to.exist;
-
-        done();
-      });
-    });
+    const { user: authUser, error } = await User.authenticate()('hugo', 'password');
+    expect(authUser).to.exist;
+    expect(error).to.not.exist;
   });
 
-  it('should not authenticate an existing user by unconfigured alternative query field', function (done) {
+  it('should not authenticate an existing user by unconfigured alternative query field', async () => {
     const UserSchema = new Schema({
       email: String,
     });
@@ -94,22 +78,10 @@ describe('alternative query field', function () {
 
     const email = 'hugo@test.org';
     const user = new User({ username: 'hugo', email: email });
-    User.register(user, 'password', function (err) {
-      if (err) {
-        return done(err);
-      }
+    await User.register(user, 'password');
 
-      User.authenticate()('hugo@test.org', 'password', function (err, user, error) {
-        if (err) {
-          return done(err);
-        }
-
-        expect(err).to.not.exist;
-        expect(user).to.be.false;
-        expect(error).to.exist;
-
-        done();
-      });
-    });
+    const { user: authUser, error } = await User.authenticate()('hugo@test.org', 'password');
+    expect(authUser).to.be.false;
+    expect(error).to.exist;
   });
 });

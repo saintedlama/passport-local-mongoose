@@ -1,9 +1,12 @@
 const crypto = require('crypto');
+const { promisify } = require('util');
 const LocalStrategy = require('passport-local').Strategy;
 
 const pbkdf2 = require('./lib/pbkdf2');
 const errors = require('./lib/errors');
 const authenticate = require('./lib/authenticate');
+
+const randomBytesAsync = promisify(crypto.randomBytes);
 
 module.exports = function (schema, options) {
   options = options || {};
@@ -13,18 +16,11 @@ module.exports = function (schema, options) {
   options.encoding = options.encoding || 'hex';
   options.digestAlgorithm = options.digestAlgorithm || 'sha256'; // To get a list of supported hashes use crypto.getHashes()
 
-  function defaultPasswordValidator(_password, cb) {
-    cb(null);
-  }
-
-  function defaultPasswordValidatorAsync(password) {
-    return new Promise((resolve, reject) => {
-      options.passwordValidator(password, (err) => (err ? reject(err) : resolve()));
-    });
+  function defaultPasswordValidator(_password) {
+    return Promise.resolve();
   }
 
   options.passwordValidator = options.passwordValidator || defaultPasswordValidator;
-  options.passwordValidatorAsync = options.passwordValidatorAsync || defaultPasswordValidatorAsync;
 
   // Populate field names with defaults if not set
   options.usernameField = options.usernameField || 'username';
@@ -94,113 +90,68 @@ module.exports = function (schema, options) {
     }
   });
 
-  schema.methods.setPassword = function (password, cb) {
-    const promise = Promise.resolve()
-      .then(() => {
-        if (!password) {
-          throw new errors.MissingPasswordError(options.errorMessages.MissingPasswordError);
-        }
-      })
-      .then(() => options.passwordValidatorAsync(password))
-      .then(() => randomBytes(options.saltlen))
-      .then((saltBuffer) => saltBuffer.toString(options.encoding))
-      .then((salt) => {
-        this.set(options.saltField, salt);
-
-        return salt;
-      })
-      .then((salt) => pbkdf2Promisified(password, salt, options))
-      .then((hashRaw) => {
-        this.set(options.hashField, Buffer.from(hashRaw, 'binary').toString(options.encoding));
-      })
-      .then(() => this);
-
-    if (!cb) {
-      return promise;
+  schema.methods.setPassword = async function (password) {
+    if (!password) {
+      throw new errors.MissingPasswordError(options.errorMessages.MissingPasswordError);
     }
 
-    promise.then((result) => cb(null, result)).catch((err) => cb(err));
+    await options.passwordValidator(password);
+
+    const saltBuffer = await randomBytesAsync(options.saltlen);
+    const salt = saltBuffer.toString(options.encoding);
+    this.set(options.saltField, salt);
+
+    const hashRaw = await pbkdf2(password, salt, options);
+    this.set(options.hashField, Buffer.from(hashRaw, 'binary').toString(options.encoding));
+
+    return this;
   };
 
-  schema.methods.changePassword = function (oldPassword, newPassword, cb) {
-    const promise = Promise.resolve()
-      .then(() => {
-        if (!oldPassword || !newPassword) {
-          throw new errors.MissingPasswordError(options.errorMessages.MissingPasswordError);
-        }
-      })
-      .then(() => this.authenticate(oldPassword))
-      .then(({ user, error }) => {
-        if (!user) {
-          throw error;
-        }
-      })
-      .then(() => this.setPassword(newPassword))
-      .then(() => this.save())
-      .then(() => this);
-
-    if (!cb) {
-      return promise;
+  schema.methods.changePassword = async function (oldPassword, newPassword) {
+    if (!oldPassword || !newPassword) {
+      throw new errors.MissingPasswordError(options.errorMessages.MissingPasswordError);
     }
 
-    promise.then((result) => cb(null, result)).catch((err) => cb(err));
+    const { user, error } = await this.authenticate(oldPassword);
+    if (!user) {
+      throw error;
+    }
+
+    await this.setPassword(newPassword);
+    await this.save();
+
+    return this;
   };
 
-  schema.methods.authenticate = function (password, cb) {
-    const promise = Promise.resolve().then(() => {
-      if (this.get(options.saltField)) {
-        return authenticate(this, password, options);
-      }
-
-      return this.constructor.findByUsername(this.get(options.usernameField), true).then((user) => {
-        if (user) {
-          return authenticate(user, password, options);
-        }
-
-        return { user: false, error: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
-      });
-    });
-
-    if (!cb) {
-      return promise;
+  schema.methods.authenticate = async function (password) {
+    if (this.get(options.saltField)) {
+      return await authenticate(this, password, options);
     }
 
-    promise.then(({ user, error }) => cb(null, user, error)).catch((err) => cb(err));
+    const user = await this.constructor.findByUsername(this.get(options.usernameField), true);
+    if (user) {
+      return await authenticate(user, password, options);
+    }
+
+    return { user: false, error: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
   };
 
   if (options.limitAttempts) {
-    schema.methods.resetAttempts = function (cb) {
-      const promise = Promise.resolve().then(() => {
-        this.set(options.attemptsField, 0);
-        return this.save();
-      });
-
-      if (!cb) {
-        return promise;
-      }
-
-      promise.then((result) => cb(null, result)).catch((err) => cb(err));
+    schema.methods.resetAttempts = async function () {
+      this.set(options.attemptsField, 0);
+      return await this.save();
     };
   }
 
   // Passport Local Interface
   schema.statics.authenticate = function () {
-    return (username, password, cb) => {
-      const promise = Promise.resolve()
-        .then(() => this.findByUsername(username, true))
-        .then((user) => {
-          if (user) {
-            return user.authenticate(password);
-          }
-
-          return { user: false, error: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
-        });
-
-      if (!cb) {
-        return promise;
+    return async (username, password) => {
+      const user = await this.findByUsername(username, true);
+      if (user) {
+        return await user.authenticate(password);
       }
 
-      promise.then(({ user, error }) => cb(null, user, error)).catch((err) => cb(err));
+      return { user: false, error: new errors.IncorrectUsernameError(options.errorMessages.IncorrectUsernameError) };
     };
   };
 
@@ -212,45 +163,36 @@ module.exports = function (schema, options) {
   };
 
   schema.statics.deserializeUser = function () {
-    return (username, cb) => {
-      this.findByUsername(username, cb);
+    return async (username, cb) => {
+      try {
+        const user = await this.findByUsername(username);
+        cb(null, user);
+      } catch (err) {
+        cb(err);
+      }
     };
   };
 
-  schema.statics.register = function (user, password, cb) {
+  schema.statics.register = async function (user, password) {
     // Create an instance of this in case user isn't already an instance
     if (!(user instanceof this)) {
       user = new this(user);
     }
 
-    const promise = Promise.resolve()
-      .then(() => {
-        if (!user.get(options.usernameField)) {
-          throw new errors.MissingUsernameError(options.errorMessages.MissingUsernameError);
-        }
-      })
-      .then(() => this.findByUsername(user.get(options.usernameField)))
-      .then((existingUser) => {
-        if (existingUser) {
-          throw new errors.UserExistsError(options.errorMessages.UserExistsError);
-        }
-      })
-      .then(() => user.setPassword(password))
-      .then(() => user.save());
-
-    if (!cb) {
-      return promise;
+    if (!user.get(options.usernameField)) {
+      throw new errors.MissingUsernameError(options.errorMessages.MissingUsernameError);
     }
 
-    promise.then((result) => cb(null, result)).catch((err) => cb(err));
+    const existingUser = await this.findByUsername(user.get(options.usernameField));
+    if (existingUser) {
+      throw new errors.UserExistsError(options.errorMessages.UserExistsError);
+    }
+
+    await user.setPassword(password);
+    return await user.save();
   };
 
-  schema.statics.findByUsername = function (username, opts, cb) {
-    if (typeof opts === 'function') {
-      cb = opts;
-      opts = {};
-    }
-
+  schema.statics.findByUsername = function (username, opts) {
     if (typeof opts == 'boolean') {
       opts = {
         selectHashSaltFields: opts,
@@ -292,14 +234,6 @@ module.exports = function (schema, options) {
       query.populate(options.populateFields);
     }
 
-    if (cb) {
-      query
-        .exec()
-        .then((user) => cb(null, user))
-        .catch(cb);
-      return;
-    }
-
     return query;
   };
 
@@ -307,13 +241,5 @@ module.exports = function (schema, options) {
     return new LocalStrategy(options, this.authenticate());
   };
 };
-
-function pbkdf2Promisified(password, salt, options) {
-  return new Promise((resolve, reject) => pbkdf2(password, salt, options, (err, hashRaw) => (err ? reject(err) : resolve(hashRaw))));
-}
-
-function randomBytes(saltlen) {
-  return new Promise((resolve, reject) => crypto.randomBytes(saltlen, (err, saltBuffer) => (err ? reject(err) : resolve(saltBuffer))));
-}
 
 module.exports.errors = errors;

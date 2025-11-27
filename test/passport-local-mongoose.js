@@ -138,45 +138,7 @@ describe('passportLocalMongoose', function () {
     });
   });
 
-  describe('#setPassword() callback', function () {
-    it('should set yield an error if password is undefined', function (done) {
-      const user = new DefaultUser();
-
-      user.setPassword(undefined, function (err) {
-        expect(err).to.exist;
-        done();
-      });
-    });
-
-    it('should set salt and hash', function (done) {
-      const user = new DefaultUser();
-
-      user.setPassword('password', function (err) {
-        if (err) {
-          return done(err);
-        }
-        expect(user.hash).to.exist;
-        expect(user.salt).to.exist;
-
-        done();
-      });
-    });
-
-    it('should authenticate user with arguments supplied to setPassword', function (done) {
-      const user = new DefaultUser();
-
-      setPasswordAndAuthenticate(user, 'password', 'password', function (err, result) {
-        if (err) {
-          return done(err);
-        }
-        expect(result).to.equal(user);
-
-        done();
-      });
-    });
-  });
-
-  describe('#setPassword() async', function () {
+  describe('#setPassword()', function () {
     it('should set yield an error if password is undefined', () => {
       const user = new DefaultUser();
 
@@ -199,125 +161,15 @@ describe('passportLocalMongoose', function () {
       });
     });
 
-    it('should authenticate user with arguments supplied to setPassword', () => {
+    it('should authenticate user with arguments supplied to setPassword', async () => {
       const user = new DefaultUser();
 
-      return setPasswordAndAuthenticateAsync(user, 'password', 'password').then((result) => {
-        expect(result).to.equal(user);
-      });
+      const result = await setPasswordAndAuthenticate(user, 'password', 'password');
+      expect(result.user).to.equal(user);
     });
   });
 
-  describe('#changePassword() callback', function () {
-    beforeEach(async () => await dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
-    afterEach(() => mongoose.disconnect());
-
-    it('should change password', function (done) {
-      const user = new DefaultUser();
-
-      user.setPassword('password1', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        user.changePassword('password1', 'password2', function (err, user) {
-          if (err) {
-            return done(err);
-          }
-
-          expect(user).to.exist;
-
-          user.authenticate('password2', function (err, result) {
-            if (err) {
-              return done(err);
-            }
-
-            expect(result).to.exist;
-
-            done();
-          });
-        });
-      });
-    });
-
-    it('should fail on wrong password', function (done) {
-      const user = new DefaultUser();
-
-      user.setPassword('password1', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        user.changePassword('password2', 'password2', function (err) {
-          expect(err).to.exist;
-
-          done();
-        });
-      });
-    });
-
-    it('should not fail when passwords are the same', function (done) {
-      const user = new DefaultUser();
-
-      user.setPassword('password1', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        user.changePassword('password1', 'password1', function (err, user) {
-          if (err) {
-            return done(err);
-          }
-
-          expect(user).to.exist;
-
-          done();
-        });
-      });
-    });
-
-    it('should change password when user model doesnt include salt/hash fields', function (done) {
-      const user = new DefaultUser();
-
-      user.setPassword('password1', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        delete user.salt;
-        delete user.hash;
-
-        user.changePassword('password1', 'password2', function (err, user) {
-          if (err) {
-            return done(err);
-          }
-
-          expect(user).to.exist;
-
-          done();
-        });
-      });
-    });
-
-    it('should fail when no replacement password given', function (done) {
-      const user = new DefaultUser();
-
-      user.setPassword('password1', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        user.changePassword('password1', '', function (err) {
-          expect(err).to.be.instanceof(errors.MissingPasswordError);
-
-          done();
-        });
-      });
-    });
-  });
-
-  describe('#changePassword() async', function () {
+  describe('#changePassword()', function () {
     beforeEach(async () => await dropMongodbCollections(connectionString));
     beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
     afterEach(() => mongoose.disconnect());
@@ -375,195 +227,6 @@ describe('passportLocalMongoose', function () {
       const result = await user.changePassword('password1', '').catch((err) => err);
 
       expect(result).to.be.instanceof(errors.MissingPasswordError);
-    });
-  });
-
-  describe('#authenticate() callback', function () {
-    beforeEach(async () => await dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
-    afterEach(() => mongoose.disconnect());
-
-    it('should yield false in case user cannot be authenticated', function (done) {
-      const user = new DefaultUser();
-
-      setPasswordAndAuthenticate(user, 'password', 'nopassword', function (err, result) {
-        if (err) {
-          return done(err);
-        }
-        expect(result).to.equal(false);
-
-        done();
-      });
-    });
-
-    it('should supply a message when authentication fails', function (done) {
-      const user = new DefaultUser();
-
-      setPasswordAndAuthenticate(user, 'password', 'nopassword', function (err, result, error) {
-        if (err) {
-          return done(err);
-        }
-
-        expect(error.message).to.exist;
-
-        done();
-      });
-    });
-
-    it('should supply message when limiting attempts and authenticating too soon', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {
-        limitAttempts: true,
-        interval: 20000,
-      });
-      const User = mongoose.model('LimitAttemptsTooSoonUser', UserSchema);
-
-      const user = new User({
-        username: 'mark',
-        attempts: 1,
-        last: Date.now(),
-      });
-      user.setPassword('password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        user
-          .save()
-          .then(function () {
-            user.authenticate('password', function (err, user, error) {
-              if (err) {
-                return done(err);
-              }
-              expect(user).to.be.false;
-              expect(error).to.be.instanceof(errors.AttemptTooSoonError);
-              done();
-            });
-          })
-          .catch(function (err) {
-            return done(err);
-          });
-      });
-    });
-
-    it('should get an error updating when limiting attempts and authenticating too soon', function (done) {
-      const UserSchema = new Schema({}, { saveErrorIfNotFound: true });
-      UserSchema.plugin(passportLocalMongoose, {
-        limitAttempts: true,
-        interval: 20000,
-      });
-      const User = mongoose.model('LimitAttemptsTooSoonUpdateWithError', UserSchema);
-
-      const user = new User({
-        username: 'jimmy',
-        attempts: 1,
-        last: Date.now(),
-      });
-      user.setPassword('password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        user
-          .save()
-          .then(function () {
-            user.authenticate('password', function (err, user, error) {
-              expect(err).to.not.exist;
-              expect(user).to.be.false;
-              expect(error).to.be.instanceOf(errors.AttemptTooSoonError);
-              done();
-            });
-          })
-          .catch(function (err) {
-            return done(err);
-          });
-      });
-    });
-
-    it('should update the user on password match while limiting attempts', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {
-        limitAttempts: true,
-      });
-      const User = mongoose.model('LimitAttemptsUpdateWithoutError', UserSchema);
-
-      const user = new User({
-        username: 'walter',
-      });
-      user.setPassword('password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        user
-          .save()
-          .then(function () {
-            user.authenticate('password', function (err, result, error) {
-              if (err) {
-                return done(err);
-              }
-
-              expect(result).to.exist;
-              expect(result.username).to.equal(user.username);
-              expect(error).to.not.exist;
-              done();
-            });
-          })
-          .catch(function (err) {
-            return done(err);
-          });
-      });
-    });
-
-    it('should fail to update the user on password mismatch while limiting attempts', function (done) {
-      const UserSchema = new Schema({}, { saveErrorIfNotFound: true });
-      UserSchema.plugin(passportLocalMongoose, {
-        limitAttempts: true,
-        interval: 20000,
-      });
-      const User = mongoose.model('LimitAttemptsMismatchWithAnError', UserSchema);
-
-      const user = new User({
-        username: 'wendy',
-        attempts: 1,
-        last: Date.now(),
-      });
-      user.setPassword('password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        user
-          .save()
-          .then(function () {
-            user.authenticate('WRONGpassword', function (err, user, error) {
-              if (err) {
-                return done(err);
-              }
-              expect(user).to.be.false;
-              expect(error).to.be.instanceof(errors.AttemptTooSoonError);
-              done();
-            });
-          })
-          .catch(function (err) {
-            return done(err);
-          });
-      });
-    });
-
-    it('should supply message if username is not registered', function (done) {
-      const user = new DefaultUser({
-        username: 'andrew',
-      });
-      user.authenticate('password', function (err, result, error) {
-        if (err) {
-          return done(err);
-        }
-
-        expect(result).to.be.false;
-        expect(error.message).to.exist;
-        done();
-      });
     });
   });
 
@@ -677,360 +340,6 @@ describe('passportLocalMongoose', function () {
 
       expect(authenticatedUser).to.be.false;
       expect(error.message).to.exist;
-    });
-  });
-
-  describe('static #authenticate() callback', function () {
-    beforeEach(async () => await dropMongodbCollections(connectionString));
-
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
-    afterEach(() => mongoose.disconnect());
-
-    it('should yield false with message option for authenticate', function (done) {
-      DefaultUser.authenticate()('user', 'password', function (err, result, error) {
-        if (err) {
-          return done(err);
-        }
-        expect(result).to.equal(false);
-        expect(error.message).to.exist;
-
-        done();
-      });
-    });
-
-    it('should authenticate existing user with matching password', function (done) {
-      const user = new DefaultUser({ username: 'user' });
-      user.setPassword('password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        user
-          .save()
-          .then(function () {
-            DefaultUser.authenticate()('user', 'password', function (err, result) {
-              if (err) {
-                return done(err);
-              }
-
-              expect(result).to.be.instanceof(DefaultUser);
-              expect(result.username).to.equal(user.username);
-
-              expect(result.salt).to.equal(user.salt);
-              expect(result.hash).to.equal(user.hash);
-
-              done();
-            });
-          })
-          .catch(function (err) {
-            return done(err);
-          });
-      });
-    });
-
-    it('should authenticate existing user with usernameLowerCase enabled and with matching password', function (done) {
-      const UserSchema = new Schema();
-      UserSchema.plugin(passportLocalMongoose, { usernameLowerCase: true });
-      const User = mongoose.model('AuthenticateWithLowerCaseUsername', UserSchema);
-
-      const username = 'userName';
-      User.register({ username: username }, 'password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        User.authenticate()('username', 'password', function (err, result) {
-          if (err) {
-            return done(err);
-          }
-
-          expect(result).to.be.instanceof(User);
-          expect('username').to.equal(result.username);
-
-          done();
-        });
-      });
-    });
-
-    it('should authenticate existing user with case insensitive username with matching password', function (done) {
-      const UserSchema = new Schema();
-      UserSchema.plugin(passportLocalMongoose, { usernameCaseInsensitive: true });
-      const User = mongoose.model('AuthenticateWithCaseInsensitiveUsername', UserSchema);
-
-      const username = 'userName';
-      User.register({ username: username }, 'password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        User.authenticate()('username', 'password', function (err, result) {
-          if (err) {
-            return done(err);
-          }
-
-          expect(result).to.be.instanceof(User);
-          expect(username).to.equal(result.username);
-
-          done();
-        });
-      });
-    });
-
-    it('should authenticate existing user with matching password with field overrides', function (done) {
-      const UserSchema = new Schema();
-      UserSchema.plugin(passportLocalMongoose, {
-        usernameField: 'email',
-        hashField: 'hashValue',
-        saltField: 'saltValue',
-      });
-      const User = mongoose.model('AuthenticateWithFieldOverrides', UserSchema);
-
-      const email = 'emailUsedAsUsername';
-      User.register({ email: email }, 'password', function (err, user) {
-        if (err) {
-          return done(err);
-        }
-
-        User.authenticate()(email, 'password', function (err, result) {
-          if (err) {
-            return done(err);
-          }
-
-          expect(result).to.be.instanceof(User);
-          expect(result.email).to.equal(user.email);
-          expect(result.saltValue).to.equal(user.saltValue);
-          expect(result.hashValue).to.equal(user.hashValue);
-
-          done();
-        });
-      });
-    });
-
-    it('should not authenticate existing user with non matching password', function (done) {
-      const user = new DefaultUser({ username: 'user' });
-      user.setPassword('password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        user
-          .save()
-          .then(function () {
-            DefaultUser.authenticate()('user', 'wrongpassword', function (err, result, error) {
-              if (err) {
-                return done(err);
-              }
-              expect(result).to.equal(false);
-              expect(error.message).to.exist;
-
-              done();
-            });
-          })
-          .catch(function (err) {
-            return done(err);
-          });
-      });
-    });
-
-    it('should lock authenticate after too many login attempts', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, { limitAttempts: true, interval: 20000 }); // High initial value for test
-
-      const User = mongoose.model('LockUserAfterLimitAttempts', UserSchema);
-
-      const user = new User({ username: 'user' });
-      user.setPassword('password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        user
-          .save()
-          .then(function () {
-            User.authenticate()('user', 'WRONGpassword', function (err, result) {
-              if (err) {
-                return done(err);
-              }
-              expect(result).to.be.false;
-
-              User.authenticate()('user', 'WRONGpassword', function (err, result) {
-                if (err) {
-                  return done(err);
-                }
-                expect(result).to.be.false;
-
-                User.authenticate()('user', 'WRONGpassword', function (err, result) {
-                  if (err) {
-                    return done(err);
-                  }
-                  expect(result).to.be.false;
-
-                  // Last login attempt should lock the user!
-                  User.authenticate()('user', 'password', function (err, result) {
-                    if (err) {
-                      return done(err);
-                    }
-                    expect(result).to.be.false;
-
-                    done();
-                  });
-                });
-              });
-            });
-          })
-          .catch(function (err) {
-            return done(err);
-          });
-      });
-    });
-
-    it('should completely lock account after too many failed attempts', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {
-        limitAttempts: true,
-        maxInterval: 1, // Don't require more than a millisecond of waiting
-        maxAttempts: 3,
-      });
-
-      const User = mongoose.model('LockUserPermanentlyAfterLimitAttempts', UserSchema);
-
-      function authenticateWithWrongPassword(times, next) {
-        if (times == 0) {
-          return next();
-        }
-
-        User.authenticate()('user', 'WRONGpassword', function (err, result, data) {
-          if (err) {
-            return done(err);
-          }
-          expect(result).to.be.false;
-
-          times--;
-
-          // Use should be locked at last login attempt
-          if (times == 0) {
-            expect(data.message).to.contain('locked');
-          } else {
-            expect(data.message).to.not.contain('locked');
-          }
-
-          authenticateWithWrongPassword(times, next);
-        });
-      }
-
-      const user = new User({ username: 'user' });
-      user.setPassword('password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        user
-          .save()
-          .then(function () {
-            authenticateWithWrongPassword(3, function () {
-              // Login attempt before should have locked the user!
-              User.authenticate()('user', 'password', function (err, result, data) {
-                if (err) {
-                  return done(err);
-                }
-                expect(result).to.be.false;
-                expect(data.message).to.contain('locked');
-
-                user.resetAttempts(function (err) {
-                  if (err) {
-                    return done(err);
-                  }
-
-                  // User should be unlocked
-                  User.authenticate()('user', 'password', function (err, result) {
-                    if (err) {
-                      return done(err);
-                    }
-                    expect(result).to.exist;
-
-                    done();
-                  });
-                });
-              });
-            });
-          })
-          .catch(function (err) {
-            return done(err);
-          });
-      });
-    });
-
-    it('should auto unlock account after unlock interval is reached', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {
-        limitAttempts: true,
-        maxInterval: 1, // Don't require more than a millisecond of waiting
-        maxAttempts: 3,
-        unlockInterval: 1000,
-      });
-
-      const User = mongoose.model('AutoUnLockUserAfterUnlockInterverIsReached', UserSchema);
-
-      function authenticateWithWrongPassword(times, next) {
-        if (times == 0) {
-          return next();
-        }
-
-        User.authenticate()('user', 'WRONGpassword', function (err, result, data) {
-          if (err) {
-            return done(err);
-          }
-          expect(result).to.be.false;
-
-          times--;
-
-          // Use should be locked at last login attempt
-          if (times == 0) {
-            expect(data.message).to.contain('locked');
-          } else {
-            expect(data.message).to.not.contain('locked');
-          }
-
-          authenticateWithWrongPassword(times, next);
-        });
-      }
-
-      const user = new User({ username: 'user' });
-      user.setPassword('password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        user
-          .save()
-          .then(function () {
-            authenticateWithWrongPassword(3, function () {
-              // After 1000ms user should be unlocked
-              User.authenticate()('user', 'password', function (err, result, data) {
-                if (err) {
-                  return done(err);
-                }
-                expect(result).to.be.false;
-                expect(data.message).to.contain('locked');
-
-                setTimeout(function () {
-                  User.authenticate()('user', 'password', function (err, result) {
-                    if (err) {
-                      return done(err);
-                    }
-                    expect(result).to.not.be.false;
-                    expect(result).to.exist;
-
-                    done();
-                  });
-                }, 1000);
-              });
-            });
-          })
-          .catch(function (err) {
-            return done(err);
-          });
-      });
     });
   });
 
@@ -1220,28 +529,28 @@ describe('passportLocalMongoose', function () {
       expect(DefaultUser.serializeUser).to.exist;
     });
 
-    it('should serialize existing user by username field', function (done) {
+    it('should serialize existing user by username field', async function () {
       const user = new DefaultUser({ username: 'user' });
 
-      DefaultUser.serializeUser()(user, function (err, username) {
-        expect(username).to.equal('user');
-
-        done();
+      const username = await usingPromise((cb) => {
+        DefaultUser.serializeUser()(user, cb);
       });
+
+      expect(username).to.equal('user');
     });
 
-    it('should serialize existing user by username field override', function (done) {
+    it('should serialize existing user by username field override', async () => {
       const UserSchema = new Schema();
       UserSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
       const User = mongoose.model('SerializeUserWithOverride', UserSchema);
 
       const user = new User({ email: 'emailUsedForUsername' });
 
-      User.serializeUser()(user, function (err, username) {
-        expect(username).to.equal('emailUsedForUsername');
-
-        done();
+      const username = await usingPromise((cb) => {
+        User.serializeUser()(user, cb);
       });
+
+      expect(username).to.equal('emailUsedForUsername');
     });
   });
 
@@ -1254,200 +563,25 @@ describe('passportLocalMongoose', function () {
       expect(DefaultUser.deserializeUser).to.exist;
     });
 
-    it('should deserialize users by retrieving users from mongodb', function (done) {
-      DefaultUser.register({ username: 'user' }, 'password', function (err, user) {
-        if (err) {
-          return done(err);
-        }
+    it('should deserialize users by retrieving users from mongodb', async function () {
+      const user = await DefaultUser.register({ username: 'user' }, 'password');
 
-        DefaultUser.deserializeUser()('user', function (err, loadedUser) {
-          if (err) {
-            return done(err);
-          }
-          expect(loadedUser.username).to.equal(user.username);
-
-          done();
-        });
-      });
+      const loadedUser = await usingPromise((cb) => DefaultUser.deserializeUser()('user', cb));
+      expect(loadedUser.username).to.equal(user.username);
     });
 
-    it('should deserialize users by retrieving users from mongodb with username override', function (done) {
+    it('should deserialize users by retrieving users from mongodb with username override', async () => {
       const UserSchema = new Schema();
       UserSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
       const User = mongoose.model('DeserializeUserWithOverride', UserSchema);
 
       const email = 'emailUsedForUsername';
-      User.register({ email: email }, 'password', function (err) {
-        if (err) {
-          return done(err);
-        }
+      await User.register({ email: email }, 'password');
 
-        User.deserializeUser()(email, function (err, loadedUser) {
-          if (err) {
-            return done(err);
-          }
-          expect(loadedUser.email).to.equal(email);
-
-          done();
-        });
+      const loadedUser = await usingPromise((cb) => {
+        User.deserializeUser()(email, cb);
       });
-    });
-  });
-
-  describe('static #findByUsername() callback', function () {
-    beforeEach(async () => await dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
-    afterEach(() => mongoose.disconnect());
-
-    it('should define static findByUsername helper function', function () {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('FindByUsernameDefined', UserSchema);
-
-      expect(User.findByUsername).to.exist;
-    });
-
-    it('should retrieve saved user with findByUsername helper function', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('FindByUsername', UserSchema);
-
-      const user = new User({ username: 'hugo' });
-      user
-        .save()
-        .then(function () {
-          User.findByUsername('hugo', function (err, user) {
-            if (err) {
-              return done(err);
-            }
-            expect(user).to.exist;
-            expect('hugo').to.equal(user.username);
-
-            done();
-          });
-        })
-        .catch(function (err) {
-          return done(err);
-        });
-    });
-
-    it('should return a query object when no callback is specified', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('FindByUsernameQueryObject', UserSchema);
-
-      const user = new User({ username: 'hugo' });
-      user
-        .save()
-        .then(function () {
-          const query = User.findByUsername('hugo');
-
-          expect(query).to.exist;
-
-          query
-            .exec()
-            .then(function (user) {
-              expect(user).to.exist;
-              expect(user.username).to.equal('hugo');
-
-              done();
-            })
-            .catch(function (err) {
-              return done(err);
-            });
-        })
-        .catch(function (err) {
-          return done(err);
-        });
-    });
-
-    it('should select all fields', function (done) {
-      const UserSchema = new Schema({ department: { type: String, required: true } });
-      UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('FindByUsernameWithAllFields', UserSchema);
-
-      const user = new User({ username: 'hugo', department: 'DevOps' });
-      user
-        .save()
-        .then(function () {
-          User.findByUsername('hugo', function (err, user) {
-            if (err) {
-              return done(err);
-            }
-            expect(user).to.exist;
-            expect(user.username).to.equal('hugo');
-            expect(user.department).to.equal('DevOps');
-
-            done();
-          });
-        })
-        .catch(function (err) {
-          return done(err);
-        });
-    });
-
-    it('should select fields specified by selectFields option', function (done) {
-      const UserSchema = new Schema({ department: { type: String, required: true } });
-      UserSchema.plugin(passportLocalMongoose, { selectFields: 'username' });
-      const User = mongoose.model('FindByUsernameWithSelectFieldsOption', UserSchema);
-
-      const user = new User({ username: 'hugo', department: 'DevOps' });
-      user
-        .save()
-        .then(function () {
-          User.findByUsername('hugo', function (err, user) {
-            if (err) {
-              return done(err);
-            }
-            expect(user).to.exist;
-            expect(user.username).to.equal('hugo');
-            expect(user.department).to.equal(undefined);
-
-            done();
-          });
-        })
-        .catch(function (err) {
-          return done(err);
-        });
-    });
-
-    it('should retrieve saved user with findByUsername helper function with username field override', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
-      const User = mongoose.model('FindByUsernameWithOverride', UserSchema);
-
-      const email = 'emailUsedForUsername';
-      const user = new User({ email: email });
-
-      user
-        .save()
-        .then(function () {
-          User.findByUsername(email, function (err, user) {
-            if (err) {
-              return done(err);
-            }
-            expect(user).to.exist;
-            expect(email).to.equal(user.email);
-
-            done();
-          });
-        })
-        .catch(function (err) {
-          return done(err);
-        });
-    });
-
-    it('should not throw if lowercase option is specified and no username is supplied', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, { usernameLowerCase: true });
-      const User = mongoose.model('FindByUsernameWithUndefinedUsername', UserSchema);
-
-      User.findByUsername(undefined, function (err) {
-        if (err) {
-          return done(err);
-        }
-        done();
-      });
+      expect(loadedUser.email).to.equal(email);
     });
   });
 
@@ -1546,156 +680,6 @@ describe('passportLocalMongoose', function () {
       const User = mongoose.model('FindByUsernameWithUndefinedUsernameAsync', UserSchema);
 
       await User.findByUsername(undefined);
-    });
-  });
-
-  describe('static #register() callback', function () {
-    beforeEach(async () => await dropMongodbCollections(connectionString));
-    beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
-    afterEach(() => mongoose.disconnect());
-
-    it('should define static register helper function', function () {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('RegisterDefined', UserSchema);
-
-      expect(User.register).to.exist;
-    });
-
-    it('should register user', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('RegisterUser', UserSchema);
-
-      User.register({ username: 'hugo' }, 'password', function (err, user) {
-        if (err) {
-          return done(err);
-        }
-        expect(user).to.exist;
-
-        User.findByUsername('hugo', function (err, user) {
-          if (err) {
-            return done(err);
-          }
-          expect(user).to.exist;
-          done();
-        });
-      });
-    });
-
-    it('should check for duplicate user name', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('RegisterDuplicateUser', UserSchema);
-
-      User.register({ username: 'hugo' }, 'password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        User.register({ username: 'hugo' }, 'password', function (err) {
-          expect(err).to.exist;
-          done();
-        });
-      });
-    });
-
-    it('should authenticate registered user', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, { iterations: 1 }); // 1 iteration - safes time in tests
-      const User = mongoose.model('RegisterAndAuthenticateUser', UserSchema);
-
-      User.register({ username: 'hugo' }, 'password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        User.authenticate()('hugo', 'password', function (err, user, error) {
-          if (err) {
-            return done(err);
-          }
-          expect(user).to.exist;
-          expect(error).to.not.exist;
-
-          done();
-        });
-      });
-    });
-
-    it('should not authenticate registered user with wrong password', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, { iterations: 1 }); // 1 iteration - safes time in tests
-      const User = mongoose.model('RegisterAndNotAuthenticateUser', UserSchema);
-
-      User.register({ username: 'hugo' }, 'password', function (err) {
-        if (err) {
-          return done(err);
-        }
-
-        User.authenticate()('hugo', 'wrong_password', function (err, user, error) {
-          if (err) {
-            return done(err);
-          }
-          expect(user).to.equal(false);
-          expect(error).to.exist;
-
-          done();
-        });
-      });
-    });
-
-    it('it should add username existing user without username', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('RegisterExistingUser', UserSchema);
-
-      const existingUser = new User({});
-      existingUser
-        .save()
-        .then(function (user) {
-          expect(user).to.exist;
-
-          user.username = 'hugo';
-          User.register(user, 'password', function (err, user) {
-            if (err) {
-              return done(err);
-            }
-            expect(user).to.exist;
-
-            User.findByUsername('hugo', function (err, user) {
-              if (err) {
-                return done(err);
-              }
-              expect(user).to.exist;
-              done();
-            });
-          });
-        })
-        .catch(function (err) {
-          return done(err);
-        });
-    });
-
-    it('should result in AuthenticationError error in case no username was given', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('RegisterUserWithoutUsername', UserSchema);
-
-      User.register({}, 'password', function (err) {
-        expect(err).to.be.instanceof(errors.AuthenticationError);
-        done();
-      });
-    });
-
-    it('should result in AuthenticationError error in case no password was given', function (done) {
-      const UserSchema = new Schema({});
-      UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('RegisterUserWithoutPassword', UserSchema);
-
-      User.register({ username: 'hugo' }, undefined, function (err) {
-        expect(err).to.be.instanceof(errors.AuthenticationError);
-        done();
-      });
     });
   });
 
@@ -1823,19 +807,18 @@ describe('passportLocalMongoose', function () {
   });
 });
 
-function setPasswordAndAuthenticate(user, passwordToSet, passwordToAuthenticate, cb) {
-  user.setPassword(passwordToSet, function (err) {
-    if (err) {
-      return cb(err);
-    }
-
-    user.authenticate(passwordToAuthenticate, cb);
-  });
+async function setPasswordAndAuthenticate(user, passwordToSet, passwordToAuthenticate) {
+  await user.setPassword(passwordToSet);
+  return await user.authenticate(passwordToAuthenticate);
 }
 
-// TODO: Avoid a duplicate setPasswordAndAuthenticate function
-function setPasswordAndAuthenticateAsync(user, passwordToSet, passwordToAuthenticate) {
-  return new Promise((resolve, reject) =>
-    setPasswordAndAuthenticate(user, passwordToSet, passwordToAuthenticate, (err, user) => (err ? reject(err) : resolve(user))),
-  );
+function usingPromise(fn) {
+  return new Promise((resolve, reject) => {
+    fn((err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(result);
+    });
+  });
 }
