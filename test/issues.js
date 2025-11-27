@@ -17,9 +17,7 @@ describe('issues', function () {
   this.timeout(10000); // Ten seconds - mongodb access needed
 
   beforeEach(async () => await dropMongodbCollections(connectionString));
-  beforeEach(() =>
-    mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false })
-  );
+  beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
   afterEach(() => mongoose.disconnect());
 
   it('should support nested fields - Issue #9', function (done) {

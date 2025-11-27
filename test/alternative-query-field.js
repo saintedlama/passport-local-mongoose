@@ -17,9 +17,7 @@ describe('alternative query field', function () {
   this.timeout(10000); // Ten seconds - mongo db access needed
 
   beforeEach(async () => await dropMongodbCollections(connectionString));
-  beforeEach(() =>
-    mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false })
-  );
+  beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
   afterEach(() => mongoose.disconnect());
 
   it('should find an existing user by alternative query field', function (done) {
