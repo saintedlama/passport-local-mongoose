@@ -13,7 +13,7 @@ module.exports = function (schema, options) {
   options.encoding = options.encoding || 'hex';
   options.digestAlgorithm = options.digestAlgorithm || 'sha256'; // To get a list of supported hashes use crypto.getHashes()
 
-  function defaultPasswordValidator(password, cb) {
+  function defaultPasswordValidator(_password, cb) {
     cb(null);
   }
 
@@ -88,12 +88,10 @@ module.exports = function (schema, options) {
 
   schema.add(schemaFields);
 
-  schema.pre('save', function (next) {
+  schema.pre('save', function () {
     if (options.usernameLowerCase && this[options.usernameField]) {
       this[options.usernameField] = this[options.usernameField].toLowerCase();
     }
-
-    next();
   });
 
   schema.methods.setPassword = function (password, cb) {
