@@ -3,12 +3,12 @@ import { Document } from 'mongoose';
 
 import { pbkdf2 } from './pbkdf2';
 import * as errors from './errors';
-import { PassportLocalOptions, AuthenticationResult } from '../types';
+import { PassportLocalMongooseOptions, AuthenticationResult } from '../types';
 
 export async function authenticate(
   user: Document,
   password: string,
-  options: Required<PassportLocalOptions>,
+  options: Required<PassportLocalMongooseOptions>,
 ): Promise<AuthenticationResult> {
   if (options.limitAttempts) {
     const attemptsInterval = Math.pow(options.interval, Math.log(user.get(options.attemptsField) + 1));

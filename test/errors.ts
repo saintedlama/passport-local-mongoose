@@ -1,4 +1,6 @@
-import { errors } from '../dist/index.js';
+import { describe, it, expect } from 'vitest';
+
+import { errors } from '../src/index.ts';
 
 describe('AuthenticationError', function () {
   it('should construct a valid error with stack trace and name', function () {

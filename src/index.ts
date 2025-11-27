@@ -6,15 +6,15 @@ import { Schema, Model, Query } from 'mongoose';
 import { pbkdf2 } from './lib/pbkdf2';
 import * as errors from './lib/errors';
 import { authenticate } from './lib/authenticate';
-import { PassportLocalOptions, AuthenticationResult, FindByUsernameOptions, PassportLocalDocument } from './types';
+import { PassportLocalMongooseOptions, AuthenticationResult, FindByUsernameOptions, PassportLocalMongooseDocument } from './types';
 
 const randomBytesAsync = promisify(crypto.randomBytes);
 
-function passportLocalMongoose<T extends PassportLocalDocument = PassportLocalDocument>(
+function passportLocalMongoose<T extends PassportLocalMongooseDocument = PassportLocalMongooseDocument>(
   schema: Schema<T>,
-  options?: PassportLocalOptions,
+  options?: PassportLocalMongooseOptions,
 ): void {
-  const opts: Required<PassportLocalOptions> = {
+  const opts: Required<PassportLocalMongooseOptions> = {
     saltlen: 32,
     iterations: 25000,
     keylen: 512,
@@ -243,7 +243,13 @@ function passportLocalMongoose<T extends PassportLocalDocument = PassportLocalDo
   };
 }
 
-// Export patterns for CommonJS compatibility
 passportLocalMongoose.errors = errors;
-
-export = passportLocalMongoose;
+export default passportLocalMongoose;
+export { errors };
+export {
+  PassportLocalMongooseOptions,
+  AuthenticationResult,
+  FindByUsernameOptions,
+  PassportLocalMongooseDocument,
+  PassportLocalMongooseModel,
+} from './types';

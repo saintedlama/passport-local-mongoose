@@ -1,7 +1,9 @@
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+
 import mongoose, { Schema } from 'mongoose';
 import dropMongodbCollections from 'drop-mongodb-collections';
 import Debug from 'debug';
-import passportLocalMongoose from '../dist/index.js';
+import passportLocalMongoose from '../src/index';
 
 const debug = Debug('passport:local:mongoose');
 

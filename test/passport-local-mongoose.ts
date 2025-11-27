@@ -1,14 +1,23 @@
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+
 import mongoose, { Schema } from 'mongoose';
 import dropMongodbCollections from 'drop-mongodb-collections';
 import Debug from 'debug';
-import { errors } from '../dist/index.js';
-import passportLocalMongoose from '../dist/index.js';
+import passportLocalMongoose, { errors, PassportLocalMongooseDocument, PassportLocalMongooseModel } from '../src/index';
 
 const debug = Debug('passport:local:mongoose');
 
-const DefaultUserSchema = new Schema();
+interface DefaultUserDocument extends PassportLocalMongooseDocument {
+  email?: string;
+}
+
+const DefaultUserSchema = new Schema<DefaultUserDocument>({
+  email: String,
+});
+
 DefaultUserSchema.plugin(passportLocalMongoose);
-const DefaultUser = mongoose.model('DefaultUser', DefaultUserSchema);
+const DefaultUser = mongoose.model<DefaultUserDocument>('DefaultUser', DefaultUserSchema) as PassportLocalMongooseModel<DefaultUserDocument>;
+
 
 const dbName = 'passportlocalmongoosetests';
 let connectionString = `mongodb://localhost:27017/${dbName}`;
@@ -244,12 +253,12 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should supply message when limiting attempts and authenticating too soon', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, {
         limitAttempts: true,
         interval: 20000,
       });
-      const User = mongoose.model('LimitAttemptsTooSoonUserAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('LimitAttemptsTooSoonUserAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const user = new User({
         username: 'mark',
@@ -267,12 +276,12 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should get an error updating when limiting attempts and authenticating too soon', async () => {
-      const UserSchema = new Schema({}, { saveErrorIfNotFound: true });
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({}, { saveErrorIfNotFound: true } as any);
       UserSchema.plugin(passportLocalMongoose, {
         limitAttempts: true,
         interval: 20000,
       });
-      const User = mongoose.model('LimitAttemptsTooSoonUpdateWithErrorAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('LimitAttemptsTooSoonUpdateWithErrorAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const user = new User({
         username: 'jimmy',
@@ -290,11 +299,11 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should update the user on password match while limiting attempts', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, {
         limitAttempts: true,
       });
-      const User = mongoose.model('LimitAttemptsUpdateWithoutErrorAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('LimitAttemptsUpdateWithoutErrorAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const user = new User({
         username: 'walter',
@@ -306,17 +315,19 @@ describe('passportLocalMongoose', function () {
       const { user: authenticatedUser, error } = await user.authenticate('password');
 
       expect(authenticatedUser).to.exist;
-      expect(authenticatedUser.username).to.equal(user.username);
+      if (authenticatedUser) {
+        expect(authenticatedUser.username).to.equal(user.username);
+      }
       expect(error).to.not.exist;
     });
 
     it('should fail to update the user on password mismatch while limiting attempts', async () => {
-      const UserSchema = new Schema({}, { saveErrorIfNotFound: true });
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({}, { saveErrorIfNotFound: true } as any);
       UserSchema.plugin(passportLocalMongoose, {
         limitAttempts: true,
         interval: 20000,
       });
-      const User = mongoose.model('LimitAttemptsMismatchWithAnErrorAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('LimitAttemptsMismatchWithAnErrorAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const user = new User({
         username: 'wendy',
@@ -360,16 +371,18 @@ describe('passportLocalMongoose', function () {
       const { user: result } = await DefaultUser.authenticate()('user', 'password');
 
       expect(result).to.be.instanceof(DefaultUser);
-      expect(result.username).to.equal(user.username);
-
-      expect(result.salt).to.equal(user.salt);
-      expect(result.hash).to.equal(user.hash);
+      expect(result).to.not.be.false;
+      if (result) {
+        expect(result.username).to.equal(user.username);
+        expect(result.salt).to.equal(user.salt);
+        expect(result.hash).to.equal(user.hash);
+      }
     });
 
     it('should authenticate existing user with usernameLowerCase enabled and with matching password', async () => {
-      const UserSchema = new Schema();
+      const UserSchema = new Schema<PassportLocalMongooseDocument>();
       UserSchema.plugin(passportLocalMongoose, { usernameLowerCase: true });
-      const User = mongoose.model('AuthenticateWithLowerCaseUsernameAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('AuthenticateWithLowerCaseUsernameAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const username = 'userName';
       await User.register({ username: username }, 'password');
@@ -377,13 +390,15 @@ describe('passportLocalMongoose', function () {
       const { user: result } = await User.authenticate()('username', 'password');
 
       expect(result).to.be.instanceof(User);
-      expect('username').to.equal(result.username);
+      if (result) {
+        expect('username').to.equal(result.username);
+      }
     });
 
     it('should authenticate existing user with case insensitive username with matching password', async () => {
-      const UserSchema = new Schema();
+      const UserSchema = new Schema<PassportLocalMongooseDocument>();
       UserSchema.plugin(passportLocalMongoose, { usernameCaseInsensitive: true });
-      const User = mongoose.model('AuthenticateWithCaseInsensitiveUsernameAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('AuthenticateWithCaseInsensitiveUsernameAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const username = 'userName';
       await User.register({ username: username }, 'password');
@@ -391,17 +406,19 @@ describe('passportLocalMongoose', function () {
       const { user: result } = await User.authenticate()('username', 'password');
 
       expect(result).to.be.instanceof(User);
-      expect(username).to.equal(result.username);
+      if (result) {
+        expect(username).to.equal(result.username);
+      }
     });
 
     it('should authenticate existing user with matching password with field overrides', async () => {
-      const UserSchema = new Schema();
+      const UserSchema = new Schema<PassportLocalMongooseDocument>();
       UserSchema.plugin(passportLocalMongoose, {
         usernameField: 'email',
         hashField: 'hashValue',
         saltField: 'saltValue',
       });
-      const User = mongoose.model('AuthenticateWithFieldOverridesAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('AuthenticateWithFieldOverridesAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const email = 'emailUsedAsUsername';
       const user = await User.register({ email: email }, 'password');
@@ -409,9 +426,11 @@ describe('passportLocalMongoose', function () {
       const { user: result } = await User.authenticate()(email, 'password');
 
       expect(result).to.be.instanceof(User);
-      expect(result.email).to.equal(user.email);
-      expect(result.saltValue).to.equal(user.saltValue);
-      expect(result.hashValue).to.equal(user.hashValue);
+      if (result) {
+        expect(result.email).to.equal(user.email);
+        expect(result.saltValue).to.equal(user.saltValue);
+        expect(result.hashValue).to.equal(user.hashValue);
+      }
     });
 
     it('should not authenticate existing user with non matching password', async () => {
@@ -426,10 +445,10 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should lock authenticate after too many login attempts', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, { limitAttempts: true, interval: 20000 }); // High initial value for test
 
-      const User = mongoose.model('LockUserAfterLimitAttemptsAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('LockUserAfterLimitAttemptsAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const user = new User({ username: 'user' });
       await user.setPassword('password');
@@ -451,14 +470,14 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should completely lock account after too many failed attempts', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, {
         limitAttempts: true,
         maxInterval: 1, // Don't require more than a millisecond of waiting
         maxAttempts: 3,
       });
 
-      const User = mongoose.model('LockUserPermanentlyAfterLimitAttemptsAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('LockUserPermanentlyAfterLimitAttemptsAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const user = new User({ username: 'user' });
       await user.setPassword('password');
@@ -484,7 +503,7 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should auto unlock account after unlock interval is reached', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, {
         limitAttempts: true,
         maxInterval: 1, // Don't require more than a millisecond of waiting
@@ -492,7 +511,7 @@ describe('passportLocalMongoose', function () {
         unlockInterval: 1000,
       });
 
-      const User = mongoose.model('AutoUnLockUserAfterUnlockInterverIsReachedAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('AutoUnLockUserAfterUnlockInterverIsReachedAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const user = new User({ username: 'user' });
       await user.setPassword('password');
@@ -538,9 +557,9 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should serialize existing user by username field override', async () => {
-      const UserSchema = new Schema();
+      const UserSchema = new Schema<PassportLocalMongooseDocument>();
       UserSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
-      const User = mongoose.model('SerializeUserWithOverride', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('SerializeUserWithOverride', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const user = new User({ email: 'emailUsedForUsername' });
 
@@ -564,19 +583,19 @@ describe('passportLocalMongoose', function () {
     it('should deserialize users by retrieving users from mongodb', async function () {
       const user = await DefaultUser.register({ username: 'user' }, 'password');
 
-      const loadedUser = await usingPromise((cb) => DefaultUser.deserializeUser()('user', cb));
+      const loadedUser = await usingPromise<DefaultUserDocument>((cb) => DefaultUser.deserializeUser()('user', cb));
       expect(loadedUser.username).to.equal(user.username);
     });
 
     it('should deserialize users by retrieving users from mongodb with username override', async () => {
-      const UserSchema = new Schema();
+      const UserSchema = new Schema<PassportLocalMongooseDocument>();
       UserSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
-      const User = mongoose.model('DeserializeUserWithOverride', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('DeserializeUserWithOverride', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const email = 'emailUsedForUsername';
       await User.register({ email: email }, 'password');
 
-      const loadedUser = await usingPromise((cb) => {
+      const loadedUser = await usingPromise<PassportLocalMongooseDocument>((cb) => {
         User.deserializeUser()(email, cb);
       });
       expect(loadedUser.email).to.equal(email);
@@ -589,17 +608,17 @@ describe('passportLocalMongoose', function () {
     afterEach(() => mongoose.disconnect());
 
     it('should define static findByUsername helper function', () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('FindByUsernameDefinedAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('FindByUsernameDefinedAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       expect(User.findByUsername).to.exist;
     });
 
     it('should retrieve saved user with findByUsername helper function', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('FindByUsernameAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('FindByUsernameAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const user = new User({ username: 'hugo' });
       await user.save();
@@ -611,9 +630,9 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should return a query object when no callback is specified', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('FindByUsernameQueryObjectAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('FindByUsernameQueryObjectAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const user = new User({ username: 'hugo' });
       await user.save();
@@ -628,9 +647,12 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should select all fields', async () => {
-      const UserSchema = new Schema({ department: { type: String, required: true } });
+      interface UserWithDepartment extends PassportLocalMongooseDocument {
+        department: string;
+      }
+      const UserSchema = new Schema<UserWithDepartment>({ department: { type: String, required: true } });
       UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('FindByUsernameWithAllFieldsAsync', UserSchema);
+      const User = mongoose.model<UserWithDepartment>('FindByUsernameWithAllFieldsAsync', UserSchema) as PassportLocalMongooseModel<UserWithDepartment>;
 
       const user = new User({ username: 'hugo', department: 'DevOps' });
       await user.save();
@@ -643,9 +665,12 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should select fields specified by selectFields option', async () => {
-      const UserSchema = new Schema({ department: { type: String, required: true } });
+      interface UserWithDepartment extends PassportLocalMongooseDocument {
+        department?: string;
+      }
+      const UserSchema = new Schema<UserWithDepartment>({ department: { type: String, required: true } });
       UserSchema.plugin(passportLocalMongoose, { selectFields: 'username' });
-      const User = mongoose.model('FindByUsernameWithSelectFieldsOptionAsync', UserSchema);
+      const User = mongoose.model<UserWithDepartment>('FindByUsernameWithSelectFieldsOptionAsync', UserSchema) as PassportLocalMongooseModel<UserWithDepartment>;
 
       const user = new User({ username: 'hugo', department: 'DevOps' });
       await user.save();
@@ -658,9 +683,9 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should retrieve saved user with findByUsername helper function with username field override', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
-      const User = mongoose.model('FindByUsernameWithOverrideAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('FindByUsernameWithOverrideAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const email = 'emailUsedForUsername';
       const user = new User({ email: email });
@@ -673,9 +698,9 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should not throw if lowercase option is specified and no username is supplied', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, { usernameLowerCase: true });
-      const User = mongoose.model('FindByUsernameWithUndefinedUsernameAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('FindByUsernameWithUndefinedUsernameAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       await User.findByUsername(undefined as any);
     });
@@ -687,17 +712,17 @@ describe('passportLocalMongoose', function () {
     afterEach(() => mongoose.disconnect());
 
     it('should define static register helper function', function () {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('RegisterDefinedAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('RegisterDefinedAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       expect(User.register).to.exist;
     });
 
     it('should register user', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('RegisterUserAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('RegisterUserAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const user = await User.register({ username: 'hugo' }, 'password');
       expect(user).to.exist;
@@ -707,9 +732,9 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should check for duplicate user name', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('RegisterDuplicateUserAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('RegisterDuplicateUserAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       await User.register({ username: 'hugo' }, 'password');
 
@@ -723,9 +748,9 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should authenticate registered user', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, { iterations: 1 }); // 1 iteration - safes time in tests
-      const User = mongoose.model('RegisterAndAuthenticateUserAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('RegisterAndAuthenticateUserAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       await User.register({ username: 'hugo' }, 'password');
 
@@ -736,9 +761,9 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should not authenticate registered user with wrong password', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, { iterations: 1 }); // 1 iteration - safes time in tests
-      const User = mongoose.model('RegisterAndNotAuthenticateUserAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('RegisterAndNotAuthenticateUserAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       await User.register({ username: 'hugo' }, 'password');
 
@@ -749,9 +774,9 @@ describe('passportLocalMongoose', function () {
     });
 
     it('it should add username existing user without username', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('RegisterExistingUserAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('RegisterExistingUserAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const existingUser = new User({});
       const user = await existingUser.save();
@@ -765,9 +790,9 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should result in AuthenticationError error in case no username was given', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('RegisterUserWithoutUsernameAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('RegisterUserWithoutUsernameAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       try {
         await User.register({}, 'password');
@@ -780,9 +805,9 @@ describe('passportLocalMongoose', function () {
     });
 
     it('should result in AuthenticationError error in case no password was given', async () => {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, {});
-      const User = mongoose.model('RegisterUserWithoutPasswordAsync', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('RegisterUserWithoutPasswordAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       try {
         await User.register({ username: 'hugo' }, undefined as any);
@@ -795,9 +820,9 @@ describe('passportLocalMongoose', function () {
 
   describe('static #createStrategy()', function () {
     it('should create strategy', function () {
-      const UserSchema = new Schema({});
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
       UserSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
-      const User = mongoose.model('CreateStrategy', UserSchema);
+      const User = mongoose.model<PassportLocalMongooseDocument>('CreateStrategy', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
 
       const strategy = User.createStrategy();
       expect(strategy).to.exist;
@@ -810,7 +835,7 @@ async function setPasswordAndAuthenticate(user: any, passwordToSet: string, pass
   return await user.authenticate(passwordToAuthenticate);
 }
 
-function usingPromise<T>(fn: (cb: (err: any, result?: T) => void) => void): Promise<T> {
+function usingPromise<T>(fn: (cb: (err: any, result?: T | null) => void) => void): Promise<T> {
   return new Promise((resolve, reject) => {
     fn((err, result) => {
       if (err) {

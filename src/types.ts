@@ -1,6 +1,6 @@
 import { Document, Model, Query } from 'mongoose';
 
-export interface PassportLocalOptions {
+export interface PassportLocalMongooseOptions {
   // Field names
   usernameField?: string;
   hashField?: string;
@@ -56,14 +56,20 @@ export interface FindByUsernameOptions {
   selectHashSaltFields?: boolean;
 }
 
-export interface PassportLocalDocument extends Document {
+export interface PassportLocalMongooseDocument extends Document {
+  username?: string;
+  hash?: string;
+  salt?: string;
+  attempts?: number;
+  last?: Date;
   setPassword(_password: string): Promise<this>;
   changePassword(_oldPassword: string, _newPassword: string): Promise<this>;
   authenticate(_password: string): Promise<AuthenticationResult<this>>;
   resetAttempts?(): Promise<this>;
+  [key: string]: any; // Allow dynamic fields for custom usernameField, hashField, etc.
 }
 
-export interface PassportLocalModel<T extends PassportLocalDocument> extends Model<T> {
+export interface PassportLocalMongooseModel<T extends PassportLocalMongooseDocument> extends Model<T> {
   authenticate(): (_username: string, _password: string) => Promise<AuthenticationResult<T>>;
   serializeUser(): (_user: T, _cb: (_err: any, _id?: any) => void) => void;
   deserializeUser(): (_username: string, _cb: (_err: any, _user?: T | null) => void) => void;

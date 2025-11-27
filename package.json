@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/debug": "^4.1.12",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^24.10.1",
     "@types/passport": "1.0.17",
@@ -47,8 +48,9 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "prebuild": "rimraf dist",
+    "prebuild": "npm run clean",
     "prepublishOnly": "npm run build",
+    "clean": "rimraf dist",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
