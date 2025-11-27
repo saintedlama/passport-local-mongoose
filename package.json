@@ -36,8 +36,6 @@
     "mongoose": "^9.0.0",
     "nyc": "^17.1.0",
     "prettier": "^3.6.2",
-    "should-release": "^1.2.0",
-    "standard-version": "^9.5.0",
     "tsd": "^0.33.0"
   },
   "scripts": {
@@ -45,9 +43,7 @@
     "test:ci": "nyc --reporter=lcov mocha --recursive --throw-deprecation",
     "test:tsd": "tsd",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "should-release": "should-release",
-    "release": "standard-version"
+    "lint:fix": "eslint . --fix"
   },
   "tsd": {
     "directory": "test/types"
