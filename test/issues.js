@@ -107,8 +107,8 @@ describe('issues', function () {
   it('should support password validation - Issue #57', async () => {
     const UserSchema = new Schema({});
 
-    function passwordValidator(password) {
-      return Promise.reject(new Error('No password is valid'));
+    async function passwordValidator(_password) {
+      throw new Error('No password is valid');
     }
 
     UserSchema.plugin(passportLocalMongoose, {
@@ -125,7 +125,7 @@ describe('issues', function () {
     }
   });
 
-  it('should support password validation with promises - Issue #57', function () {
+  it('should support password validation with promises - Issue #57', async () => {
     const UserSchema = new Schema({});
 
     function passwordValidator() {
@@ -138,13 +138,12 @@ describe('issues', function () {
 
     const User = mongoose.model('ShouldSupportPasswordValidation_With_Promises_Issue_57', UserSchema);
 
-    return User.register({ username: 'nicolascage' }, 'password')
-      .then(() => {
-        throw new Error('Expected password validator to throw!');
-      })
-      .catch((err) => {
-        expect(err.message).to.equal('No password is valid');
-      });
+    try {
+      await User.register({ username: 'nicolascage' }, 'password');
+      throw new Error('Expected password validator to throw!');
+    } catch (err) {
+      expect(err.message).to.equal('No password is valid');
+    }
   });
 
   it('should not expose hash and salt fields - Issue #72', async () => {

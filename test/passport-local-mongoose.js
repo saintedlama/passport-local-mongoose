@@ -139,26 +139,24 @@ describe('passportLocalMongoose', function () {
   });
 
   describe('#setPassword()', function () {
-    it('should set yield an error if password is undefined', () => {
+    it('should set yield an error if password is undefined', async () => {
       const user = new DefaultUser();
 
-      return user
-        .setPassword()
-        .then(() => {
-          throw new Error('Should yieldd an error if password is undefined');
-        })
-        .catch(() => {
-          return;
-        });
+      try {
+        await user.setPassword();
+        throw new Error('Should yieldd an error if password is undefined');
+      } catch (_err) {
+        // Expected error
+        return;
+      }
     });
 
-    it('should set salt and hash', () => {
+    it('should set salt and hash', async () => {
       const user = new DefaultUser();
 
-      return user.setPassword('password').then((user) => {
-        expect(user.hash).to.exist;
-        expect(user.salt).to.exist;
-      });
+      const result = await user.setPassword('password');
+      expect(result.hash).to.exist;
+      expect(result.salt).to.exist;
     });
 
     it('should authenticate user with arguments supplied to setPassword', async () => {
@@ -224,9 +222,12 @@ describe('passportLocalMongoose', function () {
 
       await user.setPassword('password1');
 
-      const result = await user.changePassword('password1', '').catch((err) => err);
-
-      expect(result).to.be.instanceof(errors.MissingPasswordError);
+      try {
+        await user.changePassword('password1', '');
+        throw new Error('Expected changePassword to throw');
+      } catch (err) {
+        expect(err).to.be.instanceof(errors.MissingPasswordError);
+      }
     });
   });
 
