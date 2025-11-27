@@ -26,7 +26,6 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/debug": "^4.1.12",
-    "@types/mongoose": "^5.11.97",
     "@types/node": "^24.10.1",
     "@types/passport": "1.0.17",
     "@types/passport-local": "1.0.38",

@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.0.0](https://github.com/saintedlama/passport-local-mongoose/compare/v8.0.0...v9.0.0) (2025-11-27)
+
+### ⚠ BREAKING CHANGES
+
+* Upgraded to mongoose 9 and removed node for node versions < 20 support
+
+### Features
+
+* chore: upgrade dependencies and test setup
+* chore: remove examples causing too much maintenance effort
+* chore: modernize eslint, integrate prettier again, apply prettier fixes
+* chore: remove call to next for mongoose 9 compatibility
+* chore: remove mongo 4.x from build matrix and add back node 18
+* chore: switch to manual release process due to standard-version deprecation
+* chore: deprecate callback support, remove tests, use modern js for error creation
+* refactor remaining promise structures to async/await
+* chore: migrate to vitest
+* chore: remove typing artifacts
+* chore: rewrite in typescript
+* chore: remove index and cleanup README.md
+* chore: remove tsd from package.json
+* fix type problems
+* chore: remove node 18 from build matrix
+* chore: update minor dependencies
+
 ## [8.0.0](https://github.com/saintedlama/passport-local-mongoose/compare/v7.1.2...v8.0.0) (2023-03-14)
 
 
