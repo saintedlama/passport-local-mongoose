@@ -131,6 +131,7 @@ User.plugin(passportLocalMongoose, options);
 * `maxAttempts`: specifies the maximum number of failed attempts allowed before preventing login. Default: Infinity.
 * `unlockInterval`: specifies the interval in milliseconds, which is for unlock user automatically after the interval is reached. Defaults to 'undefined' which means deactivated.
 * `passwordValidator`: specifies your custom validation function for the password in the form:
+
     ```js
     passwordValidator = function(password,cb) {
       if (someValidationErrorExists(password)) {
@@ -140,8 +141,10 @@ User.plugin(passportLocalMongoose, options);
       return cb()
     }
     ```
+
     Default: validates non-empty passwords.
 * `passwordValidatorAsync`: specifies your custom validation function for the password with promises in the form:
+
     ```js
     passwordValidatorAsync = function(password) {
       return someAsyncValidation(password)
@@ -150,6 +153,7 @@ User.plugin(passportLocalMongoose, options);
         })
     }
     ```
+
 * `usernameQueryFields`: specifies alternative fields of the model for identifying a user (e.g. email).
 * `findByUsername`: Specifies a query function that is executed with query parameters to restrict the query with extra query parameters. For example query only users with field "active" set to `true`. Default: `function(model, queryParameters) { return model.findOne(queryParameters); }`. See the examples section for a use case.
 
@@ -174,11 +178,6 @@ Passport-Local Mongoose use the pbkdf2 algorithm of the node crypto library.
 [Pbkdf2](http://en.wikipedia.org/wiki/PBKDF2) was chosen because platform independent
 (in contrary to bcrypt). For every user a generated salt value is saved to make
 rainbow table attacks even harder.
-
-### Examples
-
-For a complete example implementing a registration, login and logout see the
-[login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
 
 ## API Documentation
 
@@ -237,7 +236,7 @@ User.createStrategy();
 * `authenticate()` Generates a function that is used in Passport's LocalStrategy
 * `serializeUser()` Generates a function that is used by Passport to serialize users into the session
 * `deserializeUser()` Generates a function that is used by Passport to deserialize users into the session
-* `register(user, password, cb)` Convenience method to register a new user instance with a given password. Checks if username is unique. See [login example](https://github.com/saintedlama/passport-local-mongoose/tree/master/examples/login).
+* `register(user, password, cb)` Convenience method to register a new user instance with a given password. Checks if username is unique.
 * `findByUsername()` Convenience method to find a user instance by it's unique username.
 * `createStrategy()` Creates a configured passport-local `LocalStrategy` instance that can be used in passport.
 
