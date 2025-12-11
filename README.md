@@ -48,6 +48,16 @@ You're free to define your User how you like. Passport-Local Mongoose will add a
 
 Additionally, Passport-Local Mongoose adds some methods to your Schema. See the [API Documentation](https://github.com/saintedlama/passport-local-mongoose#api-documentation) section for more details.
 
+#### ESM modules
+
+When using ESM modules, you need to import the default export of passport-local-mongoose like this
+
+```javascript
+import passportLocalMongoose from 'passport-local-mongoose';
+
+User.plugin(passportLocalMongoose.default);
+```
+
 ### Configure Passport/Passport-Local
 
 You should configure Passport/Passport-Local as described in [the Passport Guide](http://passportjs.org/guide/configure/).
