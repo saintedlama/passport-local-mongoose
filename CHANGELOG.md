@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.0.1](https://github.com/saintedlama/passport-local-mongoose/compare/v9.0.0...v9.0.1) (2025-12-12)
+
+### Bug Fixes
+
+* fix: add back callback to schema.statics.authenticate to fix issue #388
+
+### Features
+
+* chore: add back examples
+* chore: fix eslint config by disabling js no-unused-vars in favor of typescript equivalent
+* chore: add instructions for ESM module usage
+
 ## [9.0.0](https://github.com/saintedlama/passport-local-mongoose/compare/v8.0.0...v9.0.0) (2025-11-27)
 
 ### ⚠ BREAKING CHANGES
