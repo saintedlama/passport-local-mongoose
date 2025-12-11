@@ -6,7 +6,13 @@ import { Schema, Model, Query } from 'mongoose';
 import { pbkdf2 } from './lib/pbkdf2';
 import * as errors from './lib/errors';
 import { authenticate } from './lib/authenticate';
-import { PassportLocalMongooseOptions, AuthenticationResult, FindByUsernameOptions, PassportLocalMongooseDocument } from './types';
+import {
+  PassportLocalMongooseOptions,
+  AuthenticationResult,
+  FindByUsernameOptions,
+  PassportLocalMongooseDocument,
+  VerifyCallback,
+} from './types';
 
 const randomBytesAsync = promisify(crypto.randomBytes);
 
@@ -137,14 +143,23 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
   }
 
   // Passport Local Interface
-  schema.statics.authenticate = function (): (_username: string, _password: string) => Promise<AuthenticationResult<T>> {
-    return async (username: string, password: string): Promise<AuthenticationResult<T>> => {
-      const user = await (this as any).findByUsername(username, true);
-      if (user) {
-        return await user.authenticate(password);
+  schema.statics.authenticate = function () {
+    return (username: string, password: string, cb?: VerifyCallback<T>) => {
+      const promise = Promise.resolve()
+        .then(() => (this as any).findByUsername(username, true))
+        .then((user) => {
+          if (user) {
+            return user.authenticate(password);
+          }
+
+          return { user: false, error: new errors.IncorrectUsernameError(opts.errorMessages.IncorrectUsernameError!) };
+        });
+
+      if (!cb) {
+        return promise;
       }
 
-      return { user: false, error: new errors.IncorrectUsernameError(opts.errorMessages.IncorrectUsernameError!) };
+      return promise.then(({ user, error }) => cb(null, user, error)).catch((err) => cb(err));
     };
   };
 
@@ -221,7 +236,7 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
       queryOrParameters.push(parameter);
     }
 
-    const query = opts.findByUsername(this, { $or: queryOrParameters });
+    const query = opts.findByUsername(this as any, { $or: queryOrParameters });
 
     if (selectOpts.selectHashSaltFields) {
       query.select('+' + opts.hashField + ' +' + opts.saltField);

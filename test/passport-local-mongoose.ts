@@ -352,7 +352,7 @@ describe('passportLocalMongoose', function () {
     });
   });
 
-  describe('static #authenticate() async', function () {
+  describe('static #authenticate()', function () {
     beforeEach(async () => await dropMongodbCollections(connectionString));
     beforeEach(() => mongoose.connect(connectionString, { bufferCommands: false, autoIndex: false }));
     afterEach(() => mongoose.disconnect());
@@ -378,6 +378,33 @@ describe('passportLocalMongoose', function () {
         expect(result.hash).to.equal(user.hash);
       }
     });
+
+    it('should authenticate existing user with matching password using a callback', async () => {
+      const user = new DefaultUser({ username: 'user' });
+      await user.setPassword('password');
+      await user.save();
+
+      const { result } = await new Promise<{ result: DefaultUserDocument | false | undefined; error?: Error }>(
+        (resolve, reject) => {
+          DefaultUser.authenticate()('user', 'password', (err: Error | null, result, error) => {
+            if (err) {
+              return reject(err);
+            }
+
+            resolve({ result, error });
+          });
+        },
+      );
+
+      expect(result).to.be.instanceof(DefaultUser);
+      expect(result).to.not.be.false;
+      if (result) {
+        expect(result.username).to.equal(user.username);
+        expect(result.salt).to.equal(user.salt);
+        expect(result.hash).to.equal(user.hash);
+      }
+    });
+
 
     it('should authenticate existing user with usernameLowerCase enabled and with matching password', async () => {
       const UserSchema = new Schema<PassportLocalMongooseDocument>();

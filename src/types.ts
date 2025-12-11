@@ -69,8 +69,10 @@ export interface PassportLocalMongooseDocument extends Document {
   [key: string]: any; // Allow dynamic fields for custom usernameField, hashField, etc.
 }
 
+export type VerifyCallback<T> = (err: Error | null, user?: T | false, error?: Error) => void;
+
 export interface PassportLocalMongooseModel<T extends PassportLocalMongooseDocument> extends Model<T> {
-  authenticate(): (_username: string, _password: string) => Promise<AuthenticationResult<T>>;
+  authenticate(): (_username: string, _password: string, _callback?: VerifyCallback<T>) => Promise<AuthenticationResult<T>>;
   serializeUser(): (_user: T, _cb: (_err: any, _id?: any) => void) => void;
   deserializeUser(): (_username: string, _cb: (_err: any, _user?: T | null) => void) => void;
   register(_user: T | any, _password: string): Promise<T>;
