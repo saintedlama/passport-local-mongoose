@@ -1,0 +1,19 @@
+{
+  "name": "passport-local-mongoose-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "routes.js",
+  "scripts": {
+    "start": "node --watch server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "express": "^5.2.1",
+    "express-session": "^1.18.2",
+    "mongoose": "^9.0.1",
+    "passport": "^0.7.0"
+  }
+}
