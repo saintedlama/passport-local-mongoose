@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.0.1](https://github.com/saintedlama/passport-local-mongoose/compare/v9.0.0...v9.0.1) (2026-05-01)
+
+
+### Bug Fixes
+
+* add back callback to schema.statics.authenticate to fix issue [#388](https://github.com/saintedlama/passport-local-mongoose/issues/388) ([8654955](https://github.com/saintedlama/passport-local-mongoose/commit/8654955b1b34c09f92396aaaf7a0bc7cb6988ce6))
+
 ## [9.0.1](https://github.com/saintedlama/passport-local-mongoose/compare/v9.0.0...v9.0.1) (2025-12-12)
 
 ### Bug Fixes
