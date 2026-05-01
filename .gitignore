@@ -24,3 +24,6 @@ docs/
 
 # TypeScript
 dist/
+
+# Agent stuff
+.claude/
