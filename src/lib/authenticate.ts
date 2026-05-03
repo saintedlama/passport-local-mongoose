@@ -1,7 +1,6 @@
 import { timingSafeEqual } from 'crypto';
 import { Document } from 'mongoose';
 
-import { pbkdf2 } from './pbkdf2';
 import * as errors from './errors';
 import { PassportLocalMongooseOptions, AuthenticationResult } from '../types';
 
@@ -35,7 +34,7 @@ export async function authenticate(
     return { user: false, error: new errors.NoSaltValueStoredError(options.errorMessages.NoSaltValueStoredError!) };
   }
 
-  const hashBuffer = await pbkdf2(password, user.get(options.saltField), options);
+  const hashBuffer = await options.generateHash(password, user.get(options.saltField));
   const storedHash = Buffer.from(user.get(options.hashField), options.encoding);
 
   if (timingSafeEqual(hashBuffer, storedHash)) {

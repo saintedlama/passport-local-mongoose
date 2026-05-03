@@ -566,6 +566,40 @@ describe('passportLocalMongoose', function () {
       expect(user5).to.not.be.false;
       expect(user5).to.exist;
     });
+
+    it('should authenticate with custom generateHash', async () => {
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
+      UserSchema.plugin(passportLocalMongoose, {
+        generateHash: async (password: string, salt: string) => {
+          const { createHmac } = await import('crypto');
+          return createHmac('sha256', salt).update(password).digest();
+        },
+      });
+      const User = mongoose.model<PassportLocalMongooseDocument>('GenerateHashAuthenticate', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
+
+      await User.register({ username: 'user' }, 'password');
+      const { user, error } = await User.authenticate()('user', 'password');
+
+      expect(user).to.exist;
+      expect(error).to.not.exist;
+    });
+
+    it('should reject wrong password with custom generateHash', async () => {
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
+      UserSchema.plugin(passportLocalMongoose, {
+        generateHash: async (password: string, salt: string) => {
+          const { createHmac } = await import('crypto');
+          return createHmac('sha256', salt).update(password).digest();
+        },
+      });
+      const User = mongoose.model<PassportLocalMongooseDocument>('GenerateHashRejectWrongPassword', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
+
+      await User.register({ username: 'user' }, 'password');
+      const { user, error } = await User.authenticate()('user', 'wrongpassword');
+
+      expect(user).to.equal(false);
+      expect(error).to.exist;
+    });
   });
 
   describe('static #serializeUser()', function () {
@@ -855,6 +889,7 @@ describe('passportLocalMongoose', function () {
       expect(strategy).to.exist;
     });
   });
+
 });
 
 async function setPasswordAndAuthenticate(user: any, passwordToSet: string, passwordToAuthenticate: string) {

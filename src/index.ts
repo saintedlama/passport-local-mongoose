@@ -26,6 +26,7 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
     keylen: 512,
     encoding: 'hex',
     digestAlgorithm: 'sha256',
+    generateHash: (password: string, salt: string) => pbkdf2(password, salt, opts),
     usernameField: 'username',
     usernameUnique: true,
     usernameQueryFields: [],
@@ -99,7 +100,7 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
     const salt = saltBuffer.toString(opts.encoding);
     this.set(opts.saltField, salt);
 
-    const hashRaw = await pbkdf2(password, salt, opts);
+    const hashRaw = await opts.generateHash(password, salt);
     this.set(opts.hashField, Buffer.from(hashRaw).toString(opts.encoding));
 
     return this;
