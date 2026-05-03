@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.1.0](https://github.com/saintedlama/passport-local-mongoose/compare/v9.0.3...v9.1.0) (2026-05-03)
+
+
+### Features
+
+* add generateHash option to provide custom hash algorithm ([#395](https://github.com/saintedlama/passport-local-mongoose/issues/395)) ([7f14239](https://github.com/saintedlama/passport-local-mongoose/commit/7f14239abfb9e693ab03c33ec052c353f002093e))
+
+
+### Bug Fixes
+
+* remove scmp in favor of timingSafeEqual ([1f23d20](https://github.com/saintedlama/passport-local-mongoose/commit/1f23d20da19b4cc203cc1f37a4917c775c2bd041))
+
 ## [9.0.3](https://github.com/saintedlama/passport-local-mongoose/compare/v9.0.2...v9.0.3) (2026-05-01)
 
 
