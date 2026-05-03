@@ -1,4 +1,4 @@
-import scmp from 'scmp';
+import { timingSafeEqual } from 'crypto';
 import { Document } from 'mongoose';
 
 import { pbkdf2 } from './pbkdf2';
@@ -36,8 +36,9 @@ export async function authenticate(
   }
 
   const hashBuffer = await pbkdf2(password, user.get(options.saltField), options);
+  const storedHash = Buffer.from(user.get(options.hashField), options.encoding);
 
-  if (scmp(hashBuffer, Buffer.from(user.get(options.hashField), options.encoding))) {
+  if (timingSafeEqual(hashBuffer, storedHash)) {
     if (options.limitAttempts) {
       user.set(options.lastLoginField, Date.now());
       user.set(options.attemptsField, 0);
