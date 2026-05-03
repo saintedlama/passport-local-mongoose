@@ -18,6 +18,7 @@ export interface PassportLocalMongooseOptions {
   keylen?: number;
   encoding?: BufferEncoding;
   digestAlgorithm?: string;
+  generateHash?: (_password: string, _salt: string) => Promise<Buffer>;
   passwordValidator?: (_password: string) => Promise<void>;
 
   // Rate limiting

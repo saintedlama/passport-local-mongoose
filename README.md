@@ -166,8 +166,19 @@ User.plugin(passportLocalMongoose, options);
 
 * `usernameQueryFields`: specifies alternative fields of the model for identifying a user (e.g. email).
 * `findByUsername`: Specifies a query function that is executed with query parameters to restrict the query with extra query parameters. For example query only users with field "active" set to `true`. Default: `function(model, queryParameters) { return model.findOne(queryParameters); }`. See the examples section for a use case.
+* `generateHash`: Replaces the built-in PBKDF2 hashing with a custom async function. The function receives the plain-text password and the user's stored salt, and must return a `Buffer` containing the derived key. The same function is called both when setting a password and when verifying one, so the result must be deterministic for a given (password, salt) pair. Default: PBKDF2 using the `iterations`, `keylen`, and `digestAlgorithm` options.
 
-**_Attention!_** Changing any of the hashing options (saltlen, iterations or keylen) in a production environment will prevent existing users from authenticating!
+    ```js
+    const { scrypt, timingSafeEqual } = require('crypto');
+    const { promisify } = require('util');
+    const scryptAsync = promisify(scrypt);
+
+    UserSchema.plugin(passportLocalMongoose, {
+      generateHash: (password, salt) => scryptAsync(password, salt, 64),
+    });
+    ```
+
+**_Attention!_** Changing any of the hashing options (saltlen, iterations, keylen, or generateHash) in a production environment will prevent existing users from authenticating!
 
 #### Error Messages
 
@@ -184,10 +195,14 @@ Override default error messages by setting `options.errorMessages`.
 
 ### Hash Algorithm
 
-Passport-Local Mongoose use the pbkdf2 algorithm of the node crypto library.
-[Pbkdf2](http://en.wikipedia.org/wiki/PBKDF2) was chosen because platform independent
+Passport-Local Mongoose uses the pbkdf2 algorithm of the node crypto library by default.
+[Pbkdf2](http://en.wikipedia.org/wiki/PBKDF2) was chosen because it is platform independent
 (in contrary to bcrypt). For every user a generated salt value is saved to make
 rainbow table attacks even harder.
+
+To use a different algorithm, supply the `generateHash` option. The function receives
+`(password, salt)` and must return a `Promise<Buffer>`. It is called identically during
+password creation and verification, so the result must be deterministic.
 
 ## API Documentation
 
