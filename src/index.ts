@@ -149,50 +149,38 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
     };
   }
 
-  schema.statics.authenticate = function (this: Model<T>) {
-    return async (username: string, password: string, cb?: VerifyCallback<T>): Promise<AuthenticationResult<T>> => {
-      try {
-        const user = await (this as any).findByUsername(username, true);
+  // Passport Local Interface
+  schema.statics.authenticate = function () {
+    return (username: string, password: string, cb?: VerifyCallback<T>) => {
+      const promise = Promise.resolve()
+        .then(() => (this as any).findByUsername(username, true))
+        .then((user) => {
+          if (user) {
+            return user.authenticate(password);
+          }
 
-        if (user) {
-          const authResult = await authenticate(user, password, opts);
-          if (cb) {
-            cb(null, authResult.user, authResult.error);
-          }
-          return authResult;
-        } else {
-          const authResult: AuthenticationResult<T> = {
-            user: false,
-            error: new errors.IncorrectUsernameError(opts.errorMessages.IncorrectUsernameError!),
-          };
-          if (cb) {
-            cb(null, authResult.user, authResult.error);
-          }
-          return authResult;
-        }
-      } catch (err: any) {
-        if (cb) {
-          cb(err);
-        }
-        throw err;
+          return { user: false, error: new errors.IncorrectUsernameError(opts.errorMessages.IncorrectUsernameError!) };
+        });
+
+      if (!cb) {
+        return promise;
       }
+
+      return promise.then(({ user, error }) => cb(null, user, error)).catch((err) => cb(err));
     };
   };
 
-  schema.statics.serializeUser = function () {
-    return function (user: T, cb: (err: any, id?: any) => void) {
-      try {
-        cb(null, user.get(opts.usernameField));
-      } catch (err) {
-        cb(err);
-      }
+  // Passport Interface
+  schema.statics.serializeUser = function (): (_user: T, _cb: (_err: any, _id?: any) => void) => void {
+    return function (user: T, cb: (_err: any, _id?: any) => void): void {
+      cb(null, user.get(opts.usernameField));
     };
   };
 
-  schema.statics.deserializeUser = function (this: Model<T>) {
-    return async function (this: any, username: string, cb: (err: any, user?: T | null) => void) {
+  schema.statics.deserializeUser = function (): (_username: string, _cb: (_err: any, _user?: T | null) => void) => void {
+    return async (username: string, cb: (_err: any, _user?: T | null) => void): Promise<void> => {
       try {
-        const user = await this.findByUsername(username);
+        const user = await (this as any).findByUsername(username);
         cb(null, user);
       } catch (err) {
         cb(err);
