@@ -1,4 +1,4 @@
-import { Document, Model, Query } from 'mongoose';
+import { Document, Model, Query, SaveOptions, ClientSession } from 'mongoose';
 
 export interface PassportLocalMongooseOptions {
   // Field names
@@ -55,6 +55,7 @@ export interface AuthenticationResult<T = any> {
 
 export interface FindByUsernameOptions {
   selectHashSaltFields?: boolean;
+  session?: ClientSession;
 }
 
 export interface PassportLocalMongooseDocument extends Document {
@@ -64,9 +65,9 @@ export interface PassportLocalMongooseDocument extends Document {
   attempts?: number;
   last?: Date;
   setPassword(_password: string): Promise<this>;
-  changePassword(_oldPassword: string, _newPassword: string): Promise<this>;
+  changePassword(_oldPassword: string, _newPassword: string, _options?: SaveOptions): Promise<this>;
   authenticate(_password: string): Promise<AuthenticationResult<this>>;
-  resetAttempts?(): Promise<this>;
+  resetAttempts?(_options?: SaveOptions): Promise<this>;
   [key: string]: any; // Allow dynamic fields for custom usernameField, hashField, etc.
 }
 
@@ -76,7 +77,7 @@ export interface PassportLocalMongooseModel<T extends PassportLocalMongooseDocum
   authenticate(): (_username: string, _password: string, _callback?: VerifyCallback<T>) => Promise<AuthenticationResult<T>>;
   serializeUser(): (_user: T, _cb: (_err: any, _id?: any) => void) => void;
   deserializeUser(): (_username: string, _cb: (_err: any, _user?: T | null) => void) => void;
-  register(_user: T | any, _password: string): Promise<T>;
+  register(_user: T | any, _password: string, _options?: SaveOptions): Promise<T>;
   findByUsername(_username: string, _selectHashSaltFields?: boolean | FindByUsernameOptions): Query<T | null, T>;
   createStrategy(): any;
 }

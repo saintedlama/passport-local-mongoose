@@ -166,6 +166,16 @@ describe('passportLocalMongoose', function () {
       expect(projection['username']).to.equal(1);
     });
 
+    it('should accept session option in findByUsername - Issue #315', function () {
+      const UserSchema = new Schema();
+      UserSchema.plugin(passportLocalMongoose);
+      const User = mongoose.model('FindByUsernameSessionTest', UserSchema) as PassportLocalMongooseModel;
+
+      const fakeSession = {} as any;
+      const query = User.findByUsername('testuser', { session: fakeSession });
+      expect((query.getOptions() as any).session).to.equal(fakeSession);
+    });
+
     it('should throw MissingUsernameError if neither usernameField nor usernameQueryFields are provided on register - Issue #361', async function () {
       const UserSchema = new Schema({ email: String });
       UserSchema.plugin(passportLocalMongoose, { usernameQueryFields: ['email'] });

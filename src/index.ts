@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { promisify } from 'util';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { Schema, Model, Query } from 'mongoose';
+import { Schema, Model, Query, SaveOptions } from 'mongoose';
 
 import { pbkdf2 } from './lib/pbkdf2';
 import * as errors from './lib/errors';
@@ -107,7 +107,12 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
     return this;
   };
 
-  schema.methods.changePassword = async function (this: T, oldPassword: string, newPassword: string): Promise<T> {
+  schema.methods.changePassword = async function (
+    this: T,
+    oldPassword: string,
+    newPassword: string,
+    saveOptions?: SaveOptions,
+  ): Promise<T> {
     if (!oldPassword || !newPassword) {
       throw new errors.MissingPasswordError(opts.errorMessages.MissingPasswordError!);
     }
@@ -118,7 +123,7 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
     }
 
     await this.setPassword(newPassword);
-    await this.save();
+    await this.save(saveOptions);
 
     return this;
   };
@@ -138,9 +143,9 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
   };
 
   if (opts.limitAttempts) {
-    schema.methods.resetAttempts = async function (): Promise<T> {
+    schema.methods.resetAttempts = async function (this: T, saveOptions?: SaveOptions): Promise<T> {
       this.set(opts.attemptsField, 0);
-      return await this.save();
+      return await this.save(saveOptions);
     };
   }
 
@@ -183,10 +188,14 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
     };
   };
 
-  schema.statics.register = async function (this: Model<T>, user: T | any, password: string): Promise<T> {
+  schema.statics.register = async function (this: Model<T>, user: T | any, password: string, saveOptions?: SaveOptions): Promise<T> {
     // Create an instance of this in case user isn't already an instance
     if (!(user instanceof this)) {
       user = new this(user);
+    }
+
+    if (saveOptions?.session) {
+      user.$session(saveOptions.session);
     }
 
     const providedFields = [opts.usernameField, ...opts.usernameQueryFields].filter(
@@ -197,15 +206,20 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
       throw new errors.MissingUsernameError(opts.errorMessages.MissingUsernameError!);
     }
 
+    const findByUsernameOpts: FindByUsernameOptions = {};
+    if (saveOptions?.session) {
+      findByUsernameOpts.session = saveOptions.session;
+    }
+
     for (const field of providedFields) {
-      const existingUser = await (this as any).findByUsername(user.get(field));
+      const existingUser = await (this as any).findByUsername(user.get(field), findByUsernameOpts);
       if (existingUser) {
         throw new errors.UserExistsError(opts.errorMessages.UserExistsError!);
       }
     }
 
     await user.setPassword(password);
-    return await user.save();
+    return await user.save(saveOptions);
   };
 
   schema.statics.findByUsername = function (
@@ -245,6 +259,10 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
     }
 
     const query = opts.findByUsername(this as any, { $or: queryOrParameters });
+
+    if (selectOpts.session) {
+      query.session(selectOpts.session);
+    }
 
     if (selectOpts.selectHashSaltFields) {
       query.select('+' + opts.hashField + ' +' + opts.saltField);
