@@ -198,7 +198,11 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
       user.$session(saveOptions.session);
     }
 
-    if (!user.get(opts.usernameField)) {
+    const providedFields = [opts.usernameField, ...opts.usernameQueryFields].filter(
+      (field, index, self) => Boolean(user.get(field)) && self.indexOf(field) === index,
+    );
+
+    if (providedFields.length === 0) {
       throw new errors.MissingUsernameError(opts.errorMessages.MissingUsernameError!);
     }
 
@@ -207,9 +211,11 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
       findByUsernameOpts.session = saveOptions.session;
     }
 
-    const existingUser = await (this as any).findByUsername(user.get(opts.usernameField), findByUsernameOpts);
-    if (existingUser) {
-      throw new errors.UserExistsError(opts.errorMessages.UserExistsError!);
+    for (const field of providedFields) {
+      const existingUser = await (this as any).findByUsername(user.get(field), findByUsernameOpts);
+      if (existingUser) {
+        throw new errors.UserExistsError(opts.errorMessages.UserExistsError!);
+      }
     }
 
     await user.setPassword(password);

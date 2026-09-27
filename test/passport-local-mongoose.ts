@@ -32,6 +32,14 @@ describe('passportLocalMongoose', function () {
     expect(passportLocalMongoose.errors).to.exist;
   });
 
+  it('should create AttemptTooSoonError with retryAfter and attemptsRemaining - Issue #250', function () {
+    const error = new passportLocalMongoose.errors.AttemptTooSoonError('Too soon', 42, 3);
+    expect(error.message).to.equal('Too soon');
+    expect(error.name).to.equal('AttemptTooSoonError');
+    expect(error.retryAfter).to.equal(42);
+    expect(error.attemptsRemaining).to.equal(3);
+  });
+
   describe('#plugin()', function () {
     it('should add "username" field to model', function () {
       const user = new DefaultUser({ username: 'username' });
@@ -167,6 +175,19 @@ describe('passportLocalMongoose', function () {
       const query = User.findByUsername('testuser', { session: fakeSession });
       expect((query.getOptions() as any).session).to.equal(fakeSession);
     });
+
+    it('should throw MissingUsernameError if neither usernameField nor usernameQueryFields are provided on register - Issue #361', async function () {
+      const UserSchema = new Schema({ email: String });
+      UserSchema.plugin(passportLocalMongoose, { usernameQueryFields: ['email'] });
+      const User = mongoose.model('RegisterMissingIdentifierTest', UserSchema) as PassportLocalMongooseModel;
+
+      try {
+        await User.register({}, 'password');
+        expect.fail('Expected register to throw MissingUsernameError');
+      } catch (err: any) {
+        expect(err).to.be.instanceof(passportLocalMongoose.errors.MissingUsernameError);
+      }
+    });
   });
 
   describe('#setPassword()', function () {
@@ -298,6 +319,8 @@ describe('passportLocalMongoose', function () {
 
       expect(authenticatedUser).to.be.false;
       expect(error).to.be.instanceof(errors.AttemptTooSoonError);
+      expect((error as errors.AttemptTooSoonError).retryAfter).to.be.a('number');
+      expect((error as errors.AttemptTooSoonError).attemptsRemaining).to.be.a('number');
     });
 
     it('should get an error updating when limiting attempts and authenticating too soon', async () => {
