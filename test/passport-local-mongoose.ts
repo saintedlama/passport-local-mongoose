@@ -157,6 +157,19 @@ describe('passportLocalMongoose', function () {
       expect(projection['+salt']).to.equal(1);
       expect(projection['username']).to.equal(1);
     });
+
+    it('should throw MissingUsernameError if neither usernameField nor usernameQueryFields are provided on register - Issue #361', async function () {
+      const UserSchema = new Schema({ email: String });
+      UserSchema.plugin(passportLocalMongoose, { usernameQueryFields: ['email'] });
+      const User = mongoose.model('RegisterMissingIdentifierTest', UserSchema) as PassportLocalMongooseModel;
+
+      try {
+        await User.register({}, 'password');
+        expect.fail('Expected register to throw MissingUsernameError');
+      } catch (err: any) {
+        expect(err).to.be.instanceof(passportLocalMongoose.errors.MissingUsernameError);
+      }
+    });
   });
 
   describe('#setPassword()', function () {

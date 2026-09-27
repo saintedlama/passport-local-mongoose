@@ -189,13 +189,19 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
       user = new this(user);
     }
 
-    if (!user.get(opts.usernameField)) {
+    const providedFields = [opts.usernameField, ...opts.usernameQueryFields].filter(
+      (field, index, self) => Boolean(user.get(field)) && self.indexOf(field) === index,
+    );
+
+    if (providedFields.length === 0) {
       throw new errors.MissingUsernameError(opts.errorMessages.MissingUsernameError!);
     }
 
-    const existingUser = await (this as any).findByUsername(user.get(opts.usernameField));
-    if (existingUser) {
-      throw new errors.UserExistsError(opts.errorMessages.UserExistsError!);
+    for (const field of providedFields) {
+      const existingUser = await (this as any).findByUsername(user.get(field));
+      if (existingUser) {
+        throw new errors.UserExistsError(opts.errorMessages.UserExistsError!);
+      }
     }
 
     await user.setPassword(password);
