@@ -142,6 +142,21 @@ describe('passportLocalMongoose', function () {
 
       expect(UserSchema.path('username')!.options.unique).to.equal(false);
     });
+
+    it('should select attempts and last login fields when selectFields and limitAttempts are enabled - Issue #129', function () {
+      const UserSchema = new Schema();
+      UserSchema.plugin(passportLocalMongoose, { limitAttempts: true, selectFields: 'username' });
+      const User = mongoose.model('FindByUsernameWithSelectFieldsAndLimitAttempts', UserSchema) as PassportLocalMongooseModel;
+
+      const query = User.findByUsername('hugo', true);
+      const projection = query.projection() as Record<string, any>;
+
+      expect(projection['+attempts']).to.equal(1);
+      expect(projection['+last']).to.equal(1);
+      expect(projection['+hash']).to.equal(1);
+      expect(projection['+salt']).to.equal(1);
+      expect(projection['username']).to.equal(1);
+    });
   });
 
   describe('#setPassword()', function () {
