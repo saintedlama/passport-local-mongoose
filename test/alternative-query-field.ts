@@ -79,4 +79,33 @@ describe('alternative query field', function () {
     expect(authUser).to.be.false;
     expect(error).to.exist;
   });
+
+  it('should allow registering a user with only an alternative query field - Issue #361', async () => {
+    UserSchema.plugin(passportLocalMongoose, { iterations: 1, usernameQueryFields: ['email'] });
+    const User = mongoose.model<UserDocument>('RegisterWithOnlyAlternativeField', UserSchema) as PassportLocalMongooseModel<UserDocument>;
+
+    const email = 'onlyemail@test.org';
+    const user = await User.register(new User({ email: email }), 'password');
+    expect(user).to.exist;
+    expect(user.email).to.equal(email);
+
+    const { user: authUser, error } = await User.authenticate()(email, 'password');
+    expect(authUser).to.exist;
+    expect(error).to.not.exist;
+  });
+
+  it('should prevent registering duplicate user when alternative query field matches - Issue #361', async () => {
+    UserSchema.plugin(passportLocalMongoose, { iterations: 1, usernameQueryFields: ['email'] });
+    const User = mongoose.model<UserDocument>('RegisterDuplicateAlternativeField', UserSchema) as PassportLocalMongooseModel<UserDocument>;
+
+    const email = 'duplicate@test.org';
+    await User.register(new User({ email: email }), 'password');
+
+    try {
+      await User.register(new User({ email: email }), 'password');
+      expect.fail('Expected duplicate registration to throw');
+    } catch (err: any) {
+      expect(err).to.be.instanceof(passportLocalMongoose.errors.UserExistsError);
+    }
+  });
 });
