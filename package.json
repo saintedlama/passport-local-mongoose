@@ -25,10 +25,10 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/debug": "^4.1.13",
-    "@types/node": "^25.6.0",
+    "@types/node": "^26.6.3",
     "@types/passport": "1.0.17",
     "@types/passport-local": "1.0.38",
-    "@vitest/coverage-v8": "^4.1.5",
+    "@vitest/coverage-v8": "^5.0.2",
     "debug": "^4.4.3",
     "drop-mongodb-collections": "^2.0.0",
     "eslint": "^10.2.1",
@@ -41,7 +41,7 @@
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.1",
-    "vitest": "^4.1.5"
+    "vitest": "^5.0.2"
   },
   "scripts": {
     "build": "tsc",
