@@ -157,6 +157,16 @@ describe('passportLocalMongoose', function () {
       expect(projection['+salt']).to.equal(1);
       expect(projection['username']).to.equal(1);
     });
+
+    it('should accept session option in findByUsername - Issue #315', function () {
+      const UserSchema = new Schema();
+      UserSchema.plugin(passportLocalMongoose);
+      const User = mongoose.model('FindByUsernameSessionTest', UserSchema) as PassportLocalMongooseModel;
+
+      const fakeSession = {} as any;
+      const query = User.findByUsername('testuser', { session: fakeSession });
+      expect((query.getOptions() as any).session).to.equal(fakeSession);
+    });
   });
 
   describe('#setPassword()', function () {

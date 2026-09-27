@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { promisify } from 'util';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { Schema, Model, Query } from 'mongoose';
+import { Schema, Model, Query, SaveOptions } from 'mongoose';
 
 import { pbkdf2 } from './lib/pbkdf2';
 import * as errors from './lib/errors';
@@ -107,7 +107,12 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
     return this;
   };
 
-  schema.methods.changePassword = async function (this: T, oldPassword: string, newPassword: string): Promise<T> {
+  schema.methods.changePassword = async function (
+    this: T,
+    oldPassword: string,
+    newPassword: string,
+    saveOptions?: SaveOptions,
+  ): Promise<T> {
     if (!oldPassword || !newPassword) {
       throw new errors.MissingPasswordError(opts.errorMessages.MissingPasswordError!);
     }
@@ -118,7 +123,7 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
     }
 
     await this.setPassword(newPassword);
-    await this.save();
+    await this.save(saveOptions);
 
     return this;
   };
@@ -138,44 +143,56 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
   };
 
   if (opts.limitAttempts) {
-    schema.methods.resetAttempts = async function (): Promise<T> {
+    schema.methods.resetAttempts = async function (this: T, saveOptions?: SaveOptions): Promise<T> {
       this.set(opts.attemptsField, 0);
-      return await this.save();
+      return await this.save(saveOptions);
     };
   }
 
-  // Passport Local Interface
-  schema.statics.authenticate = function () {
-    return (username: string, password: string, cb?: VerifyCallback<T>) => {
-      const promise = Promise.resolve()
-        .then(() => (this as any).findByUsername(username, true))
-        .then((user) => {
-          if (user) {
-            return user.authenticate(password);
-          }
-
-          return { user: false, error: new errors.IncorrectUsernameError(opts.errorMessages.IncorrectUsernameError!) };
-        });
-
-      if (!cb) {
-        return promise;
-      }
-
-      return promise.then(({ user, error }) => cb(null, user, error)).catch((err) => cb(err));
-    };
-  };
-
-  // Passport Interface
-  schema.statics.serializeUser = function (): (_user: T, _cb: (_err: any, _id?: any) => void) => void {
-    return function (user: T, cb: (_err: any, _id?: any) => void): void {
-      cb(null, user.get(opts.usernameField));
-    };
-  };
-
-  schema.statics.deserializeUser = function (): (_username: string, _cb: (_err: any, _user?: T | null) => void) => void {
-    return async (username: string, cb: (_err: any, _user?: T | null) => void): Promise<void> => {
+  schema.statics.authenticate = function (this: Model<T>) {
+    return async (username: string, password: string, cb?: VerifyCallback<T>): Promise<AuthenticationResult<T>> => {
       try {
-        const user = await (this as any).findByUsername(username);
+        const user = await (this as any).findByUsername(username, true);
+
+        if (user) {
+          const authResult = await authenticate(user, password, opts);
+          if (cb) {
+            cb(null, authResult.user, authResult.error);
+          }
+          return authResult;
+        } else {
+          const authResult: AuthenticationResult<T> = {
+            user: false,
+            error: new errors.IncorrectUsernameError(opts.errorMessages.IncorrectUsernameError!),
+          };
+          if (cb) {
+            cb(null, authResult.user, authResult.error);
+          }
+          return authResult;
+        }
+      } catch (err: any) {
+        if (cb) {
+          cb(err);
+        }
+        throw err;
+      }
+    };
+  };
+
+  schema.statics.serializeUser = function () {
+    return function (user: T, cb: (err: any, id?: any) => void) {
+      try {
+        cb(null, user.get(opts.usernameField));
+      } catch (err) {
+        cb(err);
+      }
+    };
+  };
+
+  schema.statics.deserializeUser = function (this: Model<T>) {
+    return async function (this: any, username: string, cb: (err: any, user?: T | null) => void) {
+      try {
+        const user = await this.findByUsername(username);
         cb(null, user);
       } catch (err) {
         cb(err);
@@ -183,23 +200,32 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
     };
   };
 
-  schema.statics.register = async function (this: Model<T>, user: T | any, password: string): Promise<T> {
+  schema.statics.register = async function (this: Model<T>, user: T | any, password: string, saveOptions?: SaveOptions): Promise<T> {
     // Create an instance of this in case user isn't already an instance
     if (!(user instanceof this)) {
       user = new this(user);
+    }
+
+    if (saveOptions?.session) {
+      user.$session(saveOptions.session);
     }
 
     if (!user.get(opts.usernameField)) {
       throw new errors.MissingUsernameError(opts.errorMessages.MissingUsernameError!);
     }
 
-    const existingUser = await (this as any).findByUsername(user.get(opts.usernameField));
+    const findByUsernameOpts: FindByUsernameOptions = {};
+    if (saveOptions?.session) {
+      findByUsernameOpts.session = saveOptions.session;
+    }
+
+    const existingUser = await (this as any).findByUsername(user.get(opts.usernameField), findByUsernameOpts);
     if (existingUser) {
       throw new errors.UserExistsError(opts.errorMessages.UserExistsError!);
     }
 
     await user.setPassword(password);
-    return await user.save();
+    return await user.save(saveOptions);
   };
 
   schema.statics.findByUsername = function (
@@ -239,6 +265,10 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
     }
 
     const query = opts.findByUsername(this as any, { $or: queryOrParameters });
+
+    if (selectOpts.session) {
+      query.session(selectOpts.session);
+    }
 
     if (selectOpts.selectHashSaltFields) {
       query.select('+' + opts.hashField + ' +' + opts.saltField);
