@@ -261,4 +261,38 @@ describe('issues', function () {
     // Expect that active users can authenticate!
     expect(user).to.exist;
   });
+
+  it('should select attemptsField and lastLoginField when selectFields is specified and limitAttempts is true - Issue #129', async () => {
+    const UserSchema = new Schema({
+      email: String,
+    });
+
+    UserSchema.plugin(passportLocalMongoose, {
+      limitAttempts: true,
+      selectFields: 'email username',
+    });
+
+    const User = mongoose.model('Issue129Model', UserSchema);
+
+    // Verify query projection selects attempts and lastLogin alongside hash and salt
+    const query = User.findByUsername('testuser', true);
+    const projection = query.projection() as Record<string, any>;
+    expect(projection['+attempts']).to.equal(1);
+    expect(projection['+last']).to.equal(1);
+    expect(projection['+hash']).to.equal(1);
+    expect(projection['+salt']).to.equal(1);
+
+    await User.register({ username: 'testuser', email: 'test@example.com' }, 'password');
+
+    // Attempting authentication with wrong password should increment attempts and not fail with CastError (NaN)
+    const authenticate = User.authenticate();
+    const result = await authenticate('testuser', 'wrongpassword');
+
+    expect(result.user).toBe(false);
+    expect(result.error).toBeDefined();
+    expect(result.error.name).toBe('IncorrectPasswordError');
+
+    const user = await User.findOne({ username: 'testuser' });
+    expect(user!.attempts).toBe(1);
+  });
 });

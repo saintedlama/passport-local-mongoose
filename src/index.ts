@@ -98,6 +98,7 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
 
     const saltBuffer = await randomBytesAsync(opts.saltlen);
     const salt = saltBuffer.toString(opts.encoding);
+
     this.set(opts.saltField, salt);
 
     const hashRaw = await opts.generateHash(password, salt);
@@ -241,6 +242,10 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
 
     if (selectOpts.selectHashSaltFields) {
       query.select('+' + opts.hashField + ' +' + opts.saltField);
+
+      if (opts.limitAttempts) {
+        query.select('+' + opts.attemptsField + ' +' + opts.lastLoginField);
+      }
     }
 
     if (opts.selectFields) {
