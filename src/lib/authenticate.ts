@@ -15,10 +15,16 @@ export async function authenticate(
     const attemptsInterval = Math.pow(options.interval, Math.log(attempts + 1));
     const calculatedInterval = attemptsInterval < options.maxInterval ? attemptsInterval : options.maxInterval;
 
-    if (Date.now() - lastLogin < calculatedInterval) {
+    const timeSinceLastLogin = Date.now() - lastLogin;
+    if (timeSinceLastLogin < calculatedInterval) {
       user.set(options.lastLoginField, Date.now());
       await user.save();
-      return { user: false, error: new errors.AttemptTooSoonError(options.errorMessages.AttemptTooSoonError!) };
+      const retryAfter = Math.ceil((calculatedInterval - timeSinceLastLogin) / 1000);
+      const attemptsRemaining = options.maxAttempts === Infinity ? Infinity : Math.max(0, options.maxAttempts - attempts);
+      return {
+        user: false,
+        error: new errors.AttemptTooSoonError(options.errorMessages.AttemptTooSoonError!, retryAfter, attemptsRemaining),
+      };
     }
 
     if (attempts >= options.maxAttempts!) {

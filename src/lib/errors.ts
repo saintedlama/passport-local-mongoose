@@ -49,9 +49,14 @@ export class NoSaltValueStoredError extends AuthenticationError {
 }
 
 export class AttemptTooSoonError extends AuthenticationError {
-  constructor(message: string) {
+  public retryAfter?: number;
+  public attemptsRemaining?: number;
+
+  constructor(message: string, retryAfter?: number, attemptsRemaining?: number) {
     super(message);
     this.name = 'AttemptTooSoonError';
+    this.retryAfter = retryAfter;
+    this.attemptsRemaining = attemptsRemaining;
   }
 }
 
