@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.2.0](https://github.com/saintedlama/passport-local-mongoose/compare/v9.1.0...v9.2.0) (2026-09-28)
+
+
+### Features
+
+* add retryAfter and attemptsRemaining to AttemptTooSoonError ([#250](https://github.com/saintedlama/passport-local-mongoose/issues/250)) ([#411](https://github.com/saintedlama/passport-local-mongoose/issues/411)) ([24992e8](https://github.com/saintedlama/passport-local-mongoose/commit/24992e8d7009a3959768d76c445946099831d890))
+* inspect usernameQueryFields in User.register() ([#361](https://github.com/saintedlama/passport-local-mongoose/issues/361)) ([#413](https://github.com/saintedlama/passport-local-mongoose/issues/413)) ([ace345c](https://github.com/saintedlama/passport-local-mongoose/commit/ace345ce6bcf16b969f9570eb7db9f0c0e8c8fdb))
+* support transactions and SaveOptions in register, changePassword and findByUsername ([#315](https://github.com/saintedlama/passport-local-mongoose/issues/315)) ([#412](https://github.com/saintedlama/passport-local-mongoose/issues/412)) ([9109aa5](https://github.com/saintedlama/passport-local-mongoose/commit/9109aa555ed644307c2d383e43f90f6ab5b0a7f2))
+
+
+### Bug Fixes
+
+* **security:** patch 5 npm vulnerabilities ([#409](https://github.com/saintedlama/passport-local-mongoose/issues/409)) ([b4270cd](https://github.com/saintedlama/passport-local-mongoose/commit/b4270cd2bcafaf85109695b3113000a9e26b09bd))
+* select attempts and last login fields when limitAttempts is enabled ([#129](https://github.com/saintedlama/passport-local-mongoose/issues/129)) ([#408](https://github.com/saintedlama/passport-local-mongoose/issues/408)) ([cce332f](https://github.com/saintedlama/passport-local-mongoose/commit/cce332f877dbab747208981f15a02ae9d897dbcc))
+
 ## [9.1.0](https://github.com/saintedlama/passport-local-mongoose/compare/v9.0.3...v9.1.0) (2026-05-03)
 
 
