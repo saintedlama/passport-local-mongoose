@@ -47,7 +47,6 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "prebuild": "npm run clean",
-    "prepublishOnly": "npm run build",
     "clean": "rimraf dist",
     "test": "vitest run",
     "test:watch": "vitest",
