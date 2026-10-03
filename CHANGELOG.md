@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.2.1](https://github.com/saintedlama/passport-local-mongoose/compare/v9.2.0...v9.2.1) (2026-10-03)
+
+
+### Bug Fixes
+
+* **auth:** run password hash for nonexistent users to prevent timing-based username enumeration ([#417](https://github.com/saintedlama/passport-local-mongoose/issues/417)) ([4bbefa3](https://github.com/saintedlama/passport-local-mongoose/commit/4bbefa3b6ed12ce8629de003b4ab7563c4bbadea))
+
 ## [9.2.0](https://github.com/saintedlama/passport-local-mongoose/compare/v9.1.0...v9.2.0) (2026-09-28)
 
 
