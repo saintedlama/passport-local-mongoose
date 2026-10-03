@@ -648,6 +648,51 @@ describe('passportLocalMongoose', function () {
       expect(user).to.equal(false);
       expect(error).to.exist;
     });
+
+    it('should run the password hash for a nonexistent user to avoid timing-based username enumeration', async () => {
+      const hashes: { password: string; salt: string }[] = [];
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
+      UserSchema.plugin(passportLocalMongoose, {
+        generateHash: async (password: string, salt: string) => {
+          hashes.push({ password, salt });
+          return Buffer.from('dummy');
+        },
+      });
+      const User = mongoose.model<PassportLocalMongooseDocument>('TimingSafeNonexistentUserAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
+
+      (User as any).findByUsername = async () => null;
+
+      const { user, error } = await User.authenticate()('nonexistent', 'password');
+
+      expect(user).to.equal(false);
+      expect(error).to.be.instanceof(errors.IncorrectUsernameError);
+      expect(hashes).to.have.length(1);
+      expect(hashes[0].password).to.equal('password');
+      expect(hashes[0].salt).to.equal('0'.repeat(64));
+    });
+
+    it('should run the password hash on instance authenticate for a nonexistent user', async () => {
+      const hashes: { password: string; salt: string }[] = [];
+      const UserSchema = new Schema<PassportLocalMongooseDocument>({});
+      UserSchema.plugin(passportLocalMongoose, {
+        generateHash: async (password: string, salt: string) => {
+          hashes.push({ password, salt });
+          return Buffer.from('dummy');
+        },
+      });
+      const User = mongoose.model<PassportLocalMongooseDocument>('TimingSafeNonexistentInstanceAsync', UserSchema) as PassportLocalMongooseModel<PassportLocalMongooseDocument>;
+
+      (User as any).findByUsername = async () => null;
+
+      const user = new User({ username: 'nonexistent' });
+      const { user: authenticatedUser, error } = await user.authenticate('password');
+
+      expect(authenticatedUser).to.equal(false);
+      expect(error).to.be.instanceof(errors.IncorrectUsernameError);
+      expect(hashes).to.have.length(1);
+      expect(hashes[0].password).to.equal('password');
+      expect(hashes[0].salt).to.equal('0'.repeat(64));
+    });
   });
 
   describe('static #serializeUser()', function () {
