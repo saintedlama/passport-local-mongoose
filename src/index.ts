@@ -61,6 +61,10 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
   opts.errorMessages.MissingUsernameError = opts.errorMessages.MissingUsernameError || 'No username was given';
   opts.errorMessages.UserExistsError = opts.errorMessages.UserExistsError || 'A user with the given username is already registered';
 
+  // Fixed dummy salt used to keep authentication timing constant when the
+  // username does not exist, preventing username enumeration via timing.
+  const dummySalt = Buffer.alloc(opts.saltlen, 0).toString(opts.encoding);
+
   // Populate username query fields
   if (options?.usernameQueryFields) {
     opts.usernameQueryFields.push(...options.usernameQueryFields, opts.usernameField);
@@ -139,6 +143,8 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
       return await authenticate(user, password, opts);
     }
 
+    await opts.generateHash(password, dummySalt);
+
     return { user: false, error: new errors.IncorrectUsernameError(opts.errorMessages.IncorrectUsernameError!) };
   };
 
@@ -154,10 +160,12 @@ function passportLocalMongoose<T extends PassportLocalMongooseDocument = Passpor
     return (username: string, password: string, cb?: VerifyCallback<T>) => {
       const promise = Promise.resolve()
         .then(() => (this as any).findByUsername(username, true))
-        .then((user) => {
+        .then(async (user) => {
           if (user) {
             return user.authenticate(password);
           }
+
+          await opts.generateHash(password, dummySalt);
 
           return { user: false, error: new errors.IncorrectUsernameError(opts.errorMessages.IncorrectUsernameError!) };
         });
